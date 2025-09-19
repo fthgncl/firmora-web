@@ -1,43 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
+<html lang="tr">
+<head>
+    <!-- Karakter kodlamasını UTF-8 olarak ayarlar. Türkçe karakterler dahil olmak üzere tüm karakterlerin doğru görüntülenmesi için kullanılır. -->
+    <meta charset="utf-8"/>
+
+    <!-- Tarayıcı sekmesinde veya yer imlerinde görünen küçük simgeyi tanımlar. Bu dosya "public" klasöründe yer almalı ve proje derlenirken gerçek URL ile değiştirilecektir. -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico"/>
+
+    <!-- Sayfanın genişliğini cihazın genişliğine ayarlayan ve başlangıçta 1x ölçeklenmeyi sağlayan meta etiketi. Bu, sayfanın mobil cihazlarda düzgün görünmesini sağlar. -->
+    <meta name="viewport" content="initial-scale=1, width=device-width"/>
+
+    <!-- Material Design için kullanılan yazı tiplerini önceden bağlamak için. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+
+    <!-- Tarayıcı sekmesinin veya mobil cihazlarda üst çubuğun rengini ayarlar. Siyah (#000000) olarak tanımlanmıştır; istenirse değiştirilebilir. -->
+    <meta name="theme-color" content="#000000"/>
+
+    <!-- Sayfanın açıklamasını belirtir. Bu açıklama arama motorları tarafından kullanılır. Projeye uygun bir açıklama ekleyebilirsiniz. -->
+    <meta name="description" content="create-react-app ile oluşturulmuş bir web sitesi"/>
+
+    <!-- Yazı tipleri: Inter ve Roboto -->
+    <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <!-- Apple cihazlarında ana ekrana eklendiğinde kullanılacak simgeyi belirtir. Bu dosya "public" klasöründe bulunmalıdır. -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png"/>
+
     <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
+      "manifest.json" dosyası, bir web sitesinin mobil cihazlarda uygulama gibi davranmasını sağlar.
+      Bu dosya; uygulama adı, simgeler ve tema rengi gibi bilgileri içerir.
     -->
-  </body>
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json"/>
+
+    <!-- Inter yazı tipini eklemek için. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Tarayıcı sekmesinde görünen başlık. Projeye uygun bir başlık ekleyebilirsiniz. -->
+    <title>Firmora</title>
+</head>
+<body id="body">
+<!-- Kullanıcının JavaScript devre dışı bırakmış olması durumunda gösterilecek bir mesaj. -->
+<noscript>You need to enable JavaScript to run this app.</noscript>
+
+<!-- React bileşenlerinin yerleştirileceği ana kapsayıcı. React uygulaması bu kapsayıcıyı "root" ID'si ile kullanır. -->
+<div id="root"></div>
+</body>
 </html>
