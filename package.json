@@ -15,6 +15,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "buildAndPush": "react-scripts build && xcopy /E /I /Y build E:\\Software\\firmora && git -C E:\\Software\\firmora add . && git -C E:\\Software\\firmora commit -m \"auto build\" && git -C E:\\Software\\firmora push",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
