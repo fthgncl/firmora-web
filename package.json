@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "env-cmd": "^11.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
@@ -17,8 +18,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "env-cmd -f .env.development react-scripts start",
+    "build": "env-cmd -f .env.production react-scripts build",
     "buildAndPush": "react-scripts build && powershell -NoProfile -ExecutionPolicy Bypass -Command \"& { $dest='E:\\Software\\allinone-personal'; $src='build'; if (-not (Test-Path \\\"$dest\\.git\\\")) { throw 'Hedef git repo değil' }; Get-ChildItem -LiteralPath $dest -Force | ? { $_.Name -ne '.git' } | Remove-Item -Recurse -Force; Copy-Item -Path \\\"$src\\*\\\" -Destination $dest -Recurse -Force -Container; git -C $dest add -A; $diff = git -C $dest status --porcelain; if ([string]::IsNullOrWhiteSpace($diff)) { Write-Host 'No changes, skipping commit/push.'; exit 0 }; $stamp=Get-Date -Format 'yyyy-MM-dd HH:mm'; git -C $dest commit -m \\\"auto build: $stamp\\\"; git -C $dest push }\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
