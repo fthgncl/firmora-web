@@ -5,6 +5,7 @@ import {BrowserRouter} from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {ThemeProvider, createTheme} from '@mui/material/styles';
+import './services/i18n';
 
 const theme = createTheme();
 
