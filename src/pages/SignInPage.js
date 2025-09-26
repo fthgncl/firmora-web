@@ -19,6 +19,7 @@ import IconButton from "@mui/material/IconButton";
 import CircularProgress from "@mui/material/CircularProgress";
 import * as React from "react";
 import {useAuth} from "../contexts/AuthContext";
+import LanguageSelector from '../components/LanguageSelector';
 
 export default function SignInSide() {
     const { t } = useTranslation();
@@ -81,6 +82,16 @@ export default function SignInSide() {
                 }}
             />
             <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 16,
+                        zIndex: 1000
+                    }}
+                >
+                    <LanguageSelector />
+                </Box>
                 <Box
                     sx={{
                         my: 8,
