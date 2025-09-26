@@ -11,6 +11,7 @@ import Menu from '@mui/material/Menu';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import ThemeSwitcher from './ThemeSwitcher';
+import LanguageSelector from "./LanguageSelector";
 
 export default function MenuAppBar() {
     const { user, logout } = useAuth();
@@ -48,6 +49,7 @@ export default function MenuAppBar() {
                         {process.env.REACT_APP_NAME}
                     </Typography>
                     <ThemeSwitcher />
+                    <LanguageSelector />
                     {user && (
                         <div>
                             <IconButton

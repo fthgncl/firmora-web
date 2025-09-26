@@ -26,3 +26,5 @@ i18n
         fallbackLng: "en",
         interpolation: { escapeValue: false },
     });
+
+export default i18n;
