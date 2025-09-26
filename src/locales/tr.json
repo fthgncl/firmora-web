@@ -1,5 +1,23 @@
 {
     "welcome": "Uygulamama hoş geldiniz!",
     "hello": "Merhaba",
-    "bye": "Hoşçakal"
+    "bye": "Hoşçakal",
+    "login": {
+        "title": "Giriş Yap",
+        "username": "Kullanıcı Adı",
+        "password": "Şifre",
+        "loginButton": "Giriş Yap",
+        "loginSuccess": "Giriş başarılı",
+        "errors": {
+            "serverError": "Sunucuya bağlanılamadı",
+            "unexpectedError": "Beklenmeyen bir hata oluştu",
+            "defaultError": "Bir hata oluştu"
+        }
+    },
+    "auth": {
+        "errors": {
+            "invalidToken": "Geçersiz token:",
+            "tokenDecodeError": "Token çözülürken bir hata oluştu:"
+        }
+    }
 }

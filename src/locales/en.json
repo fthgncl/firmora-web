@@ -1,5 +1,23 @@
 {
     "welcome": "Welcome to my app!",
     "hello": "Hello",
-    "bye": "Goodbye"
+    "bye": "Goodbye",
+    "login": {
+        "title": "Sign In",
+        "username": "Username",
+        "password": "Password",
+        "loginButton": "Sign In",
+        "loginSuccess": "Login successful",
+        "errors": {
+            "serverError": "Could not connect to server",
+            "unexpectedError": "An unexpected error occurred",
+            "defaultError": "An error occurred"
+        }
+    },
+    "auth": {
+        "errors": {
+            "invalidToken": "Invalid token:",
+            "tokenDecodeError": "Error occurred while decoding token:"
+        }
+    }
 }

@@ -1,4 +1,7 @@
 import {useState} from 'react'
+import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,21 +18,50 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import CircularProgress from "@mui/material/CircularProgress";
 import * as React from "react";
+import {useAuth} from "../contexts/AuthContexts";
 
 export default function SignInSide() {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const {login} = useAuth();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         const loginData = {
             username: data.get('username'),
             password: data.get('password'),
+            rememberMe: false
         };
+
         setIsLoading(true);
+        setErrorMessage('');
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/sign-in`, loginData);
+            if (response.data.status === "success") {
+                login({token: response.data.token});
+                navigate('/');
+            }
+        } catch (error) {
+
+            if (error.response) {
+                // API'den dönen hata mesajı
+                setErrorMessage(error.response.data.message || t('login.errors.defaultError'));
+            } else if (error.request) {
+                // Network hatası
+                setErrorMessage(t('login.errors.serverError'));
+            } else {
+                // Diğer hatalar
+                setErrorMessage(t('login.errors.unexpectedError'));
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -62,7 +94,7 @@ export default function SignInSide() {
                         <LockOutlinedIcon/>
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Giriş Yap
+                        {t('login.title')}
                     </Typography>
                     <Box component="form" noValidate onSubmit={handleSubmit} sx={{mt: 1}}>
                         <TextField
@@ -70,7 +102,7 @@ export default function SignInSide() {
                             required
                             fullWidth
                             id="username"
-                            label="Kullanıcı Adı"
+                            label={t('login.username')}
                             name="username"
                             autoComplete="username"
                             autoFocus
@@ -80,7 +112,7 @@ export default function SignInSide() {
                             required
                             fullWidth
                             name="password"
-                            label="Şifre"
+                            label={t('login.password')}
                             type={showPassword ? 'text' : 'password'}
                             id="password"
                             autoComplete="current-password"
@@ -107,7 +139,7 @@ export default function SignInSide() {
                             variant="contained"
                             sx={{mt: 3, mb: 2}}
                         >
-                            {isLoading ? <CircularProgress color="inherit"/> : <>Giriş Yap</>}
+                            {isLoading ? <CircularProgress color="inherit"/> : <>{t('login.loginButton')}</>}
                         </Button>
                     </Box>
                 </Box>
