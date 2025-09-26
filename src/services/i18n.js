@@ -14,7 +14,7 @@ const loadLocales = () => {
             flag: require(`../images/flags/${languageCode.toUpperCase()}.png`)
         };
     });
-    console.log(resources);
+
     return resources;
 };
 
