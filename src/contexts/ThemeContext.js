@@ -17,7 +17,16 @@ const saveTheme = (themeName) => {
 
 const getThemeProps = (themeName) => {
     const foundTheme = themes.find(theme => theme.name === themeName);
-    return foundTheme ? foundTheme : themes.find(theme => theme.name === defaultThemeName);
+    if (foundTheme) {
+        return foundTheme;
+    }
+
+    // Environment değişkeni henüz yüklenmemişse veya bulunamıyorsa
+    const defaultTheme = defaultThemeName ? 
+        themes.find(theme => theme.name === defaultThemeName) : 
+        themes[0]; // İlk temayı fallback olarak kullan
+
+    return defaultTheme || themes[0]; // Son çare olarak ilk temayı döndür
 };
 
 export const AppThemeProvider = ({children}) => {
