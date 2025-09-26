@@ -15,6 +15,7 @@
         }
     },
     "auth": {
+        "logout": "Abmelden",
         "errors": {
             "invalidToken": "Ungültiger Token:",
             "tokenDecodeError": "Fehler beim Dekodieren des Tokens:"

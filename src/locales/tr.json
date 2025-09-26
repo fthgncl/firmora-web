@@ -15,6 +15,7 @@
         }
     },
     "auth": {
+        "logout": "Çıkış Yap",
         "errors": {
             "invalidToken": "Geçersiz token:",
             "tokenDecodeError": "Token çözülürken bir hata oluştu:"

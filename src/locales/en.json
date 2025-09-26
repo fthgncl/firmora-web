@@ -15,6 +15,7 @@
         }
     },
     "auth": {
+        "logout": "Logout",
         "errors": {
             "invalidToken": "Invalid token:",
             "tokenDecodeError": "Error occurred while decoding token:"

@@ -6,19 +6,16 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
+import { useAuth } from '../contexts/AuthContexts';
+import { useTranslation } from 'react-i18next';
 
 export default function MenuAppBar() {
-    const [auth, setAuth] = React.useState(true);
+    const { user, logout } = useAuth();
+    const { t } = useTranslation();
     const [anchorEl, setAnchorEl] = React.useState(null);
 
-    const handleChange = (event) => {
-        setAuth(event.target.checked);
-    };
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -28,20 +25,13 @@ export default function MenuAppBar() {
         setAnchorEl(null);
     };
 
+    const handleLogout = () => {
+        logout();
+        handleClose();
+    };
+
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <FormGroup>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={auth}
-                            onChange={handleChange}
-                            aria-label="login switch"
-                        />
-                    }
-                    label={auth ? 'Logout' : 'Login'}
-                />
-            </FormGroup>
             <AppBar position="static">
                 <Toolbar>
                     <IconButton
@@ -56,9 +46,10 @@ export default function MenuAppBar() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         {process.env.REACT_APP_NAME}
                     </Typography>
-                    {auth && (
+                    {user && (
                         <div>
                             <IconButton
+                                sx={{borderRadius: 3}}
                                 size="large"
                                 aria-label="account of current user"
                                 aria-controls="menu-appbar"
@@ -66,13 +57,17 @@ export default function MenuAppBar() {
                                 onClick={handleMenu}
                                 color="inherit"
                             >
-                                <AccountCircle />
+                                <Typography variant="h6" component="div"
+                                            sx={{flexGrow: 2, marginRight: 2, fontSize: 15}}>
+                                    {user.username}
+                                </Typography>
+                                <AccountCircle/>
                             </IconButton>
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorEl}
                                 anchorOrigin={{
-                                    vertical: 'top',
+                                    vertical: 'bottom',
                                     horizontal: 'right',
                                 }}
                                 keepMounted
@@ -83,8 +78,9 @@ export default function MenuAppBar() {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleLogout}>
+                                    {t('auth.logout')}
+                                </MenuItem>
                             </Menu>
                         </div>
                     )}
