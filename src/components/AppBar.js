@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import ThemeSwitcher from './ThemeSwitcher';
 
 export default function MenuAppBar() {
     const { user, logout } = useAuth();
@@ -46,6 +47,7 @@ export default function MenuAppBar() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         {process.env.REACT_APP_NAME}
                     </Typography>
+                    <ThemeSwitcher />
                     {user && (
                         <div>
                             <IconButton
