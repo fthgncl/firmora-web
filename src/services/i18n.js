@@ -26,11 +26,3 @@ i18n
         fallbackLng: "en",
         interpolation: { escapeValue: false },
     });
-
-// Bayrak yolunu döndüren yardımcı fonksiyon
-export const getFlagPath = (languageCode) => {
-    const resources = i18n.options.resources;
-    return resources[languageCode]?.flag || `/images/${languageCode.toUpperCase()}.png`;
-};
-
-export default i18n;
