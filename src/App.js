@@ -1,15 +1,30 @@
 import './css/App.css';
 import {Route, Routes} from "react-router-dom";
+import AuthRoute from "./components/AuthRoute";
 import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
+import SignInPage from "./pages/SignInPage";
 import NotFound from "./pages/NotFound";
 
 function App() {
     return (
         <div className="page-container">
             <Routes>
-                <Route path="/" element={<HomePage/>}/>
-                <Route path="/login" element={<LoginPage/>}/>
+
+                {/* Giriş yapmamış kullanıcıların girebileği sayfalar */}
+                <Route path="/sign-in" element={
+                    <AuthRoute requireGuest={true} redirectTo="/">
+                        <SignInPage/>
+                    </AuthRoute>
+                }/>
+
+                {/* Giriş yapmış kullanıcıların girebileği sayfalar */}
+                <Route path="/" element={
+                    <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                        <HomePage/>
+                    </AuthRoute>
+                }/>
+
+                {/* Herkesin girebileği sayfalar */}
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
         </div>
