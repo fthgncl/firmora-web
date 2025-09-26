@@ -18,7 +18,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import CircularProgress from "@mui/material/CircularProgress";
 import * as React from "react";
-import {useAuth} from "../contexts/AuthContexts";
+import {useAuth} from "../contexts/AuthContext";
 
 export default function SignInSide() {
     const { t } = useTranslation();
