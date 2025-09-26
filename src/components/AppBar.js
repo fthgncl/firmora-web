@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
+import Stack from '@mui/material/Stack';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
@@ -35,59 +35,89 @@ export default function MenuAppBar() {
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
-                <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}
+                <Toolbar sx={{ gap: 1 }}>
+                    <Typography
+                        variant="h6"
+                        component="div"
+                        sx={{
+                            flexGrow: 1,
+                            fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                        }}
                     >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         {process.env.REACT_APP_NAME}
                     </Typography>
-                    <ThemeSwitcher />
-                    <LanguageSelector />
-                    {user && (
-                        <div>
-                            <IconButton
-                                sx={{borderRadius: 3}}
-                                size="large"
-                                aria-label="account of current user"
-                                aria-controls="menu-appbar"
-                                aria-haspopup="true"
-                                onClick={handleMenu}
-                                color="inherit"
-                            >
-                                <Typography variant="h6" component="div"
-                                            sx={{flexGrow: 2, marginRight: 2, fontSize: 15}}>
-                                    {user.username}
-                                </Typography>
-                                <AccountCircle/>
-                            </IconButton>
-                            <Menu
-                                id="menu-appbar"
-                                anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(anchorEl)}
-                                onClose={handleClose}
-                            >
-                                <MenuItem onClick={handleLogout}>
-                                    {t('auth.logout')}
-                                </MenuItem>
-                            </Menu>
-                        </div>
-                    )}
+
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        sx={{ display: 'flex' }}
+                    >
+                        <ThemeSwitcher />
+                        <LanguageSelector />
+
+                        {user && (
+                            <Box sx={{ ml: 1 }}>
+                                <IconButton
+                                    size="large"
+                                    aria-label="account of current user"
+                                    aria-controls="menu-appbar"
+                                    aria-haspopup="true"
+                                    onClick={handleMenu}
+                                    color="inherit"
+                                    sx={{
+                                        borderRadius: 2,
+                                        px: { xs: 1, sm: 2 },
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                                        }
+                                    }}
+                                >
+                                    <Typography
+                                        variant="body2"
+                                        component="span"
+                                        sx={{
+                                            mr: 1,
+                                            display: { xs: 'none', sm: 'block' },
+                                            fontWeight: 500
+                                        }}
+                                    >
+                                        {user.username}
+                                    </Typography>
+                                    <AccountCircle />
+                                </IconButton>
+
+                                <Menu
+                                    id="menu-appbar"
+                                    anchorEl={anchorEl}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleClose}
+                                    sx={{
+                                        mt: 1,
+                                        '& .MuiMenu-paper': {
+                                            minWidth: 120
+                                        }
+                                    }}
+                                >
+                                    <MenuItem
+                                        onClick={handleLogout}
+                                        sx={{ px: 2, py: 1 }}
+                                    >
+                                        {t('auth.logout')}
+                                    </MenuItem>
+                                </Menu>
+                            </Box>
+                        )}
+                    </Stack>
                 </Toolbar>
             </AppBar>
         </Box>
