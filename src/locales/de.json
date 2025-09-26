@@ -2,6 +2,9 @@
     "welcome": "Willkommen in meiner App!",
     "hello": "Hallo",
     "bye": "Auf Wiedersehen",
+    "common": {
+        "allRightsReserved": "Alle Rechte vorbehalten"
+    },
     "login": {
         "title": "Anmelden",
         "username": "Benutzername",

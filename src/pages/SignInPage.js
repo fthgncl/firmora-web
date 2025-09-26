@@ -142,6 +142,14 @@ export default function SignInSide() {
                             {isLoading ? <CircularProgress color="inherit"/> : <>{t('login.loginButton')}</>}
                         </Button>
                     </Box>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        align="center"
+                        sx={{ mt: 4, mb: 2 }}
+                    >
+                        © {new Date().getFullYear()} Allinone Trade. {t('common.allRightsReserved')}
+                    </Typography>
                 </Box>
             </Grid>
         </Grid>

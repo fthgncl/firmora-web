@@ -2,6 +2,9 @@
     "welcome": "Welcome to my app!",
     "hello": "Hello",
     "bye": "Goodbye",
+    "common": {
+        "allRightsReserved": "All rights reserved"
+    },
     "login": {
         "title": "Sign In",
         "username": "Username",
