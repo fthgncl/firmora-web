@@ -159,7 +159,7 @@ export default function SignInSide() {
                         align="center"
                         sx={{ mt: 4, mb: 2 }}
                     >
-                        © {new Date().getFullYear()} Allinone Trade. {t('common.allRightsReserved')}
+                        © {new Date().getFullYear()} {process.env.REACT_APP_NAME}. {t('common.allRightsReserved')}
                     </Typography>
                 </Box>
             </Grid>
