@@ -40,7 +40,7 @@ i18n.on('languageChanged', (lng) => {
     // Mevcut interceptor'ları temizle ve yeniden ekle
     axios.interceptors.request.clear();
     axios.interceptors.request.use((config) => {
-        config.headers['Accept-Language'] = lng;
+        config.headers['x-language'] = lng;
         return config;
     });
 });
