@@ -30,12 +30,11 @@ i18n
 
 // Axios interceptor ile tüm isteklere dil header'ını ekle
 axios.interceptors.request.use((config) => {
-    config.headers['Accept-Language'] = i18n.language;
+    config.headers['x-language'] = i18n.language;
     return config;
 });
 
 // Dil değiştiğinde interceptor'ı güncelle
-// TODO: Accept-Language değiştiği zaman diğer siteleri de etkiliyor. Bunun yerine başka bir key değiştirsin. API tarafı o keyi kontrol etsin. Eğer o key yoksa Accept-Language göre hareket etsin.
 i18n.on('languageChanged', (lng) => {
     // Mevcut interceptor'ları temizle ve yeniden ekle
     axios.interceptors.request.clear();
