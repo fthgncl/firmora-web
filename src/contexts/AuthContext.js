@@ -17,28 +17,22 @@ export const AuthProvider = ({children}) => {
         const storedToken = localStorage.getItem(`${process.env.REACT_APP_NAME}-auth`);
         if (storedToken) {
             try {
-                const {id, username} = jwtDecode(storedToken);
-                setUser({
-                    id,
-                    username
-                });
+                const decodedToken = jwtDecode(storedToken);
+                setUser(decodedToken);
                 setToken(storedToken);
             } catch (error) {
                 console.error(t('auth.errors.invalidToken'), error);
                 localStorage.removeItem(`${process.env.REACT_APP_NAME}-auth`);
             }
         }
-    }, [t]);
+    }, []);
 
     const login = ({token}) => {
         try {
-            const {id, username} = jwtDecode(token);
+            const decodedToken = jwtDecode(token);
 
-            // Kullanıcı bilgilerini ayarla
-            setUser({
-                id,
-                username
-            });
+            // Kullanıcı bilgilerini ayarla (token içindeki tüm bilgiler)
+            setUser(decodedToken);
 
             setToken(token);
             localStorage.setItem(`${process.env.REACT_APP_NAME}-auth`, token);
