@@ -1,5 +1,6 @@
 import './css/App.css';
 import {Route, Routes} from "react-router-dom";
+import {Box, CssBaseline} from "@mui/material";
 import AuthRoute from "./utils/AuthRoute";
 import HomePage from "./pages/HomePage";
 import SignInPage from "./pages/SignInPage";
@@ -7,7 +8,12 @@ import NotFound from "./pages/NotFound";
 
 function App() {
     return (
-        <div className="page-container">
+        <Box sx={{
+            minHeight: '100vh',
+            bgcolor: 'background.default',
+            color: 'text.primary'
+        }}>
+            <CssBaseline />
             <Routes>
 
                 {/* Giriş yapmamış kullanıcıların girebileği sayfalar */}
@@ -27,7 +33,7 @@ function App() {
                 {/* Herkesin girebileği sayfalar */}
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
-        </div>
+        </Box>
     );
 }
 
