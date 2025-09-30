@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Paper, IconButton, CircularProgress, Alert, useTheme } from '@mui/material';
+import { 
+    Container, 
+    Box, 
+    Typography, 
+    Paper, 
+    IconButton, 
+    CircularProgress, 
+    Alert, 
+    useTheme
+} from '@mui/material';
 import { Business, Add } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import CreateCompanyDialog from './CreateCompanyDialog';
 
 export default function CompanyList() {
     const { token } = useAuth();
@@ -54,39 +64,42 @@ export default function CompanyList() {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [openDialog, setOpenDialog] = useState(false);
+
+    // Firma listesini getiren ortak fonksiyon
+    const fetchCompanies = async () => {
+        try {
+            setLoading(true);
+            setError('');
+
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/companies`, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
+
+            if (response.data.status === 'success') {
+                setCompanies(response.data.companies);
+            }
+        } catch (err) {
+            console.error('Firma listesi yüklenirken hata:', err);
+            if (err.response) {
+                setError(err.response.data.message || 'Firmalar yüklenirken bir hata oluştu');
+            } else if (err.request) {
+                setError('Sunucuya ulaşılamıyor');
+            } else {
+                setError('Beklenmeyen bir hata oluştu');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchCompanies = async () => {
-            try {
-                setLoading(true);
-                setError('');
-
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/companies`, {
-                    headers: {
-                        'x-access-token': token
-                    }
-                });
-
-                if (response.data.status === 'success') {
-                    setCompanies(response.data.companies);
-                }
-            } catch (err) {
-                console.error('Firma listesi yüklenirken hata:', err);
-                if (err.response) {
-                    setError(err.response.data.message || 'Firmalar yüklenirken bir hata oluştu');
-                } else if (err.request) {
-                    setError('Sunucuya ulaşılamıyor');
-                } else {
-                    setError('Beklenmeyen bir hata oluştu');
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
         if (token) {
             fetchCompanies();
         }
+        
     }, [token]);
 
     const handleCompanyClick = (company) => {
@@ -95,8 +108,18 @@ export default function CompanyList() {
     };
 
     const handleAddCompany = () => {
-        console.log('Yeni firma oluştur');
-        // Buraya yeni firma oluşturma modalı veya sayfası açma kodu eklenebilir
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+    const handleCompanyCreated = () => {
+        // Dialog'u kapat
+        handleCloseDialog();
+        // Firma listesini yeniden yükle
+        fetchCompanies();
     };
 
     if (loading) {
@@ -246,6 +269,13 @@ export default function CompanyList() {
                     </Box>
                 </Box>
             </Paper>
+
+            <CreateCompanyDialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                onCompanyCreated={handleCompanyCreated}
+                token={token}
+            />
         </Container>
     );
 }
