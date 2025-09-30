@@ -1,6 +1,6 @@
 import './css/App.css';
 import {Route, Routes} from "react-router-dom";
-import AuthRoute from "./components/AuthRoute";
+import AuthRoute from "./utils/AuthRoute";
 import HomePage from "./pages/HomePage";
 import SignInPage from "./pages/SignInPage";
 import NotFound from "./pages/NotFound";
