@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { 
-    Container, 
-    Box, 
-    Typography, 
-    Paper, 
-    IconButton, 
-    CircularProgress, 
-    Alert, 
+import React, {useState, useEffect} from 'react';
+import {
+    Container,
+    Box,
+    Typography,
+    Paper,
+    IconButton,
+    CircularProgress,
+    Alert,
     useTheme
 } from '@mui/material';
-import { Business, Add } from '@mui/icons-material';
+import {Business, Add} from '@mui/icons-material';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
+import {useAuth} from '../contexts/AuthContext';
 import CreateCompanyDialog from './CreateCompanyDialog';
 
 export default function CompanyList() {
-    const { token, checkPermissions} = useAuth();
+    const {token, checkPermissions} = useAuth();
     const theme = useTheme();
 
     const companyCardStyle = {
@@ -127,8 +127,8 @@ export default function CompanyList() {
         return (
             <Container maxWidth="lg">
                 <Paper sx={containerStyle}>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
-                        <CircularProgress />
+                    <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px'}}>
+                        <CircularProgress/>
                     </Box>
                 </Paper>
             </Container>
@@ -145,17 +145,22 @@ export default function CompanyList() {
         );
     }
 
+    // Kullanıcının hiç firması yoksa ve 'b' yetkisi yoksa komponenti gösterme
+    if (companies.length === 0 && !checkPermissions('b')) {
+        return null;
+    }
+
     return (
         <Container maxWidth="lg">
             <Paper sx={containerStyle}>
-                <Typography 
-                    variant="h5" 
-                    component="h2" 
-                    sx={{ 
-                        textAlign: 'center', 
-                        mb: 3, 
+                <Typography
+                    variant="h5"
+                    component="h2"
+                    sx={{
+                        textAlign: 'center',
+                        mb: 3,
                         color: 'text.primary',
-                        fontWeight: 600 
+                        fontWeight: 600
                     }}
                 >
                     Firmalarım
@@ -176,16 +181,16 @@ export default function CompanyList() {
                             onClick={() => handleCompanyClick(company)}
                             elevation={2}
                         >
-                            <Business 
-                                sx={{ 
-                                    fontSize: '36px', 
-                                    color: 'primary.main', 
-                                    mb: 0.5 
-                                }} 
+                            <Business
+                                sx={{
+                                    fontSize: '36px',
+                                    color: 'primary.main',
+                                    mb: 0.5
+                                }}
                             />
-                            <Typography 
-                                variant="h6" 
-                                sx={{ 
+                            <Typography
+                                variant="h6"
+                                sx={{
                                     fontWeight: 600,
                                     color: 'text.primary',
                                     mb: 0.3,
@@ -199,9 +204,9 @@ export default function CompanyList() {
                             >
                                 {company.company_name}
                             </Typography>
-                            <Typography 
-                                variant="body2" 
-                                sx={{ 
+                            <Typography
+                                variant="body2"
+                                sx={{
                                     color: 'text.secondary',
                                     fontSize: '0.7rem',
                                     lineHeight: 1.1,
@@ -213,9 +218,9 @@ export default function CompanyList() {
                             >
                                 {company.sector}
                             </Typography>
-                            <Typography 
-                                variant="caption" 
-                                sx={{ 
+                            <Typography
+                                variant="caption"
+                                sx={{
                                     color: 'text.disabled',
                                     fontSize: '0.65rem',
                                     mt: 0.3
@@ -226,7 +231,7 @@ export default function CompanyList() {
                         </Paper>
                     ))}
 
-                    { checkPermissions(token, 'b') && (
+                    {checkPermissions('b') && (
                         <Box
                             sx={{
                                 ...companyCardStyle,
@@ -254,7 +259,7 @@ export default function CompanyList() {
                                     }
                                 }}
                             >
-                                <Add sx={{ fontSize: '24px' }} />
+                                <Add sx={{fontSize: '24px'}}/>
                             </IconButton>
                             <Typography
                                 variant="body2"
