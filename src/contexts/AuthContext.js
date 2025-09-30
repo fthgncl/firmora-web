@@ -1,6 +1,6 @@
 import {createContext, useState, useContext, useEffect} from "react";
 import {jwtDecode} from 'jwt-decode';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
 const AuthContext = createContext(null);
 
@@ -9,7 +9,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({children}) => {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
 
@@ -25,6 +25,7 @@ export const AuthProvider = ({children}) => {
                 localStorage.removeItem(`${process.env.REACT_APP_NAME}-auth`);
             }
         }
+        // eslint-disable-next-line
     }, []);
 
     const login = ({token}) => {
@@ -47,9 +48,28 @@ export const AuthProvider = ({children}) => {
         localStorage.removeItem(`${process.env.REACT_APP_NAME}-auth`);
     };
 
+    const checkPermissions = (nesesarryPermissions, fullMatch = false) => {
+        // Kullanıcının sahip olduğu yetkiler
+        const userPermissions = user.permissions || "";
+
+        if (userPermissions.includes('a'))
+            return true;
+
+        // Gereken yetkileri bir diziye ayır
+        const requiredPermissions = nesesarryPermissions.split("");
+
+        if (fullMatch) {
+            // Tüm yetkilerin bulunup bulunmadığını kontrol et
+            return requiredPermissions.every(permission => userPermissions.includes(permission));
+        } else {
+            // Herhangi bir yetkinin bulunup bulunmadığını kontrol et
+            return requiredPermissions.some(permission => userPermissions.includes(permission));
+        }
+    };
+
 
     return (
-        <AuthContext.Provider value={{user, token, login, logout}}>
+        <AuthContext.Provider value={{user, token, login, logout, checkPermissions}}>
             {children}
         </AuthContext.Provider>
     );

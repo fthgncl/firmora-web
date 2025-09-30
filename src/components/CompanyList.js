@@ -15,7 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import CreateCompanyDialog from './CreateCompanyDialog';
 
 export default function CompanyList() {
-    const { token } = useAuth();
+    const { token, checkPermissions} = useAuth();
     const theme = useTheme();
 
     const companyCardStyle = {
@@ -99,7 +99,8 @@ export default function CompanyList() {
         if (token) {
             fetchCompanies();
         }
-        
+
+        // eslint-disable-next-line
     }, [token]);
 
     const handleCompanyClick = (company) => {
@@ -225,48 +226,51 @@ export default function CompanyList() {
                         </Paper>
                     ))}
 
-                    <Box
-                        sx={{
-                            ...companyCardStyle,
-                            border: `2px dashed ${theme.palette.primary.main}`,
-                            backgroundColor: 'transparent',
-                            boxShadow: 'none',
-                            '&:hover': {
-                                backgroundColor: theme.palette.action.hover,
-                                borderColor: theme.palette.primary.dark,
-                                boxShadow: 'none',
-                                transform: 'translateY(-2px)',
-                            }
-                        }}
-                        onClick={handleAddCompany}
-                    >
-                        <IconButton
+                    { checkPermissions(token, 'b') && (
+                        <Box
                             sx={{
-                                backgroundColor: 'primary.main',
-                                color: 'primary.contrastText',
-                                width: '40px',
-                                height: '40px',
-                                mb: 0.5,
+                                ...companyCardStyle,
+                                border: `2px dashed ${theme.palette.primary.main}`,
+                                backgroundColor: 'transparent',
+                                boxShadow: 'none',
                                 '&:hover': {
-                                    backgroundColor: 'primary.dark',
+                                    backgroundColor: theme.palette.action.hover,
+                                    borderColor: theme.palette.primary.dark,
+                                    boxShadow: 'none',
+                                    transform: 'translateY(-2px)',
                                 }
                             }}
+                            onClick={handleAddCompany}
                         >
-                            <Add sx={{ fontSize: '24px' }} />
-                        </IconButton>
-                        <Typography 
-                            variant="body2" 
-                            sx={{ 
-                                color: 'primary.main',
-                                fontWeight: 500,
-                                fontSize: '0.75rem',
-                                lineHeight: 1.2,
-                                textAlign: 'center'
-                            }}
-                        >
-                            Yeni Firma Oluştur
-                        </Typography>
-                    </Box>
+                            <IconButton
+                                sx={{
+                                    backgroundColor: 'primary.main',
+                                    color: 'primary.contrastText',
+                                    width: '40px',
+                                    height: '40px',
+                                    mb: 0.5,
+                                    '&:hover': {
+                                        backgroundColor: 'primary.dark',
+                                    }
+                                }}
+                            >
+                                <Add sx={{ fontSize: '24px' }} />
+                            </IconButton>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: 'primary.main',
+                                    fontWeight: 500,
+                                    fontSize: '0.75rem',
+                                    lineHeight: 1.2,
+                                    textAlign: 'center'
+                                }}
+                            >
+                                Yeni Firma Oluştur
+                            </Typography>
+                        </Box>
+                    )}
+
                 </Box>
             </Paper>
 
