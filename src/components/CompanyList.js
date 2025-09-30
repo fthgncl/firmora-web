@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { Container, Box, Typography, Paper, IconButton } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Box, Typography, Paper, IconButton, CircularProgress, Alert } from '@mui/material';
 import { Business, Add } from '@mui/icons-material';
+import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const companyCardStyle = {
     display: 'flex',
@@ -48,11 +50,44 @@ const containerStyle = {
 };
 
 export default function CompanyList() {
-    const [companies] = useState([
-        { id: 1, name: 'ABC Teknoloji A.Ş.', description: 'Yazılım ve Danışmanlık' },
-        { id: 2, name: 'XYZ Ticaret Ltd.', description: 'İthalat ve İhracat' },
-        { id: 3, name: 'DEF İnşaat A.Ş.', description: 'Yapı ve İnşaat Hizmetleri' }
-    ]);
+    const { token } = useAuth();
+    const [companies, setCompanies] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchCompanies = async () => {
+            try {
+                setLoading(true);
+                setError('');
+
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/companies`, {
+                    headers: {
+                        'x-access-token': token
+                    }
+                });
+
+                if (response.data.status === 'success') {
+                    setCompanies(response.data.companies);
+                }
+            } catch (err) {
+                console.error('Firma listesi yüklenirken hata:', err);
+                if (err.response) {
+                    setError(err.response.data.message || 'Firmalar yüklenirken bir hata oluştu');
+                } else if (err.request) {
+                    setError('Sunucuya ulaşılamıyor');
+                } else {
+                    setError('Beklenmeyen bir hata oluştu');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (token) {
+            fetchCompanies();
+        }
+    }, [token]);
 
     const handleCompanyClick = (company) => {
         console.log('Firma seçildi:', company);
@@ -63,6 +98,28 @@ export default function CompanyList() {
         console.log('Yeni firma oluştur');
         // Buraya yeni firma oluşturma modalı veya sayfası açma kodu eklenebilir
     };
+
+    if (loading) {
+        return (
+            <Container maxWidth="lg">
+                <Paper sx={containerStyle}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                        <CircularProgress />
+                    </Box>
+                </Paper>
+            </Container>
+        );
+    }
+
+    if (error) {
+        return (
+            <Container maxWidth="lg">
+                <Paper sx={containerStyle}>
+                    <Alert severity="error">{error}</Alert>
+                </Paper>
+            </Container>
+        );
+    }
 
     return (
         <Container maxWidth="lg">
@@ -116,7 +173,7 @@ export default function CompanyList() {
                                     width: '100%'
                                 }}
                             >
-                                {company.name}
+                                {company.company_name}
                             </Typography>
                             <Typography 
                                 variant="body2" 
@@ -130,7 +187,17 @@ export default function CompanyList() {
                                     width: '100%'
                                 }}
                             >
-                                {company.description}
+                                {company.sector}
+                            </Typography>
+                            <Typography 
+                                variant="caption" 
+                                sx={{ 
+                                    color: '#999',
+                                    fontSize: '0.65rem',
+                                    mt: 0.3
+                                }}
+                            >
+                                {company.currency}
                             </Typography>
                         </Paper>
                     ))}
