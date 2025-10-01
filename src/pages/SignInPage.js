@@ -20,6 +20,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import * as React from "react";
 import {useAuth} from "../contexts/AuthContext";
 import LanguageSelector from '../components/LanguageSelector';
+import Link from '@mui/material/Link';
 
 export default function SignInSide() {
     const { t } = useTranslation();
@@ -152,6 +153,17 @@ export default function SignInSide() {
                         >
                             {isLoading ? <CircularProgress color="inherit"/> : <>{t('login.loginButton')}</>}
                         </Button>
+                        <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
+                            Hesabınız yok mu?{' '}
+                            <Link
+                                component="button"
+                                variant="body2"
+                                onClick={() => navigate('/sign-up')}
+                                sx={{ cursor: 'pointer' }}
+                            >
+                                Kayıt Olun
+                            </Link>
+                        </Typography>
                     </Box>
                     <Typography
                         variant="body2"

@@ -13,6 +13,8 @@ import { useFormik } from "formik";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import SignUpSchema from "../schemas/signUpSchema";
+import { useNavigate } from "react-router-dom";
+import Link from '@mui/material/Link';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -45,6 +47,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 export default function SignUp() {
     const [apiErrors, setApiErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
 
     const onSubmit = async (values, actions) => {
@@ -216,6 +219,17 @@ export default function SignUp() {
                         >
                             {isLoading ? 'Kayıt Yapılıyor...' : 'Kaydol'}
                         </Button>
+                        <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
+                            Hesabınız var mı?{' '}
+                            <Link
+                                component="button"
+                                variant="body2"
+                                onClick={() => navigate('/sign-in')}
+                                sx={{ cursor: 'pointer' }}
+                            >
+                                Giriş yapın
+                            </Link>
+                        </Typography>
                     </Box>
                 </Card>
             </SignUpContainer>
