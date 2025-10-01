@@ -13,39 +13,53 @@ export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
 
+    const logout = () => {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem(`${process.env.REACT_APP_NAME}-auth`);
+    };
+
+    // Token'ı decode edip süre kontrolü yapan yardımcı fonksiyon
+    const validateAndDecodeToken = (tokenToValidate) => {
+        try {
+            const decodedToken = jwtDecode(tokenToValidate);
+
+            // Token süresini kontrol et
+            const currentTime = Date.now() / 1000; // Unix timestamp (saniye)
+            if (decodedToken.exp && decodedToken.exp < currentTime) {
+                console.warn(t('auth.errors.tokenExpired'));
+                logout();
+                return null;
+            }
+
+            return decodedToken;
+        } catch (error) {
+            console.error(t('auth.errors.invalidToken'), error);
+            logout();
+            return null;
+        }
+    };
+
     useEffect(() => {
         const storedToken = localStorage.getItem(`${process.env.REACT_APP_NAME}-auth`);
         if (storedToken) {
-            try {
-                const decodedToken = jwtDecode(storedToken);
+            const decodedToken = validateAndDecodeToken(storedToken);
+            if (decodedToken) {
                 setUser(decodedToken);
                 setToken(storedToken);
-            } catch (error) {
-                console.error(t('auth.errors.invalidToken'), error);
-                localStorage.removeItem(`${process.env.REACT_APP_NAME}-auth`);
             }
         }
         // eslint-disable-next-line
     }, []);
 
     const login = ({token}) => {
-        try {
-            const decodedToken = jwtDecode(token);
-
+        const decodedToken = validateAndDecodeToken(token);
+        if (decodedToken) {
             // Kullanıcı bilgilerini ayarla (token içindeki tüm bilgiler)
             setUser(decodedToken);
-
             setToken(token);
             localStorage.setItem(`${process.env.REACT_APP_NAME}-auth`, token);
-        } catch (error) {
-            console.error(t('auth.errors.tokenDecodeError'), error);
         }
-    };
-
-    const logout = () => {
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem(`${process.env.REACT_APP_NAME}-auth`);
     };
 
     const checkPermissions = (nesesarryPermissions, fullMatch = false) => {
