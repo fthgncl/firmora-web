@@ -21,6 +21,7 @@ import * as React from "react";
 import {useAuth} from "../contexts/AuthContext";
 import LanguageSelector from '../components/LanguageSelector';
 import Link from '@mui/material/Link';
+import Copyright from '../components/Copyright';
 
 export default function SignInSide() {
     const { t } = useTranslation();
@@ -165,14 +166,7 @@ export default function SignInSide() {
                             </Link>
                         </Typography>
                     </Box>
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        align="center"
-                        sx={{ mt: 4, mb: 2 }}
-                    >
-                        © {new Date().getFullYear()} {process.env.REACT_APP_NAME}. {t('common.allRightsReserved')}
-                    </Typography>
+                    <Copyright />
                 </Box>
             </Grid>
         </Grid>

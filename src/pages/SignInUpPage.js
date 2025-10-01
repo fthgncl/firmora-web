@@ -15,6 +15,7 @@ import {useEffect, useState} from "react";
 import SignUpSchema from "../schemas/signUpSchema";
 import { useNavigate } from "react-router-dom";
 import Link from '@mui/material/Link';
+import Copyright from '../components/Copyright';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -232,6 +233,7 @@ export default function SignUp() {
                         </Typography>
                     </Box>
                 </Card>
+                <Copyright />
             </SignUpContainer>
         </>
     );
