@@ -4,6 +4,7 @@ import {Box, CssBaseline} from "@mui/material";
 import AuthRoute from "./utils/AuthRoute";
 import HomePage from "./pages/HomePage";
 import SignInPage from "./pages/SignInPage";
+import SignInUpPage from "./pages/SignInUpPage";
 import NotFound from "./pages/NotFound";
 import { AlertProvider } from "./contexts/AlertContext";
 
@@ -22,6 +23,13 @@ function App() {
                     <Route path="/sign-in" element={
                         <AuthRoute requireGuest={true} redirectTo="/">
                             <SignInPage/>
+                        </AuthRoute>
+                    }/>
+
+
+                    <Route path="/sign-up" element={
+                        <AuthRoute requireGuest={true} redirectTo="/">
+                            <SignInUpPage/>
                         </AuthRoute>
                     }/>
 
