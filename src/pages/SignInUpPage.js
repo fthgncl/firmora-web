@@ -16,6 +16,7 @@ import SignUpSchema from "../schemas/signUpSchema";
 import { useNavigate } from "react-router-dom";
 import Link from '@mui/material/Link';
 import Copyright from '../components/Copyright';
+import PhoneInputField from '../components/PhoneInputField';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -56,8 +57,7 @@ export default function SignUp() {
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/sign-up`, values);
             if (response.data.status === 'success') {
-
-
+                console.log(response.data)
             }
             actions.resetForm();
         } catch (error) {
@@ -71,12 +71,13 @@ export default function SignUp() {
         }
     };
 
-    const { values , errors, handleSubmit, handleChange, setErrors, touched, handleBlur, validateForm } = useFormik({
+    const { values , errors, handleSubmit, handleChange, setErrors, touched, handleBlur, validateForm, setFieldValue } = useFormik({
         initialValues: {
             name: '',
             surname: '',
             username: '',
             email: '',
+            phone: '',
             password: '',
             confirmpassword: ''
         },
@@ -171,6 +172,23 @@ export default function SignUp() {
                                 helperText={touched.email && errors.email}
                                 disabled={isLoading}
                             />
+                        </FormControl>
+                        <FormControl error={!!errors.phone}>
+                            <FormLabel htmlFor="phone">Telefon Numarası</FormLabel>
+                            <PhoneInputField
+                                defaultCountry="DE"
+                                value={values.phone}
+                                onChange={(value) => setFieldValue('phone', value)}
+                                disabled={isLoading}
+                                placeholder="Telefon numarası girin"
+                                error={!!errors.phone}
+                                touched={touched.phone}
+                            />
+                            {touched.phone && errors.phone && (
+                                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75, display: 'block' }}>
+                                    {errors.phone}
+                                </Typography>
+                            )}
                         </FormControl>
                         <FormControl>
                             <FormLabel htmlFor="password">Şifre</FormLabel>
