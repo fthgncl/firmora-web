@@ -76,8 +76,8 @@ export const AlertProvider = ({ children }) => {
                     key={alert.id}
                     open={alert.open}
                     anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right'
+                        vertical: 'bottom',
+                        horizontal: 'center'
                     }}
                     sx={{
                         mt: index * 7, // Birden fazla alert için üst üste sıralama
