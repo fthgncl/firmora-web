@@ -17,6 +17,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
 import * as React from "react";
 import {useAuth} from "../contexts/AuthContext";
 import LanguageSelector from '../components/LanguageSelector';
@@ -30,7 +31,36 @@ export default function SignInSide() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isEmailNotVerified, setIsEmailNotVerified] = useState(false);
+    const [emailOrUsername, setEmailOrUsername] = useState('');
+    const [isResending, setIsResending] = useState(false);
+    const [resendMessage, setResendMessage] = useState('');
     const {login} = useAuth();
+
+    const handleResendVerification = async () => {
+        setIsResending(true);
+        setResendMessage('');
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify-email/send`, {
+                emailOrUsername: emailOrUsername
+            });
+
+            if (response.data.status === "success") {
+                setResendMessage(response.data.message || 'Doğrulama e-postası başarıyla gönderildi.');
+                setErrorMessage('');
+                setIsEmailNotVerified(false);
+            }
+        } catch (error) {
+            if (error.response) {
+                setResendMessage(error.response.data.message || 'E-posta gönderilemedi. Lütfen tekrar deneyiniz.');
+            } else {
+                setResendMessage('Bir hata oluştu. Lütfen tekrar deneyiniz.');
+            }
+        } finally {
+            setIsResending(false);
+        }
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -53,13 +83,23 @@ export default function SignInSide() {
         } catch (error) {
 
             if (error.response) {
-                // API'den dönen hata mesajı
-                setErrorMessage(error.response.data.message || t('login.errors.defaultError'));
+                // E-posta doğrulanmamış hatası (403)
+                if (error.response.status === 403) {
+                    setIsEmailNotVerified(true);
+                    setEmailOrUsername(loginData.username);
+                    setErrorMessage(error.response.data.message || 'E-posta adresiniz doğrulanmamış.');
+                } else {
+                    setIsEmailNotVerified(false);
+                    // API'den dönen hata mesajı
+                    setErrorMessage(error.response.data.message || t('login.errors.defaultError'));
+                }
             } else if (error.request) {
                 // Network hatası
+                setIsEmailNotVerified(false);
                 setErrorMessage(t('login.errors.serverError'));
             } else {
                 // Diğer hatalar
+                setIsEmailNotVerified(false);
                 setErrorMessage(t('login.errors.unexpectedError'));
             }
         } finally {
@@ -143,8 +183,35 @@ export default function SignInSide() {
                                 </InputAdornment>
                             }}
                         />
-                        <Typography sx={{textAlign: 'center', color: 'error.main'}}
-                                    variant='body2'>{errorMessage}</Typography>
+                        {errorMessage && !isEmailNotVerified && (
+                            <Typography sx={{textAlign: 'center', color: 'error.main'}}
+                                        variant='body2'>{errorMessage}</Typography>
+                        )}
+
+                        {isEmailNotVerified && (
+                            <Box sx={{ mt: 2 }}>
+                                <Alert severity="warning" sx={{ mb: 2 }}>
+                                    {errorMessage}
+                                </Alert>
+                                <Button
+                                    disabled={isResending}
+                                    onClick={handleResendVerification}
+                                    fullWidth
+                                    variant="outlined"
+                                    color="warning"
+                                    sx={{ mb: 2 }}
+                                >
+                                    {isResending ? <CircularProgress size={24} color="inherit"/> : 'Doğrulama E-postasını Tekrar Gönder'}
+                                </Button>
+                            </Box>
+                        )}
+
+                        {resendMessage && (
+                            <Alert severity={resendMessage.includes('başarıyla') ? 'success' : 'error'} sx={{ mt: 2, mb: 2 }}>
+                                {resendMessage}
+                            </Alert>
+                        )}
+
                         <Button
                             disabled={isLoading}
                             type="submit"
