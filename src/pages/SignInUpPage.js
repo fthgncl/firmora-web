@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import Link from '@mui/material/Link';
 import Copyright from '../components/Copyright';
 import PhoneInputField from '../components/PhoneInputField';
+import { useAlert } from '../contexts/AlertContext';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -50,6 +51,7 @@ export default function SignUp() {
     const [apiErrors, setApiErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const { showSuccess, showError } = useAlert();
 
 
     const onSubmit = async (values, actions) => {
@@ -57,14 +59,24 @@ export default function SignUp() {
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/sign-up`, values);
             if (response.data.status === 'success') {
-                console.log(response.data)
+                showSuccess(response.data.message, 'Başarılı', 3000);
+                actions.resetForm();
+                setTimeout(() => {
+                    navigate('/sign-in');
+                }, 3000);
             }
-            actions.resetForm();
         } catch (error) {
-            if (error.response && error.response.data.errors) {
-                setApiErrors(error.response.data.errors);
+            if (error.response) {
+                if (error.response.data.errors) {
+                    setApiErrors(error.response.data.errors);
+                    showError('Kayıt işlemi sırasında bir hata oluştu. Lütfen form bilgilerinizi kontrol edin.', 'Hata');
+                } else {
+                    showError(error.response.data.message || 'Kayıt işlemi başarısız oldu.', 'Hata');
+                }
+            } else if (error.request) {
+                showError('Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.', 'Bağlantı Hatası');
             } else {
-                console.error('İstemci hatası:', error.message);
+                showError('Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.', 'Hata');
             }
         } finally {
             setIsLoading(false);
