@@ -62,12 +62,29 @@ export const AuthProvider = ({children}) => {
         }
     };
 
-    const checkPermissions = (nesesarryPermissions, fullMatch = false) => {
-        // Kullanıcının sahip olduğu yetkiler
-        const userPermissions = user.permissions || "";
+    const checkPermissions = (nesesarryPermissions, companyId, fullMatch = false) => {
+        // Kullanıcı yoksa veya permissions yoksa
+        if (!user || !user.permissions || !Array.isArray(user.permissions)) {
+            return false;
+        }
 
-        if (userPermissions.includes('a'))
+        // Belirtilen firmaya ait yetkileri bul
+        const companyPermission = user.permissions.find(
+            perm => perm.companyId === companyId
+        );
+
+        // Firma bulunamazsa yetki yok
+        if (!companyPermission) {
+            return false;
+        }
+
+        // Kullanıcının sahip olduğu yetkiler
+        const userPermissions = companyPermission.permissions || "";
+
+        // Admin yetkisi kontrolü (tüm yetkilere sahip)
+        if (userPermissions.includes('a')) {
             return true;
+        }
 
         // Gereken yetkileri bir diziye ayır
         const requiredPermissions = nesesarryPermissions.split("");
