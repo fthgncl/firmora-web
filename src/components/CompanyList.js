@@ -15,7 +15,7 @@ import {useAuth} from '../contexts/AuthContext';
 import CreateCompanyDialog from './CreateCompanyDialog';
 
 export default function CompanyList() {
-    const {token, checkPermissions} = useAuth();
+    const {user, token} = useAuth();
     const theme = useTheme();
 
     const companyCardStyle = {
@@ -146,7 +146,7 @@ export default function CompanyList() {
     }
 
     // Kullanıcının hiç firması yoksa ve 'b' yetkisi yoksa komponenti gösterme
-    if (companies.length === 0 && !checkPermissions('b')) {
+    if (companies.length === 0 && user.max_companies === 0 ) {
         return null;
     }
 
@@ -231,7 +231,7 @@ export default function CompanyList() {
                         </Paper>
                     ))}
 
-                    {checkPermissions('b') && (
+                    {companies.length < user.max_companies && (
                         <Box
                             sx={{
                                 ...companyCardStyle,
