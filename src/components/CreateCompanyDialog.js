@@ -191,7 +191,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         error={formik.touched.currency && Boolean(formik.errors.currency)}
-                        helperText={formik.touched.currency && formik.errors.currency || '3 harfli ISO para birimi kodu'}
+                        helperText={(formik.touched.currency && formik.errors.currency) || '3 harfli ISO para birimi kodu'}
                         disabled={formik.isSubmitting}
                         margin="normal"
                         variant="outlined"
