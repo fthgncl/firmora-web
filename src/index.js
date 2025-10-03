@@ -14,10 +14,7 @@ root.render(
     <AuthProvider>
         <AppThemeProvider>
             <AlertProvider>
-                <BrowserRouter 
-                    basename={process.env.REACT_APP_BASE_PATH || ''}
-                    future={{v7_startTransition: true, v7_relativeSplatPath: true}}
-                >
+                <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
                     <App/>
                 </BrowserRouter>
             </AlertProvider>

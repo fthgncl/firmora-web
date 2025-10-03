@@ -27,6 +27,7 @@ function App() {
                         </AuthRoute>
                     }/>
 
+
                     <Route path="/sign-up" element={
                         <AuthRoute requireGuest={true} redirectTo="/">
                             <SignInUpPage/>
@@ -48,7 +49,6 @@ function App() {
 
                     {/* Herkesin girebileği sayfalar */}
                     <Route path="*" element={<NotFound/>}/>
-
                 </Routes>
             </Box>
         </AlertProvider>
