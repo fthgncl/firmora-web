@@ -12,10 +12,12 @@ import {
 import {Business, Add} from '@mui/icons-material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
+import {useNavigate} from 'react-router-dom';
 import CreateCompanyDialog from './CreateCompanyDialog';
 
 export default function CompanyList() {
     const {user, token} = useAuth();
+    const navigate = useNavigate();
     const theme = useTheme();
 
     const companyCardStyle = {
@@ -105,7 +107,7 @@ export default function CompanyList() {
 
     const handleCompanyClick = (company) => {
         console.log('Firma seçildi:', company);
-        // Buraya firma detayına yönlendirme kodu eklenebilir
+        navigate(`/company/${company.id}`);
     };
 
     const handleAddCompany = () => {

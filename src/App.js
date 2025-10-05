@@ -7,6 +7,7 @@ import SignInPage from "./pages/SignInPage";
 import SignInUpPage from "./pages/SignInUpPage";
 import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
+import CompanyPage from "./pages/CompanyPage";
 import { AlertProvider } from "./contexts/AlertContext";
 
 function App() {
@@ -44,6 +45,12 @@ function App() {
                     <Route path="/" element={
                         <AuthRoute requireAuth={true} redirectTo="/sign-in">
                             <HomePage/>
+                        </AuthRoute>
+                    }/>
+
+                    <Route path="/company/:companyId" element={
+                        <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                            <CompanyPage/>
                         </AuthRoute>
                     }/>
 
