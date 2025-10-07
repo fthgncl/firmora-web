@@ -12,6 +12,8 @@ import {
     Divider,
     ListItemIcon,
     Tooltip,
+    Slide,
+    useScrollTrigger,
 } from '@mui/material';
 import {
     Logout,
@@ -25,6 +27,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAppBar } from '../contexts/AppBarContext';
 import ThemeSwitcher from './ThemeSwitcher';
 import LanguageSelector from './LanguageSelector';
+
+function HideOnScroll({ children }) {
+    const trigger = useScrollTrigger();
+
+    return (
+        <Slide appear={false} direction="down" in={!trigger}>
+            {children}
+        </Slide>
+    );
+}
 
 export default function MenuAppBar() {
     const {appBarOpen} = useAppBar();
@@ -65,11 +77,15 @@ export default function MenuAppBar() {
     };
 
     return (
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar
-                position="static"
-            >
-                <Toolbar sx={{ gap: 1, minHeight: { xs: 56, sm: 64 } }}>
+        <>
+            <HideOnScroll>
+                <AppBar
+                    position="fixed"
+                    sx={{
+                        zIndex: (theme) => theme.zIndex.drawer + 1,
+                    }}
+                >
+                    <Toolbar sx={{ gap: 1, minHeight: { xs: 56, sm: 64 } }}>
                     {/* Menu Toggle Button */}
                     {user && (
                         <Tooltip title={drawerOpen ? 'Menüyü Kapat' : 'Menüyü Aç'}>
@@ -243,6 +259,8 @@ export default function MenuAppBar() {
                     </Stack>
                 </Toolbar>
             </AppBar>
-        </Box>
+        </HideOnScroll>
+        <Toolbar />
+        </>
     );
 }
