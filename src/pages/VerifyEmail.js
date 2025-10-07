@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import AppBar from '../components/AppBar';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Box from '@mui/material/Box';
@@ -204,7 +203,6 @@ export default function VerifyEmailPage() {
 
     return (
         <>
-            <AppBar />
             <Stack
                 direction="column"
                 component="main"

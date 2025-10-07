@@ -8,57 +8,59 @@ import SignInUpPage from "./pages/SignInUpPage";
 import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import CompanyPage from "./pages/CompanyPage";
-import { AlertProvider } from "./contexts/AlertContext";
+import React from "react";
+import AppBar from "./components/AppBar";
+
 
 function App() {
+
     return (
-        <AlertProvider>
-            <Box sx={{
-                minHeight: '100vh',
-                bgcolor: 'background.default',
-                color: 'text.primary'
-            }}>
-                <CssBaseline />
-                <Routes>
+        <Box sx={{
+            minHeight: '100vh',
+            bgcolor: 'background.default',
+            color: 'text.primary'
+        }}>
+            <CssBaseline/>
+            <AppBar/>
+            <Routes>
 
-                    {/* Giriş yapmamış kullanıcıların girebileği sayfalar */}
-                    <Route path="/sign-in" element={
-                        <AuthRoute requireGuest={true} redirectTo="/">
-                            <SignInPage/>
-                        </AuthRoute>
-                    }/>
+                {/* Giriş yapmamış kullanıcıların girebileği sayfalar */}
+                <Route path="/sign-in" element={
+                    <AuthRoute requireGuest={true} redirectTo="/">
+                        <SignInPage/>
+                    </AuthRoute>
+                }/>
 
 
-                    <Route path="/sign-up" element={
-                        <AuthRoute requireGuest={true} redirectTo="/">
-                            <SignInUpPage/>
-                        </AuthRoute>
-                    }/>
+                <Route path="/sign-up" element={
+                    <AuthRoute requireGuest={true} redirectTo="/">
+                        <SignInUpPage/>
+                    </AuthRoute>
+                }/>
 
-                    <Route path="/verify-email/:token" element={
-                        <AuthRoute requireGuest={true} redirectTo="/">
-                            <VerifyEmail/>
-                        </AuthRoute>
-                    }/>
+                <Route path="/verify-email/:token" element={
+                    <AuthRoute requireGuest={true} redirectTo="/">
+                        <VerifyEmail/>
+                    </AuthRoute>
+                }/>
 
-                    {/* Giriş yapmış kullanıcıların girebileği sayfalar */}
-                    <Route path="/" element={
-                        <AuthRoute requireAuth={true} redirectTo="/sign-in">
-                            <HomePage/>
-                        </AuthRoute>
-                    }/>
+                {/* Giriş yapmış kullanıcıların girebileği sayfalar */}
+                <Route path="/" element={
+                    <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                        <HomePage/>
+                    </AuthRoute>
+                }/>
 
-                    <Route path="/company/:companyId" element={
-                        <AuthRoute requireAuth={true} redirectTo="/sign-in">
-                            <CompanyPage/>
-                        </AuthRoute>
-                    }/>
+                <Route path="/company/:companyId" element={
+                    <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                        <CompanyPage/>
+                    </AuthRoute>
+                }/>
 
-                    {/* Herkesin girebileği sayfalar */}
-                    <Route path="*" element={<NotFound/>}/>
-                </Routes>
-            </Box>
-        </AlertProvider>
+                {/* Herkesin girebileği sayfalar */}
+                <Route path="*" element={<NotFound/>}/>
+            </Routes>
+        </Box>
     );
 }
 

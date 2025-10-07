@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +23,7 @@ import {useAuth} from "../contexts/AuthContext";
 import LanguageSelector from '../components/LanguageSelector';
 import Link from '@mui/material/Link';
 import Copyright from '../components/Copyright';
+import {useAppBar} from "../contexts/AppBarContext";
 
 export default function SignInSide() {
     const { t } = useTranslation();
@@ -36,6 +37,12 @@ export default function SignInSide() {
     const [isResending, setIsResending] = useState(false);
     const [resendMessage, setResendMessage] = useState('');
     const {login} = useAuth();
+    const {toggleAppBar} = useAppBar();
+
+    useEffect(() => {
+        toggleAppBar(false);
+        // eslint-disable-next-line
+    }, []);
 
     const handleResendVerification = async () => {
         setIsResending(true);

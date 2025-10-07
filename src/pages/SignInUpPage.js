@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import CircularProgress from '@mui/material/CircularProgress';
-import AppBar from '../components/AppBar';
 import { styled } from '@mui/material/styles';
 import { useFormik } from "formik";
 import axios from "axios";
@@ -104,7 +103,6 @@ export default function SignUp() {
 
     return (
         <>
-            <AppBar/>
             <SignUpContainer sx={{ mt: 11, mb: 5, height: '100%' }} direction="column" justifyContent="space-between">
                 <Card variant="outlined">
                     <Typography

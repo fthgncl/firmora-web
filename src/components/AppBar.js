@@ -1,23 +1,40 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
+import {
+    AppBar,
+    Box,
+    Toolbar,
+    Typography,
+    IconButton,
+    Stack,
+    MenuItem,
+    Menu,
+    Avatar,
+    Divider,
+    ListItemIcon,
+    Tooltip,
+} from '@mui/material';
+import {
+    Logout,
+    Settings,
+    Person,
+    Menu as MenuIcon,
+} from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useAppBar } from '../contexts/AppBarContext';
 import ThemeSwitcher from './ThemeSwitcher';
-import LanguageSelector from "./LanguageSelector";
+import LanguageSelector from './LanguageSelector';
 
 export default function MenuAppBar() {
+    const {appBarOpen} = useAppBar();
     const { user, logout } = useAuth();
     const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { toggleDrawer, drawerOpen } = useAppBar();
     const [anchorEl, setAnchorEl] = React.useState(null);
 
+    if (!appBarOpen) return null;
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -27,68 +44,137 @@ export default function MenuAppBar() {
         setAnchorEl(null);
     };
 
+    const handleProfile = () => {
+        navigate('/profile');
+        handleClose();
+    };
+
+    const handleSettings = () => {
+        navigate('/settings');
+        handleClose();
+    };
+
     const handleLogout = () => {
         logout();
         handleClose();
     };
 
+    const getUserInitials = () => {
+        if (!user?.username) return '?';
+        return user.username.charAt(0).toUpperCase();
+    };
+
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static">
-                <Toolbar sx={{ gap: 1 }}>
+            <AppBar
+                position="static"
+            >
+                <Toolbar sx={{ gap: 1, minHeight: { xs: 56, sm: 64 } }}>
+                    {/* Menu Toggle Button */}
+                    {user && (
+                        <Tooltip title={drawerOpen ? 'Menüyü Kapat' : 'Menüyü Aç'}>
+                            <IconButton
+                                color="inherit"
+                                aria-label="toggle drawer"
+                                onClick={toggleDrawer}
+                                edge="start"
+                                sx={{
+                                    mr: 1,
+                                    display: { xs: 'none', md: 'flex' },
+                                }}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+
+                    {/* App Title */}
                     <Typography
                         variant="h6"
                         component="div"
+                        onClick={() => navigate('/')}
                         sx={{
                             flexGrow: 1,
-                            fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                            fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                            fontWeight: 600,
+                            letterSpacing: '0.5px',
+                            cursor: 'pointer',
+                            '&:hover': {
+                                opacity: 0.8,
+                            }
                         }}
                     >
                         {process.env.REACT_APP_NAME}
                     </Typography>
 
+                    {/* Right Side Actions */}
                     <Stack
                         direction="row"
                         spacing={1}
                         alignItems="center"
-                        sx={{ display: 'flex' }}
                     >
                         <ThemeSwitcher />
                         <LanguageSelector />
 
                         {user && (
-                            <Box sx={{ ml: 1 }}>
-                                <IconButton
-                                    size="large"
-                                    aria-label="account of current user"
-                                    aria-controls="menu-appbar"
-                                    aria-haspopup="true"
-                                    onClick={handleMenu}
-                                    color="inherit"
-                                    sx={{
-                                        borderRadius: 2,
-                                        px: { xs: 1, sm: 2 },
-                                        '&:hover': {
-                                            backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                                        }
-                                    }}
-                                >
-                                    <Typography
-                                        variant="body2"
-                                        component="span"
+                            <>
+                                {/* User Menu Button */}
+                                <Tooltip title="Hesap">
+                                    <IconButton
+                                        size="large"
+                                        aria-label="kullanıcı menüsü"
+                                        aria-controls="user-menu"
+                                        aria-haspopup="true"
+                                        onClick={handleMenu}
                                         sx={{
-                                            mr: 1,
-                                            display: { xs: 'none', sm: 'block' },
-                                            fontWeight: 500
+                                            ml: 1,
+                                            p: 0.5,
                                         }}
                                     >
-                                        {user.username}
-                                    </Typography>
-                                    <AccountCircle />
-                                </IconButton>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1,
+                                                px: 1,
+                                                py: 0.5,
+                                                borderRadius: 2,
+                                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                                transition: 'all 0.2s',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                                }
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    display: { xs: 'none', sm: 'block' },
+                                                    fontWeight: 600,
+                                                    color: 'white',
+                                                }}
+                                            >
+                                                {user.username}
+                                            </Typography>
+                                            <Avatar
+                                                sx={{
+                                                    width: 32,
+                                                    height: 32,
+                                                    bgcolor: 'white',
+                                                    color: 'primary.main',
+                                                    fontSize: '0.875rem',
+                                                    fontWeight: 700,
+                                                }}
+                                            >
+                                                {getUserInitials()}
+                                            </Avatar>
+                                        </Box>
+                                    </IconButton>
+                                </Tooltip>
 
+                                {/* User Menu */}
                                 <Menu
-                                    id="menu-appbar"
+                                    id="user-menu"
                                     anchorEl={anchorEl}
                                     anchorOrigin={{
                                         vertical: 'bottom',
@@ -102,20 +188,57 @@ export default function MenuAppBar() {
                                     open={Boolean(anchorEl)}
                                     onClose={handleClose}
                                     sx={{
-                                        mt: 1,
+                                        mt: 1.5,
                                         '& .MuiMenu-paper': {
-                                            minWidth: 120
+                                            minWidth: 200,
+                                            borderRadius: 2,
+                                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                                         }
                                     }}
                                 >
-                                    <MenuItem
-                                        onClick={handleLogout}
-                                        sx={{ px: 2, py: 1 }}
-                                    >
-                                        {t('auth.logout')}
+                                    {/* User Info Header */}
+                                    <Box sx={{ px: 2, py: 1.5 }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                            {user.username}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {user.email || 'Kullanıcı'}
+                                        </Typography>
+                                    </Box>
+
+                                    <Divider />
+
+                                    {/* Menu Items */}
+                                    <MenuItem onClick={handleProfile} sx={{ py: 1.5 }}>
+                                        <ListItemIcon>
+                                            <Person fontSize="small" />
+                                        </ListItemIcon>
+                                        <Typography variant="body2">
+                                            {t('profile') || 'Profil'}
+                                        </Typography>
+                                    </MenuItem>
+
+                                    <MenuItem onClick={handleSettings} sx={{ py: 1.5 }}>
+                                        <ListItemIcon>
+                                            <Settings fontSize="small" />
+                                        </ListItemIcon>
+                                        <Typography variant="body2">
+                                            {t('settings') || 'Ayarlar'}
+                                        </Typography>
+                                    </MenuItem>
+
+                                    <Divider />
+
+                                    <MenuItem onClick={handleLogout} sx={{ py: 1.5, color: 'error.main' }}>
+                                        <ListItemIcon>
+                                            <Logout fontSize="small" color="error" />
+                                        </ListItemIcon>
+                                        <Typography variant="body2">
+                                            {t('auth.logout')}
+                                        </Typography>
                                     </MenuItem>
                                 </Menu>
-                            </Box>
+                            </>
                         )}
                     </Stack>
                 </Toolbar>
