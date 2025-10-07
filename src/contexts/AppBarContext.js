@@ -25,6 +25,7 @@ export const AppBarProvider = ({ children }) => {
     const toggleDrawer = (status) => {
         if ( status !== undefined ){
             setDrawerOpen(status);
+            return;
         }
 
         setDrawerOpen(prev => !prev);
@@ -34,6 +35,7 @@ export const AppBarProvider = ({ children }) => {
     const toggleAppBar = (status) => {
         if ( status !== undefined ){
             setAppBarOpen(status);
+            return;
         }
 
         setAppBarOpen(prev => !prev);
