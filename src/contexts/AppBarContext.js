@@ -6,6 +6,17 @@ export const useAppBar = () => {
     return useContext(AppBarContext);
 };
 
+// AppBar'ı otomatik olarak gizle ve sayfa değiştiğinde tekrar göster
+export const useHideAppBar = () => {
+    const { setAppBarOpen } = useAppBar();
+
+    useEffect(() => {
+        setAppBarOpen(false);
+        return () => setAppBarOpen(true);
+        // eslint-disable-next-line
+    }, []);
+};
+
 export const AppBarProvider = ({ children }) => {
     // Drawer açık/kapalı durumu - localStorage'dan al
     const [drawerOpen, setDrawerOpen] = useState(() => {
