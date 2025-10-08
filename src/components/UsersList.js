@@ -30,7 +30,7 @@ import {
     Divider,
     Typography,
 } from '@mui/material';
-import { Search, Clear, Refresh } from '@mui/icons-material';
+import { Search, Clear, Refresh, CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
 const SORT_FIELDS = [
@@ -55,10 +55,9 @@ export default function UsersList({
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
-    // ---- table state ----
     const [rows, setRows] = useState([]);
     const [limit, setLimit] = useState(initialLimit);
-    const [page, setPage] = useState(0); // zero-based
+    const [page, setPage] = useState(0);
     const [sortBy, setSortBy] = useState('name');
     const [sortOrder, setSortOrder] = useState('ASC');
 
@@ -66,7 +65,6 @@ export default function UsersList({
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
 
-    // ---- search state ----
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [suggOpen, setSuggOpen] = useState(false);
@@ -74,13 +72,12 @@ export default function UsersList({
     const searchRef = useRef(null);
     const suggAbortRef = useRef(null);
 
-    // offset hesapla
     const offset = useMemo(() => page * limit, [page, limit]);
 
     const authHeaders = useMemo(
         () => ({
             headers: {
-                'x-access-token': token, // not: kullanıcı örneği böyle istedi
+                'x-access-token': token,
                 'Content-Type': 'application/json',
             },
         }),
@@ -122,14 +119,12 @@ export default function UsersList({
         }
     }, [API_URL, authHeaders, companyId, limit, offset, searchTerm, sortBy, sortOrder]);
 
-    // ilk yükleme + her parametre değişiminde fetch
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
 
-    // ---- debounced suggestions (typeahead) ----
+    // Typeahead (>=2 karakterde, küçük limit ile)
     useEffect(() => {
-        // 2 karakterden kısa ise kapat
         if (!searchTerm || searchTerm.trim().length < 2) {
             setSuggestions([]);
             setSuggOpen(false);
@@ -141,7 +136,6 @@ export default function UsersList({
                 setSuggLoading(true);
                 setSuggOpen(true);
 
-                // önceki isteği iptal et
                 if (suggAbortRef.current) suggAbortRef.current.abort();
                 const controller = new AbortController();
                 suggAbortRef.current = controller;
@@ -149,7 +143,7 @@ export default function UsersList({
                 const body = {
                     companyId,
                     searchTerm,
-                    limit: 5,          // öneriler için küçük limit
+                    limit: 5,
                     offset: 0,
                     sortBy: 'name',
                     sortOrder: 'ASC',
@@ -166,12 +160,11 @@ export default function UsersList({
                     setSuggestions([]);
                 }
             } catch {
-                // öneriler hatasını sessiz geçiyoruz
                 setSuggestions([]);
             } finally {
                 setSuggLoading(false);
             }
-        }, 300); // debounce 300ms
+        }, 300);
 
         return () => clearTimeout(handle);
     }, [API_URL, authHeaders, companyId, searchTerm]);
@@ -183,8 +176,6 @@ export default function UsersList({
     };
 
     const handlePickSuggestion = (u) => {
-        // Öneriye tıklanınca arama terimini isim/username ile güncelle,
-        // tam listeyi o terimle çek.
         const nextTerm = u?.username || u?.email || u?.name || '';
         setSearchTerm(nextTerm);
         setSuggOpen(false);
@@ -195,13 +186,29 @@ export default function UsersList({
         fetchUsers();
     };
 
+    const renderVerifyChip = (flag) =>
+        flag ? (
+            <Chip
+                size="small"
+                color="success"
+                icon={<CheckCircleOutline />}
+                label="Onaylandı"
+            />
+        ) : (
+            <Chip
+                size="small"
+                color="warning"
+                icon={<ErrorOutline />}
+                label="Bekleniyor"
+            />
+        );
+
     return (
         <Card sx={{ ...sx }}>
             <CardHeader
                 title="Kullanıcılar"
                 action={
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                        {/* Sort field */}
                         <FormControl size="small">
                             <Select
                                 value={sortBy}
@@ -213,7 +220,6 @@ export default function UsersList({
                             </Select>
                         </FormControl>
 
-                        {/* Sort order */}
                         <FormControl size="small">
                             <Select
                                 value={sortOrder}
@@ -225,7 +231,6 @@ export default function UsersList({
                             </Select>
                         </FormControl>
 
-                        {/* Search box */}
                         <Box sx={{ position: 'relative' }}>
                             <TextField
                                 inputRef={searchRef}
@@ -237,7 +242,6 @@ export default function UsersList({
                                     if (suggestions.length > 0) setSuggOpen(true);
                                 }}
                                 onBlur={() => {
-                                    // Biraz geciktirip kapat ki tıklama yakalansın
                                     setTimeout(() => setSuggOpen(false), 150);
                                 }}
                                 InputProps={{
@@ -260,7 +264,6 @@ export default function UsersList({
                                 }}
                             />
 
-                            {/* Suggestions dropdown */}
                             {suggOpen && (
                                 <Paper
                                     elevation={6}
@@ -269,7 +272,7 @@ export default function UsersList({
                                         top: '100%',
                                         right: 0,
                                         mt: 0.5,
-                                        width: 420,
+                                        width: 460,
                                         maxHeight: 360,
                                         overflowY: 'auto',
                                         zIndex: 10,
@@ -290,13 +293,13 @@ export default function UsersList({
                                                 <ListItemButton onMouseDown={() => handlePickSuggestion(u)}>
                                                     <ListItemText
                                                         primary={
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
                                                                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                                                     {u.name} {u.surname}
                                                                 </Typography>
-                                                                {u.username && (
-                                                                    <Chip size="small" label={`@${u.username}`} />
-                                                                )}
+                                                                {u.username && <Chip size="small" label={`@${u.username}`} />}
+                                                                {/* emailverified chip */}
+                                                                {renderVerifyChip(Boolean(u?.emailverified))}
                                                             </Box>
                                                         }
                                                         secondary={
@@ -343,13 +346,14 @@ export default function UsersList({
                                 <TableCell>E-posta</TableCell>
                                 <TableCell>Telefon</TableCell>
                                 <TableCell>Kullanıcı adı</TableCell>
+                                <TableCell>E-posta Onay</TableCell>
                                 <TableCell>Kayıt tarihi</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={6}>
+                                    <TableCell colSpan={7}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <CircularProgress size={18} />
                                             <Typography variant="body2" color="text.secondary">
@@ -360,7 +364,7 @@ export default function UsersList({
                                 </TableRow>
                             ) : rows.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6}>
+                                    <TableCell colSpan={7}>
                                         <Typography variant="body2" color="text.secondary">
                                             Kayıt bulunamadı.
                                         </Typography>
@@ -374,9 +378,15 @@ export default function UsersList({
                                         <TableCell>{u.email}</TableCell>
                                         <TableCell>{u.phone || '-'}</TableCell>
                                         <TableCell>{u.username}</TableCell>
+                                        <TableCell>{renderVerifyChip(Boolean(u?.emailverified))}</TableCell>
                                         <TableCell>
+                                            {/*TODO : Buradaki saat dilimini kullanıcının saat dilimi olacak şekilde ayarla*/}
                                             {u.created_at
-                                                ? new Date(u.created_at).toLocaleString()
+                                                ? new Date(u.created_at).toLocaleDateString('tr-TR', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric',
+                                                })
                                                 : '-'}
                                         </TableCell>
                                     </TableRow>
