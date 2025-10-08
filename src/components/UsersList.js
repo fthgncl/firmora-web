@@ -6,8 +6,6 @@ import {
     Card,
     CardHeader,
     CardContent,
-    TextField,
-    InputAdornment,
     IconButton,
     Table,
     TableHead,
@@ -31,8 +29,9 @@ import {
     ListItemIcon,
     ListItemText,
 } from '@mui/material';
-import { Search, Clear, Refresh, Visibility, CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
+import { Refresh, Visibility, CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import UserSearchField from './UserSearchField';
 
 // Kolon tanımları
 const COLUMN_DEFS = [
@@ -68,10 +67,6 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
 
-    // arama (debounced)
-    const [searchTerm, setSearchTerm] = useState('');
-    const [debouncedTerm, setDebouncedTerm] = useState('');
-
     // kolon görünürlük
     const [visibleCols, setVisibleCols] = useState(() =>
         COLUMN_DEFS.reduce(
@@ -93,11 +88,6 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
         [token]
     );
 
-    // Debounce: searchTerm değişince 300ms sonra debouncedTerm’e yaz
-    useEffect(() => {
-        const h = setTimeout(() => setDebouncedTerm(searchTerm.trim()), 300);
-        return () => clearTimeout(h);
-    }, [searchTerm]);
 
     const fetchUsers = useCallback(async () => {
         if (!companyId) {
@@ -110,7 +100,8 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
 
             const body = {
                 companyId,
-                searchTerm: debouncedTerm,
+                searchTerm: '',
+                searchScope: "company",
                 limit,
                 offset,
                 sortBy,
@@ -134,7 +125,7 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
         } finally {
             setLoading(false);
         }
-    }, [API_URL, authHeaders, companyId, debouncedTerm, limit, offset, sortBy, sortOrder]);
+    }, [API_URL, authHeaders, companyId, limit, offset, sortBy, sortOrder]);
 
     useEffect(() => {
         fetchUsers();
@@ -207,30 +198,14 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                         </Popover>
 
                         {/* Arama */}
-                        <Box sx={{ position: 'relative', minWidth: 320 }}>
-                            <TextField
-                                size="small"
-                                placeholder="Ara (isim, email, tel, username)"
-                                value={searchTerm}
-                                onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>
-                                    ),
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            {loading ? (
-                                                <CircularProgress size={16} />
-                                            ) : searchTerm ? (
-                                                <IconButton size="small" onClick={() => { setSearchTerm(''); setPage(0); }}>
-                                                    <Clear fontSize="small" />
-                                                </IconButton>
-                                            ) : null}
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </Box>
+                        <UserSearchField 
+                            companyId={companyId} 
+                            minWidth={480}
+                            onUserSelect={(user) => {
+                                // Kullanıcı seçildiğinde yapılacak işlem
+                                console.log('Seçilen kullanıcı:', user);
+                            }}
+                        />
 
                         <Tooltip title="Yenile">
                             <IconButton onClick={fetchUsers}><Refresh /></IconButton>
