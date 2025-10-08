@@ -8,20 +8,23 @@ import {AuthProvider} from './contexts/AuthContext';
 import {AppThemeProvider} from './contexts/ThemeContext';
 import {AlertProvider} from './contexts/AlertContext';
 import {AppBarProvider} from './contexts/AppBarContext';
+import {PermissionsProvider} from './contexts/PermissionsContext';
 import './services/i18n';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <AuthProvider>
-        <AppThemeProvider>
-            <AppBarProvider>
-                <AlertProvider>
-                    <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
-                        <App/>
-                    </BrowserRouter>
-                </AlertProvider>
-            </AppBarProvider>
-        </AppThemeProvider>
+        <PermissionsProvider>
+            <AppThemeProvider>
+                <AppBarProvider>
+                    <AlertProvider>
+                        <BrowserRouter future={{v7_startTransition: true, v7_relativeSplatPath: true}}>
+                            <App/>
+                        </BrowserRouter>
+                    </AlertProvider>
+                </AppBarProvider>
+            </AppThemeProvider>
+        </PermissionsProvider>
     </AuthProvider>
 );
 
