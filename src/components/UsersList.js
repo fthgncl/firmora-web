@@ -29,7 +29,7 @@ import {
     ListItemIcon,
     ListItemText,
 } from '@mui/material';
-import { Refresh, Visibility, CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
+import { Refresh, ViewColumn, CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import UserSearchField from './UserSearchField';
 
@@ -184,7 +184,7 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
 
                         <Tooltip title="Görünüm">
                             <IconButton onClick={openColsMenu} size="small">
-                                <Visibility />
+                                <ViewColumn />
                             </IconButton>
                         </Tooltip>
                         <Popover
