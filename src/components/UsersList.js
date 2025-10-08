@@ -29,9 +29,10 @@ import {
     ListItemIcon,
     ListItemText,
 } from '@mui/material';
-import { Refresh, ViewColumn, CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
+import { Refresh, ViewColumn, CheckCircleOutline, ErrorOutline, Search, Clear } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import UserSearchField from './UserSearchField';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
 
 // Kolon tanımları
 const COLUMN_DEFS = [
@@ -40,7 +41,7 @@ const COLUMN_DEFS = [
     { key: 'email', label: 'E-posta' },
     { key: 'phone', label: 'Telefon' },
     { key: 'username', label: 'Kullanıcı adı' },
-    { key: 'emailverified', label: 'E-posta Onay' },
+    { key: 'emailverified', label: 'E-posta Onayı' },
     { key: 'created_at', label: 'Kayıt tarihi' },
 ];
 
@@ -66,6 +67,7 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
     // kolon görünürlük
     const [visibleCols, setVisibleCols] = useState(() =>
@@ -77,6 +79,34 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
     const [anchorEl, setAnchorEl] = useState(null);
 
     const offset = useMemo(() => page * limit, [page, limit]);
+
+    // Arama terimine göre filtrelenmiş satırlar
+    const filteredRows = useMemo(() => {
+        if (!searchTerm.trim()) {
+            return rows;
+        }
+
+        const lowerSearch = searchTerm.toLowerCase().trim();
+        return rows.filter(user => {
+            return (
+                user.name?.toLowerCase().includes(lowerSearch) ||
+                user.surname?.toLowerCase().includes(lowerSearch) ||
+                user.email?.toLowerCase().includes(lowerSearch) ||
+                user.phone?.toLowerCase().includes(lowerSearch) ||
+                user.username?.toLowerCase().includes(lowerSearch)
+            );
+        });
+    }, [rows, searchTerm]);
+
+    // Filtrelenmiş satırların toplam sayısı
+    const filteredTotal = filteredRows.length;
+
+    // Sayfalanmış satırlar
+    const paginatedRows = useMemo(() => {
+        const start = page * limit;
+        const end = start + limit;
+        return filteredRows.slice(start, end);
+    }, [filteredRows, page, limit]);
 
     const authHeaders = useMemo(
         () => ({
@@ -130,6 +160,11 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
+
+    // Arama terimi değiştiğinde sayfayı sıfırla
+    useEffect(() => {
+        setPage(0);
+    }, [searchTerm]);
 
     // Görünüm menüsü
     const openColsMenu = (e) => setAnchorEl(e.currentTarget);
@@ -211,11 +246,25 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                     {/* Sağ grup: Arama */}
                     <Box sx={{ display: 'flex', gap: 1, flex: { xs: '1', md: '0 1 auto' }, alignItems: 'center' }}>
                         <Box sx={{ flex: 1, minWidth: { xs: '100%', md: 320 }, maxWidth: { md: 480 } }}>
-                            <UserSearchField 
-                                companyId={companyId} 
-                                minWidth="100%"
-                                onUserSelect={(user) => {
-                                    console.log('Seçilen kullanıcı:', user);
+                            <TextField
+                                fullWidth
+                                size="small"
+                                placeholder="Tabloda ara (isim, email, tel, username)"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Search fontSize="small" />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: searchTerm ? (
+                                        <InputAdornment position="end">
+                                            <IconButton size="small" onClick={() => setSearchTerm('')}>
+                                                <Clear fontSize="small" />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ) : null,
                                 }}
                             />
                         </Box>
@@ -251,14 +300,16 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                                         </Box>
                                     </TableCell>
                                 </TableRow>
-                            ) : rows.length === 0 ? (
+                            ) : paginatedRows.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={COLUMN_DEFS.length}>
-                                        <Typography variant="body2" color="text.secondary">Kayıt bulunamadı.</Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {searchTerm ? 'Arama sonucu bulunamadı.' : 'Kayıt bulunamadı.'}
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                rows.map(u => (
+                                paginatedRows.map(u => (
                                     <TableRow key={u.id}>
                                         {visibleCols.name && <TableCell>{u.name}</TableCell>}
                                         {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
@@ -284,10 +335,15 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                         gap: 1
                     }}
                 >
-                    <Typography variant="body2" color="text.secondary">Toplam: {total}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        {searchTerm 
+                            ? `Toplam: ${filteredTotal} (${total} içinden)` 
+                            : `Toplam: ${total}`
+                        }
+                    </Typography>
                     <TablePagination
                         component="div"
-                        count={total}
+                        count={filteredTotal}
                         page={page}
                         onPageChange={(_, newPage) => setPage(newPage)}
                         rowsPerPage={limit}

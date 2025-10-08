@@ -14,7 +14,7 @@ import { Popper } from '@mui/material';
 import { Search, Clear, ErrorOutline } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function UserSearchField({ companyId, minWidth = 320, onUserSelect }) {
+export default function UserSearchField({ companyId, minWidth = 320, onUserSelect, searchScope = 'all' }) {
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
@@ -44,7 +44,7 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                 const body = {
                     companyId,
                     searchTerm: term,
-                    searchScope: 'all', // dilersen 'company' yap
+                    searchScope: searchScope,
                     limit: 10,
                     offset: 0,
                     sortBy: 'name',
@@ -70,7 +70,7 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                 setLoading(false);
             }
         },
-        [API_URL, token, companyId]
+        [API_URL, token, companyId, searchScope]
     );
 
     // Arama terimi değiştiğinde arama yap

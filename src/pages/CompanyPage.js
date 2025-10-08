@@ -25,6 +25,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
 import {useAlert} from '../contexts/AlertContext';
 import UserList from '../components/UsersList';
+import AddUserToCompany from '../components/AddUserToCompany';
 import axios from 'axios';
 
 export default function CompanyPage() {
@@ -296,9 +297,25 @@ export default function CompanyPage() {
                 </Grid>
             </Paper>
 
-                <Grid sx={{mt:4}}>
-                    <UserList companyId={companyId} />
+            {/* Kullanıcı Ekleme */}
+            <Grid container spacing={3} sx={{ mt: 2 }}>
+                <Grid item xs={12} md={4}>
+                    <AddUserToCompany 
+                        companyId={companyId}
+                        onUserAdded={() => {
+                            // Kullanıcı listesini yenilemek için fetchCompanyDetails'i çağırabiliriz
+                            // veya UserList'e bir refresh callback'i ekleyebiliriz
+                            showAlert('Kullanıcı listesi güncelleniyor...', 'info');
+                            // UserList bileşeni zaten useEffect ile yüklendiği için otomatik yenilenecek
+                        }}
+                    />
                 </Grid>
+            </Grid>
+
+            {/* Kullanıcı Listesi */}
+            <Grid sx={{ mt: 4 }}>
+                <UserList companyId={companyId} />
+            </Grid>
         </Container>
     );
 }
