@@ -145,8 +145,9 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                 anchorEl={anchorEl}
                 placement="bottom-start"
                 style={{ 
-                    width: anchorEl?.offsetWidth || '100%',
-                    maxWidth: '100vw'
+                    width: Math.max(anchorEl?.offsetWidth || 0, 480),
+                    maxWidth: '95vw',
+                    zIndex: 1300
                 }}
             >
                 <Paper
@@ -157,6 +158,7 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                         overflowY: 'auto',
                         mt: 0.5,
                         borderRadius: 1.5,
+                        minWidth: 320
                     }}
                 >
                     <Typography variant="caption" color="text.secondary" sx={{ px: 1, pb: 1, display: 'block' }}>
@@ -178,16 +180,16 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                             onMouseDown={(e) => e.preventDefault()} // input blur olmasın
                             onClick={() => handleUserClick(user)}
                         >
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, wordBreak: 'break-word' }}>
                                         {user.name} {user.surname}
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-word', display: 'block' }}>
                                         {user.email}
                                     </Typography>
                                     {user.phone && (
-                                        <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
                                             • {user.phone}
                                         </Typography>
                                     )}
