@@ -1,5 +1,5 @@
 // src/components/UsersList.jsx
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import {
     Box,
@@ -23,66 +23,81 @@ import {
     CircularProgress,
     Alert,
     Chip,
-    Paper,
-    List,
-    ListItemButton,
-    ListItemText,
     Divider,
     Typography,
+    Popover,
+    Checkbox,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
 } from '@mui/material';
-import { Search, Clear, Refresh, CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
+import { Search, Clear, Refresh, Visibility, CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
-const SORT_FIELDS = [
-    { value: 'name', label: 'İsim' },
-    { value: 'surname', label: 'Soyisim' },
-    { value: 'email', label: 'E-posta' },
-    { value: 'phone', label: 'Telefon' },
-    { value: 'username', label: 'Kullanıcı adı' },
-    { value: 'created_at', label: 'Kayıt tarihi' },
+// Kolon tanımları
+const COLUMN_DEFS = [
+    { key: 'name', label: 'Ad' },
+    { key: 'surname', label: 'Soyad' },
+    { key: 'email', label: 'E-posta' },
+    { key: 'phone', label: 'Telefon' },
+    { key: 'username', label: 'Kullanıcı adı' },
+    { key: 'emailverified', label: 'E-posta Onay' },
+    { key: 'created_at', label: 'Kayıt tarihi' },
 ];
+
+const SORT_FIELDS = COLUMN_DEFS
+    .filter(c => ['name', 'surname', 'email', 'phone', 'username', 'created_at'].includes(c.key))
+    .map(c => ({ value: c.key, label: c.label }));
 
 const SORT_ORDERS = [
     { value: 'ASC', label: 'Artan' },
     { value: 'DESC', label: 'Azalan' },
 ];
 
-export default function UsersList({
-                                      companyId,
-                                      initialLimit = 20,
-                                      sx,
-                                  }) {
+export default function UsersList({ companyId, initialLimit = 20, sx }) {
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
+    // tablo state
     const [rows, setRows] = useState([]);
     const [limit, setLimit] = useState(initialLimit);
     const [page, setPage] = useState(0);
     const [sortBy, setSortBy] = useState('name');
     const [sortOrder, setSortOrder] = useState('ASC');
-
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
 
+    // arama (debounced)
     const [searchTerm, setSearchTerm] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
-    const [suggOpen, setSuggOpen] = useState(false);
-    const [suggLoading, setSuggLoading] = useState(false);
-    const searchRef = useRef(null);
-    const suggAbortRef = useRef(null);
+    const [debouncedTerm, setDebouncedTerm] = useState('');
+
+    // kolon görünürlük
+    const [visibleCols, setVisibleCols] = useState(() =>
+        COLUMN_DEFS.reduce(
+            (acc, c) => ({ ...acc, [c.key]: c.key !== 'created_at' }), // Kayıt tarihi varsayılan kapalı
+            {}
+        )
+    );
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const offset = useMemo(() => page * limit, [page, limit]);
 
     const authHeaders = useMemo(
         () => ({
             headers: {
-                'x-access-token': token,
+                'x-access-token': token, // senin istediğin header
                 'Content-Type': 'application/json',
             },
         }),
         [token]
     );
+
+    // Debounce: searchTerm değişince 300ms sonra debouncedTerm’e yaz
+    useEffect(() => {
+        const h = setTimeout(() => setDebouncedTerm(searchTerm.trim()), 300);
+        return () => clearTimeout(h);
+    }, [searchTerm]);
 
     const fetchUsers = useCallback(async () => {
         if (!companyId) {
@@ -92,14 +107,16 @@ export default function UsersList({
         try {
             setLoading(true);
             setErrorMsg('');
+
             const body = {
                 companyId,
-                searchTerm,
+                searchTerm: debouncedTerm,
                 limit,
                 offset,
                 sortBy,
                 sortOrder,
             };
+
             const { data } = await axios.post(API_URL, body, authHeaders);
 
             if (data?.success) {
@@ -117,91 +134,29 @@ export default function UsersList({
         } finally {
             setLoading(false);
         }
-    }, [API_URL, authHeaders, companyId, limit, offset, searchTerm, sortBy, sortOrder]);
+    }, [API_URL, authHeaders, companyId, debouncedTerm, limit, offset, sortBy, sortOrder]);
 
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
 
-    // Typeahead (>=2 karakterde, küçük limit ile)
-    useEffect(() => {
-        if (!searchTerm || searchTerm.trim().length < 2) {
-            setSuggestions([]);
-            setSuggOpen(false);
-            return;
-        }
+    // Görünüm menüsü
+    const openColsMenu = (e) => setAnchorEl(e.currentTarget);
+    const closeColsMenu = () => setAnchorEl(null);
+    const toggleCol = (key) => setVisibleCols(prev => ({ ...prev, [key]: !prev[key] }));
 
-        const handle = setTimeout(async () => {
-            try {
-                setSuggLoading(true);
-                setSuggOpen(true);
-
-                if (suggAbortRef.current) suggAbortRef.current.abort();
-                const controller = new AbortController();
-                suggAbortRef.current = controller;
-
-                const body = {
-                    companyId,
-                    searchTerm,
-                    limit: 5,
-                    offset: 0,
-                    sortBy: 'name',
-                    sortOrder: 'ASC',
-                };
-
-                const { data } = await axios.post(API_URL, body, {
-                    ...authHeaders,
-                    signal: controller.signal,
-                });
-
-                if (data?.success) {
-                    setSuggestions(data.data?.users ?? []);
-                } else {
-                    setSuggestions([]);
-                }
-            } catch {
-                setSuggestions([]);
-            } finally {
-                setSuggLoading(false);
-            }
-        }, 300);
-
-        return () => clearTimeout(handle);
-    }, [API_URL, authHeaders, companyId, searchTerm]);
-
-    const handleClearSearch = () => {
-        setSearchTerm('');
-        setSuggOpen(false);
-        setPage(0);
-    };
-
-    const handlePickSuggestion = (u) => {
-        const nextTerm = u?.username || u?.email || u?.name || '';
-        setSearchTerm(nextTerm);
-        setSuggOpen(false);
-        setPage(0);
-    };
-
-    const handleRefresh = () => {
-        fetchUsers();
-    };
-
+    // Chip + Tarih
     const renderVerifyChip = (flag) =>
         flag ? (
-            <Chip
-                size="small"
-                color="success"
-                icon={<CheckCircleOutline />}
-                label="Onaylandı"
-            />
+            <Chip size="small" color="success" icon={<CheckCircleOutline />} label="Onaylandı" />
         ) : (
-            <Chip
-                size="small"
-                color="warning"
-                icon={<ErrorOutline />}
-                label="Bekleniyor"
-            />
+            <Chip size="small" color="warning" icon={<ErrorOutline />} label="Bekleniyor" />
         );
+
+    const formatDate = (d) =>
+        d
+            ? new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+            : '-';
 
     return (
         <Card sx={{ ...sx }}>
@@ -209,53 +164,65 @@ export default function UsersList({
                 title="Kullanıcılar"
                 action={
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                        {/* Sıralama alanı */}
                         <FormControl size="small">
-                            <Select
-                                value={sortBy}
-                                onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
-                            >
+                            <Select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(0); }}>
                                 {SORT_FIELDS.map(f => (
                                     <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
 
+                        {/* Sıralama yönü */}
                         <FormControl size="small">
-                            <Select
-                                value={sortOrder}
-                                onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}
-                            >
+                            <Select value={sortOrder} onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}>
                                 {SORT_ORDERS.map(o => (
                                     <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
 
-                        <Box sx={{ position: 'relative' }}>
+                        {/* Görünüm (kolon görünürlüğü) */}
+                        <Tooltip title="Görünüm">
+                            <IconButton onClick={openColsMenu}><Visibility /></IconButton>
+                        </Tooltip>
+                        <Popover
+                            open={Boolean(anchorEl)}
+                            anchorEl={anchorEl}
+                            onClose={closeColsMenu}
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            PaperProps={{ sx: { width: 240, p: 1 } }}
+                        >
+                            <Typography variant="subtitle2" sx={{ px: 1, pb: 0.5 }}>Görünecek Sütunlar</Typography>
+                            <Divider sx={{ mb: 0.5 }} />
+                            {COLUMN_DEFS.map(c => (
+                                <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
+                                    <ListItemIcon>
+                                        <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1} disableRipple />
+                                    </ListItemIcon>
+                                    <ListItemText primary={c.label} />
+                                </ListItemButton>
+                            ))}
+                        </Popover>
+
+                        {/* Arama */}
+                        <Box sx={{ position: 'relative', minWidth: 320 }}>
                             <TextField
-                                inputRef={searchRef}
                                 size="small"
                                 placeholder="Ara (isim, email, tel, username)"
                                 value={searchTerm}
                                 onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
-                                onFocus={() => {
-                                    if (suggestions.length > 0) setSuggOpen(true);
-                                }}
-                                onBlur={() => {
-                                    setTimeout(() => setSuggOpen(false), 150);
-                                }}
                                 InputProps={{
                                     startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Search fontSize="small" />
-                                        </InputAdornment>
+                                        <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>
                                     ),
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            {suggLoading ? (
+                                            {loading ? (
                                                 <CircularProgress size={16} />
                                             ) : searchTerm ? (
-                                                <IconButton size="small" onClick={handleClearSearch}>
+                                                <IconButton size="small" onClick={() => { setSearchTerm(''); setPage(0); }}>
                                                     <Clear fontSize="small" />
                                                 </IconButton>
                                             ) : null}
@@ -263,132 +230,54 @@ export default function UsersList({
                                     ),
                                 }}
                             />
-
-                            {suggOpen && (
-                                <Paper
-                                    elevation={6}
-                                    sx={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        right: 0,
-                                        mt: 0.5,
-                                        width: 460,
-                                        maxHeight: 360,
-                                        overflowY: 'auto',
-                                        zIndex: 10,
-                                        borderRadius: 1.5,
-                                    }}
-                                >
-                                    <List dense disablePadding>
-                                        {suggestions.length === 0 && !suggLoading && (
-                                            <Box sx={{ p: 1.5 }}>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    Sonuç yok
-                                                </Typography>
-                                            </Box>
-                                        )}
-                                        {suggestions.map((u, idx) => (
-                                            <React.Fragment key={u.id || `${u.username}-${idx}`}>
-                                                {idx > 0 && <Divider />}
-                                                <ListItemButton onMouseDown={() => handlePickSuggestion(u)}>
-                                                    <ListItemText
-                                                        primary={
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-                                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                                                    {u.name} {u.surname}
-                                                                </Typography>
-                                                                {u.username && <Chip size="small" label={`@${u.username}`} />}
-                                                                {/* emailverified chip */}
-                                                                {renderVerifyChip(Boolean(u?.emailverified))}
-                                                            </Box>
-                                                        }
-                                                        secondary={
-                                                            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                                                <Typography variant="caption" color="text.secondary">{u.email}</Typography>
-                                                                {u.phone && (
-                                                                    <Typography variant="caption" color="text.secondary">
-                                                                        {u.phone}
-                                                                    </Typography>
-                                                                )}
-                                                            </Box>
-                                                        }
-                                                    />
-                                                </ListItemButton>
-                                            </React.Fragment>
-                                        ))}
-                                    </List>
-                                </Paper>
-                            )}
                         </Box>
 
                         <Tooltip title="Yenile">
-                            <IconButton onClick={handleRefresh}>
-                                <Refresh />
-                            </IconButton>
+                            <IconButton onClick={fetchUsers}><Refresh /></IconButton>
                         </Tooltip>
                     </Box>
                 }
             />
 
             <CardContent sx={{ pt: 0 }}>
-                {errorMsg && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                        {errorMsg}
-                    </Alert>
-                )}
+                {errorMsg && <Alert severity="error" sx={{ mb: 2 }}>{errorMsg}</Alert>}
 
                 <TableContainer>
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Ad</TableCell>
-                                <TableCell>Soyad</TableCell>
-                                <TableCell>E-posta</TableCell>
-                                <TableCell>Telefon</TableCell>
-                                <TableCell>Kullanıcı adı</TableCell>
-                                <TableCell>E-posta Onay</TableCell>
-                                <TableCell>Kayıt tarihi</TableCell>
+                                {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
+                                    <TableCell key={c.key}>{c.label}</TableCell>
+                                ))}
                             </TableRow>
                         </TableHead>
+
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={7}>
+                                    <TableCell colSpan={COLUMN_DEFS.length}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <CircularProgress size={18} />
-                                            <Typography variant="body2" color="text.secondary">
-                                                Yükleniyor…
-                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">Yükleniyor…</Typography>
                                         </Box>
                                     </TableCell>
                                 </TableRow>
                             ) : rows.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Kayıt bulunamadı.
-                                        </Typography>
+                                    <TableCell colSpan={COLUMN_DEFS.length}>
+                                        <Typography variant="body2" color="text.secondary">Kayıt bulunamadı.</Typography>
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                rows.map((u) => (
+                                rows.map(u => (
                                     <TableRow key={u.id}>
-                                        <TableCell>{u.name}</TableCell>
-                                        <TableCell>{u.surname}</TableCell>
-                                        <TableCell>{u.email}</TableCell>
-                                        <TableCell>{u.phone || '-'}</TableCell>
-                                        <TableCell>{u.username}</TableCell>
-                                        <TableCell>{renderVerifyChip(Boolean(u?.emailverified))}</TableCell>
-                                        <TableCell>
-                                            {/*TODO : Buradaki saat dilimini kullanıcının saat dilimi olacak şekilde ayarla*/}
-                                            {u.created_at
-                                                ? new Date(u.created_at).toLocaleDateString('tr-TR', {
-                                                    day: 'numeric',
-                                                    month: 'long',
-                                                    year: 'numeric',
-                                                })
-                                                : '-'}
-                                        </TableCell>
+                                        {visibleCols.name && <TableCell>{u.name}</TableCell>}
+                                        {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
+                                        {visibleCols.email && <TableCell>{u.email}</TableCell>}
+                                        {visibleCols.phone && <TableCell>{u.phone || '-'}</TableCell>}
+                                        {visibleCols.username && <TableCell>{u.username}</TableCell>}
+                                        {visibleCols.emailverified && <TableCell>{renderVerifyChip(Boolean(u.emailverified))}</TableCell>}
+                                        {visibleCols.created_at && <TableCell>{formatDate(u.created_at)}</TableCell>}
                                     </TableRow>
                                 ))
                             )}
@@ -397,25 +286,17 @@ export default function UsersList({
                 </TableContainer>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            Toplam: {total}
-                        </Typography>
-                    </Box>
-
+                    <Typography variant="body2" color="text.secondary">Toplam: {total}</Typography>
                     <TablePagination
                         component="div"
                         count={total}
                         page={page}
                         onPageChange={(_, newPage) => setPage(newPage)}
                         rowsPerPage={limit}
-                        onRowsPerPageChange={(e) => {
-                            setLimit(parseInt(e.target.value, 10));
-                            setPage(0);
-                        }}
+                        onRowsPerPageChange={(e) => { setLimit(parseInt(e.target.value, 10)); setPage(0); }}
                         rowsPerPageOptions={[10, 20, 50, 100]}
                         labelRowsPerPage="Sayfa başına"
-                        labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count !== -1 ? count : `≥${to}`}`}
+                        labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
                     />
                 </Box>
             </CardContent>
