@@ -14,7 +14,7 @@ import { Popper } from '@mui/material';
 import { Search, Clear, ErrorOutline } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function UserSearchField({ companyId, minWidth = 480, onUserSelect }) {
+export default function UserSearchField({ companyId, minWidth = 320, onUserSelect }) {
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
@@ -144,7 +144,10 @@ export default function UserSearchField({ companyId, minWidth = 480, onUserSelec
                 open={open}
                 anchorEl={anchorEl}
                 placement="bottom-start"
-                style={{ width: anchorEl?.offsetWidth || minWidth }}
+                style={{ 
+                    width: anchorEl?.offsetWidth || '100%',
+                    maxWidth: '100vw'
+                }}
             >
                 <Paper
                     elevation={6}

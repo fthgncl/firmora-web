@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Container,
     Box,
@@ -21,16 +21,17 @@ import {
     TrendingUp,
     Settings,
 } from '@mui/icons-material';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useAlert } from '../contexts/AlertContext';
+import {useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from '../contexts/AuthContext';
+import {useAlert} from '../contexts/AlertContext';
+import UserList from '../components/UsersList';
 import axios from 'axios';
 
 export default function CompanyPage() {
-    const { companyId } = useParams();
-    const { token } = useAuth();
+    const {companyId} = useParams();
+    const {token} = useAuth();
     const navigate = useNavigate();
-    const { showAlert } = useAlert();
+    const {showAlert} = useAlert();
 
     const [loading, setLoading] = useState(true);
     const [company, setCompany] = useState(null);
@@ -46,7 +47,7 @@ export default function CompanyPage() {
 
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/companies/get`,
-                { companyId },
+                {companyId},
                 {
                     headers: {
                         'x-access-token': token,
@@ -94,9 +95,9 @@ export default function CompanyPage() {
 
     if (loading) {
         return (
-            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }}>
-                    <CircularProgress size={60} />
+            <Container maxWidth="xl" sx={{mt: 4, mb: 4}}>
+                <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh'}}>
+                    <CircularProgress size={60}/>
                 </Box>
             </Container>
         );
@@ -104,8 +105,8 @@ export default function CompanyPage() {
 
     if (!company) {
         return (
-            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-                <Alert severity="error" sx={{ borderRadius: 2 }}>
+            <Container maxWidth="xl" sx={{mt: 4, mb: 4}}>
+                <Alert severity="error" sx={{borderRadius: 2}}>
                     Firma bulunamadı
                 </Alert>
             </Container>
@@ -113,31 +114,31 @@ export default function CompanyPage() {
     }
 
     return (
-        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="xl" sx={{mt: 4, mb: 4}}>
             {/* Header */}
-            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <IconButton 
-                        onClick={() => navigate('/')} 
-                        sx={{ 
+            <Box sx={{mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
+                    <IconButton
+                        onClick={() => navigate('/')}
+                        sx={{
                             bgcolor: 'background.paper',
                             boxShadow: 1,
-                            '&:hover': { bgcolor: 'action.hover' }
+                            '&:hover': {bgcolor: 'action.hover'}
                         }}
                     >
-                        <ArrowBack />
+                        <ArrowBack/>
                     </IconButton>
-                    <Avatar sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}>
-                        <Business sx={{ fontSize: 32 }} />
+                    <Avatar sx={{width: 56, height: 56, bgcolor: 'primary.main'}}>
+                        <Business sx={{fontSize: 32}}/>
                     </Avatar>
                     <Box>
-                        <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 0.5 }}>
+                        <Typography variant="h4" component="h1" sx={{fontWeight: 700, mb: 0.5}}>
                             {company.company_name}
                         </Typography>
-                        <Chip 
-                            label={company.sector} 
-                            size="small" 
-                            color="primary" 
+                        <Chip
+                            label={company.sector}
+                            size="small"
+                            color="primary"
                             variant="outlined"
                         />
                     </Box>
@@ -147,19 +148,19 @@ export default function CompanyPage() {
                     sx={{
                         bgcolor: 'background.paper',
                         boxShadow: 1,
-                        '&:hover': { bgcolor: 'action.hover' }
+                        '&:hover': {bgcolor: 'action.hover'}
                     }}
                 >
-                    <Settings />
+                    <Settings/>
                 </IconButton>
             </Box>
 
             {/* Stats Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={3} sx={{mb: 4}}>
                 {/* Balance Card */}
                 <Grid item xs={12} md={6} lg={4}>
-                    <Card 
-                        sx={{ 
+                    <Card
+                        sx={{
                             height: '100%',
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             color: 'white',
@@ -168,18 +169,18 @@ export default function CompanyPage() {
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', mr: 2 }}>
-                                    <AccountBalance />
+                            <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                                <Avatar sx={{bgcolor: 'rgba(255,255,255,0.2)', mr: 2}}>
+                                    <AccountBalance/>
                                 </Avatar>
-                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                <Typography variant="h6" sx={{fontWeight: 600}}>
                                     Mevcut Bakiye
                                 </Typography>
                             </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
+                            <Typography variant="h3" sx={{fontWeight: 700, mb: 1}}>
                                 {formatBalance(company.balance, company.currency)}
                             </Typography>
-                            <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                            <Typography variant="body2" sx={{opacity: 0.9}}>
                                 {company.currency} • Güncel Durum
                             </Typography>
                         </CardContent>
@@ -188,21 +189,21 @@ export default function CompanyPage() {
 
                 {/* Company Info Card */}
                 <Grid item xs={12} md={6} lg={4}>
-                    <Card sx={{ height: '100%' }}>
+                    <Card sx={{height: '100%'}}>
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
-                                    <Business />
+                            <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                                <Avatar sx={{bgcolor: 'primary.main', mr: 2}}>
+                                    <Business/>
                                 </Avatar>
-                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                <Typography variant="h6" sx={{fontWeight: 600}}>
                                     Firma Bilgileri
                                 </Typography>
                             </Box>
-                            <Box sx={{ mb: 2 }}>
+                            <Box sx={{mb: 2}}>
                                 <Typography variant="body2" color="text.secondary" gutterBottom>
                                     Firma Adı
                                 </Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 600, mb: 2 }}>
+                                <Typography variant="body1" sx={{fontWeight: 600, mb: 2}}>
                                     {company.company_name}
                                 </Typography>
                             </Box>
@@ -210,7 +211,7 @@ export default function CompanyPage() {
                                 <Typography variant="body2" color="text.secondary" gutterBottom>
                                     Sektör
                                 </Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                                <Typography variant="body1" sx={{fontWeight: 600}}>
                                     {company.sector}
                                 </Typography>
                             </Box>
@@ -220,17 +221,17 @@ export default function CompanyPage() {
 
                 {/* Date Info Card */}
                 <Grid item xs={12} md={6} lg={4}>
-                    <Card sx={{ height: '100%' }}>
+                    <Card sx={{height: '100%'}}>
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <Avatar sx={{ bgcolor: 'success.main', mr: 2 }}>
-                                    <CalendarToday />
+                            <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                                <Avatar sx={{bgcolor: 'success.main', mr: 2}}>
+                                    <CalendarToday/>
                                 </Avatar>
-                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                <Typography variant="h6" sx={{fontWeight: 600}}>
                                     Oluşturma Tarihi
                                 </Typography>
                             </Box>
-                            <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+                            <Typography variant="h5" sx={{fontWeight: 700, mb: 1}}>
                                 {formatDate(company.created_at)}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
@@ -242,10 +243,10 @@ export default function CompanyPage() {
             </Grid>
 
             {/* Additional Info */}
-            <Paper sx={{ p: 4 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                    <TrendingUp sx={{ fontSize: 28, color: 'primary.main', mr: 1.5 }} />
-                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
+            <Paper sx={{p: 4}}>
+                <Box sx={{display: 'flex', alignItems: 'center', mb: 3}}>
+                    <TrendingUp sx={{fontSize: 28, color: 'primary.main', mr: 1.5}}/>
+                    <Typography variant="h5" sx={{fontWeight: 600}}>
                         Özet Bilgiler
                     </Typography>
                 </Box>
@@ -255,7 +256,7 @@ export default function CompanyPage() {
                             <Typography variant="body2" color="text.secondary" gutterBottom>
                                 Firma ID
                             </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
+                            <Typography variant="body1" sx={{fontWeight: 600, fontFamily: 'monospace'}}>
                                 {company.id}
                             </Typography>
                         </Box>
@@ -265,7 +266,7 @@ export default function CompanyPage() {
                             <Typography variant="body2" color="text.secondary" gutterBottom>
                                 Para Birimi
                             </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            <Typography variant="body1" sx={{fontWeight: 600}}>
                                 {company.currency}
                             </Typography>
                         </Box>
@@ -287,13 +288,17 @@ export default function CompanyPage() {
                             <Typography variant="body2" color="text.secondary" gutterBottom>
                                 Sektör
                             </Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            <Typography variant="body1" sx={{fontWeight: 600}}>
                                 {company.sector}
                             </Typography>
                         </Box>
                     </Grid>
                 </Grid>
             </Paper>
+
+                <Grid sx={{mt:4}}>
+                    <UserList companyId={companyId} />
+                </Grid>
         </Container>
     );
 }

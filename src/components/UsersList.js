@@ -151,12 +151,22 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
 
     return (
         <Card sx={{ ...sx }}>
-            <CardHeader
-                title="Kullanıcılar"
-                action={
-                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                        {/* Sıralama alanı */}
-                        <FormControl size="small">
+            <CardHeader title="Kullanıcılar" />
+
+            <CardContent>
+                {/* Kontroller - Responsive */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
+                        gap: { xs: 2, md: 1 },
+                        mb: 2,
+                        alignItems: { xs: 'stretch', md: 'center' },
+                    }}
+                >
+                    {/* Sol grup: Sıralama kontrolleri */}
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
                             <Select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(0); }}>
                                 {SORT_FIELDS.map(f => (
                                     <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>
@@ -164,8 +174,7 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                             </Select>
                         </FormControl>
 
-                        {/* Sıralama yönü */}
-                        <FormControl size="small">
+                        <FormControl size="small" sx={{ minWidth: 100 }}>
                             <Select value={sortOrder} onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}>
                                 {SORT_ORDERS.map(o => (
                                     <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
@@ -173,9 +182,10 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                             </Select>
                         </FormControl>
 
-                        {/* Görünüm (kolon görünürlüğü) */}
                         <Tooltip title="Görünüm">
-                            <IconButton onClick={openColsMenu}><Visibility /></IconButton>
+                            <IconButton onClick={openColsMenu} size="small">
+                                <Visibility />
+                            </IconButton>
                         </Tooltip>
                         <Popover
                             open={Boolean(anchorEl)}
@@ -196,29 +206,33 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                                 </ListItemButton>
                             ))}
                         </Popover>
+                    </Box>
 
-                        {/* Arama */}
-                        <UserSearchField 
-                            companyId={companyId} 
-                            minWidth={480}
-                            onUserSelect={(user) => {
-                                // Kullanıcı seçildiğinde yapılacak işlem
-                                console.log('Seçilen kullanıcı:', user);
-                            }}
-                        />
+                    {/* Sağ grup: Arama */}
+                    <Box sx={{ display: 'flex', gap: 1, flex: { xs: '1', md: '0 1 auto' }, alignItems: 'center' }}>
+                        <Box sx={{ flex: 1, minWidth: { xs: '100%', md: 320 }, maxWidth: { md: 480 } }}>
+                            <UserSearchField 
+                                companyId={companyId} 
+                                minWidth="100%"
+                                onUserSelect={(user) => {
+                                    console.log('Seçilen kullanıcı:', user);
+                                }}
+                            />
+                        </Box>
 
                         <Tooltip title="Yenile">
-                            <IconButton onClick={fetchUsers}><Refresh /></IconButton>
+                            <IconButton onClick={fetchUsers} size="small">
+                                <Refresh />
+                            </IconButton>
                         </Tooltip>
                     </Box>
-                }
-            />
+                </Box>
 
-            <CardContent sx={{ pt: 0 }}>
+                {/* Hata mesajı */}
                 {errorMsg && <Alert severity="error" sx={{ mb: 2 }}>{errorMsg}</Alert>}
 
-                <TableContainer>
-                    <Table size="small">
+                <TableContainer sx={{ overflowX: 'auto' }}>
+                    <Table size="small" sx={{ minWidth: { xs: 600, md: 'auto' } }}>
                         <TableHead>
                             <TableRow>
                                 {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
@@ -260,7 +274,16 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                     </Table>
                 </TableContainer>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
+                <Box 
+                    sx={{ 
+                        display: 'flex', 
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'center' }, 
+                        justifyContent: 'space-between', 
+                        mt: 2,
+                        gap: 1
+                    }}
+                >
                     <Typography variant="body2" color="text.secondary">Toplam: {total}</Typography>
                     <TablePagination
                         component="div"
@@ -272,6 +295,12 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
                         rowsPerPageOptions={[10, 20, 50, 100]}
                         labelRowsPerPage="Sayfa başına"
                         labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
+                        sx={{
+                            '.MuiTablePagination-toolbar': {
+                                flexWrap: 'wrap',
+                                minHeight: { xs: 'auto', sm: 52 }
+                            }
+                        }}
                     />
                 </Box>
             </CardContent>
