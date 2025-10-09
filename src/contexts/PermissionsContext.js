@@ -6,7 +6,6 @@ const PermissionsContext = createContext(null);
 
 export const PermissionsProvider = ({ children }) => {
     const permissionsData = usePermissionsHook();
-
     return (
         <PermissionsContext.Provider value={permissionsData}>
             {children}
@@ -15,11 +14,7 @@ export const PermissionsProvider = ({ children }) => {
 };
 
 export const usePermissions = () => {
-    const context = useContext(PermissionsContext);
-    if (!context) {
-        throw new Error('usePermissions must be used within PermissionsProvider');
-    }
-    return context;
+    return useContext(PermissionsContext);
 };
 
 export default PermissionsContext;

@@ -298,23 +298,15 @@ export default function CompanyPage() {
             </Paper>
 
             {/* Kullanıcı Ekleme */}
-            <Grid container spacing={3} sx={{ mt: 2 }}>
+            <Grid container spacing={3} sx={{mt: 2}}>
                 <Grid item xs={12} md={4}>
-                    <AddUserToCompany 
-                        companyId={companyId}
-                        onUserAdded={() => {
-                            // Kullanıcı listesini yenilemek için fetchCompanyDetails'i çağırabiliriz
-                            // veya UserList'e bir refresh callback'i ekleyebiliriz
-                            showAlert('Kullanıcı listesi güncelleniyor...', 'info');
-                            // UserList bileşeni zaten useEffect ile yüklendiği için otomatik yenilenecek
-                        }}
-                    />
+                    <AddUserToCompany companyId={companyId}/>
                 </Grid>
             </Grid>
 
             {/* Kullanıcı Listesi */}
-            <Grid sx={{ mt: 4 }}>
-                <UserList companyId={companyId} />
+            <Grid sx={{mt: 4}}>
+                <UserList companyId={companyId}/>
             </Grid>
         </Container>
     );

@@ -106,7 +106,6 @@ export default function CompanyList() {
     }, [token]);
 
     const handleCompanyClick = (company) => {
-        console.log('Firma seçildi:', company);
         navigate(`/company/${company.id}`);
     };
 

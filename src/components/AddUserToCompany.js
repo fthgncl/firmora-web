@@ -1,5 +1,5 @@
 // src/components/AddUserToCompany.jsx
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import {
     Box,
@@ -18,25 +18,43 @@ import {
     CircularProgress,
     Chip,
     Avatar,
+    FormGroup,
+    FormControlLabel,
+    Checkbox,
+    Paper,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
 } from '@mui/material';
-import { PersonAdd, Close, CheckCircle, Email, Phone, Person } from '@mui/icons-material';
+import { PersonAdd, Close, CheckCircle, Email, Phone, Person, ExpandMore, Security } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
+import { usePermissions } from '../contexts/PermissionsContext';
 import UserSearchField from './UserSearchField';
 
-export default function AddUserToCompany({ companyId, onUserAdded }) {
+export default function AddUserToCompany({ companyId }) {
     const { token } = useAuth();
-    const { showAlert } = useAlert();
+    const { showAlert,showSuccess } = useAlert();
+    const { getPermissionsByCategory, encodePermissions, loading: permissionsLoading } = usePermissions();
     const API_URL = `${process.env.REACT_APP_API_URL}/companies/add-user`;
 
     const [open, setOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedPermissions, setSelectedPermissions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    const [permissionCategories, setPermissionCategories] = useState({});
+
+    useEffect(() => {
+        const categories = getPermissionsByCategory();
+        setPermissionCategories(categories);
+    }, [getPermissionsByCategory]);
 
     const handleOpen = () => {
         setOpen(true);
         setSelectedUser(null);
+        setSelectedPermissions([]);
         setError('');
     };
 
@@ -44,6 +62,7 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
         if (!loading) {
             setOpen(false);
             setSelectedUser(null);
+            setSelectedPermissions([]);
             setError('');
         }
     };
@@ -53,9 +72,45 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
         setError('');
     };
 
+    const handlePermissionToggle = (permissionKey) => {
+        setSelectedPermissions(prev => {
+            if (prev.includes(permissionKey)) {
+                return prev.filter(p => p !== permissionKey);
+            } else {
+                return [...prev, permissionKey];
+            }
+        });
+    };
+
+    const handleCategoryToggle = (permissions) => {
+        const permissionKeys = permissions.map(p => p.key);
+        const allSelected = permissionKeys.every(key => selectedPermissions.includes(key));
+
+        setSelectedPermissions(prev => {
+            if (allSelected) {
+                // Tümü seçiliyse, bu kategorinin tüm yetkilerini kaldır
+                return prev.filter(p => !permissionKeys.includes(p));
+            } else {
+                // Tümü seçili değilse, bu kategorinin tüm yetkilerini ekle
+                const newPermissions = [...prev];
+                permissionKeys.forEach(key => {
+                    if (!newPermissions.includes(key)) {
+                        newPermissions.push(key);
+                    }
+                });
+                return newPermissions;
+            }
+        });
+    };
+
     const handleAddUser = async () => {
         if (!selectedUser) {
             setError('Lütfen bir kullanıcı seçin');
+            return;
+        }
+
+        if (selectedPermissions.length === 0) {
+            setError('Lütfen en az bir yetki seçin');
             return;
         }
 
@@ -63,11 +118,14 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
             setLoading(true);
             setError('');
 
+            // Yetkileri encode et
+            const permissionsString = await encodePermissions(selectedPermissions);
             const response = await axios.post(
                 API_URL,
                 {
                     companyId,
                     userId: selectedUser.id,
+                    permissions: permissionsString,
                 },
                 {
                     headers: {
@@ -77,18 +135,63 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                 }
             );
 
-            if (response.data.success) {
-                showAlert('Kullanıcı başarıyla şirkete eklendi', 'success');
-                handleClose();
-                if (onUserAdded) {
-                    onUserAdded(selectedUser);
-                }
+            // API dökümanına göre başarılı yanıt kontrolü
+            if (response.data && response.data.status === "success") {
+                // API'den dönen mesajı kullan
+                const successMessage = response.data.message || 'Kullanıcı başarıyla firmaya eklendi';
+                showSuccess(successMessage, 'İşlem Başarılı');
+
+                // Dialog'u kapat ve state'i temizle
+                setOpen(false);
+                setSelectedUser(null);
+                setSelectedPermissions([]);
+                setError('');
+
             } else {
-                setError(response.data.message || 'Kullanıcı eklenirken hata oluştu');
+                // success: false durumu
+                const errorMessage = response.data?.message || 'Kullanıcı eklenirken hata oluştu';
+                setError(errorMessage);
+                showAlert(errorMessage, 'error');
             }
         } catch (err) {
             console.error('Kullanıcı ekleme hatası:', err);
-            const errorMsg = err?.response?.data?.message || err.message || 'Beklenmeyen bir hata oluştu';
+            // TODO: Dil yapılandırılmasını düzeltirken burayı temizle
+            // HTTP hata kodlarına göre mesaj belirleme
+            let errorMsg = 'Beklenmeyen bir hata oluştu';
+
+            if (err.response) {
+                // Sunucudan yanıt geldi ama hata kodu döndü
+                const status = err.response.status;
+                const responseMessage = err.response.data?.message;
+
+                switch (status) {
+                    case 400:
+                        // Gerekli alanlar eksik veya kullanıcı zaten firmada mevcut
+                        errorMsg = responseMessage || 'Geçersiz istek. Lütfen bilgileri kontrol edin.';
+                        break;
+                    case 403:
+                        // Yetkisiz erişim
+                        errorMsg = responseMessage || 'Bu işlem için yetkiniz bulunmamaktadır';
+                        break;
+                    case 404:
+                        // Kullanıcı veya firma bulunamadı
+                        errorMsg = responseMessage || 'Kullanıcı veya firma bulunamadı';
+                        break;
+                    case 500:
+                        // Sunucu hatası
+                        errorMsg = responseMessage || 'Sunucu hatası oluştu';
+                        break;
+                    default:
+                        errorMsg = responseMessage || `Hata oluştu (${status})`;
+                }
+            } else if (err.request) {
+                // İstek gönderildi ama yanıt alınamadı
+                errorMsg = 'Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin.';
+            } else {
+                // İstek oluşturulurken hata oluştu
+                errorMsg = err.message || 'Beklenmeyen bir hata oluştu';
+            }
+
             setError(errorMsg);
             showAlert(errorMsg, 'error');
         } finally {
@@ -217,6 +320,134 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                             </Box>
                         </Box>
                     )}
+
+                    {selectedUser && (
+                        <Box sx={{ mt: 3 }}>
+                            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                    <Security color="primary" />
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                        Yetki Seçimi
+                                    </Typography>
+                                    <Chip 
+                                        size="small" 
+                                        label={`${selectedPermissions.length} seçili`}
+                                        color={selectedPermissions.length > 0 ? 'primary' : 'default'}
+                                    />
+                                </Box>
+
+                                {permissionsLoading ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
+                                        <CircularProgress size={20} />
+                                        <Typography variant="body2" color="text.secondary">
+                                            Yetkiler yükleniyor...
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    <>
+                                        {Object.keys(permissionCategories).length === 0 ? (
+                                            <Alert severity="info" sx={{ mt: 2 }}>
+                                                Yetki kategorisi bulunamadı.
+                                            </Alert>
+                                        ) : (
+                                            Object.entries(permissionCategories).map(([categoryName, permissions], index) => {
+                                                const categoryColors = ['primary', 'secondary', 'success', 'warning', 'info', 'error'];
+                                                const categoryColor = categoryColors[index % categoryColors.length];
+
+                                                const selectedCount = permissions.filter(p => 
+                                                    selectedPermissions.includes(p.key)
+                                                ).length;
+
+                                                const permissionKeys = permissions.map(p => p.key);
+                                                const allSelected = permissionKeys.every(key => 
+                                                    selectedPermissions.includes(key)
+                                                );
+                                                const someSelected = selectedCount > 0 && !allSelected;
+
+                                                return (
+                                                    <Accordion key={categoryName} defaultExpanded={index === 0}>
+                                                        <AccordionSummary 
+                                                            expandIcon={<ExpandMore />}
+                                                            sx={{ 
+                                                                '& .MuiAccordionSummary-content': { 
+                                                                    alignItems: 'center',
+                                                                    gap: 1
+                                                                } 
+                                                            }}
+                                                        >
+                                                            <Checkbox
+                                                                checked={allSelected}
+                                                                indeterminate={someSelected}
+                                                                onChange={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleCategoryToggle(permissions);
+                                                                }}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                size="small"
+                                                                sx={{ p: 0, mr: 1 }}
+                                                            />
+                                                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                                                {categoryName}
+                                                            </Typography>
+                                                            <Chip 
+                                                                size="small" 
+                                                                label={`${selectedCount}/${permissions.length}`}
+                                                                sx={{ ml: 'auto' }}
+                                                                color={selectedCount > 0 ? categoryColor : 'default'}
+                                                                variant={selectedCount > 0 ? 'filled' : 'outlined'}
+                                                            />
+                                                        </AccordionSummary>
+                                                        <AccordionDetails>
+                                                            <FormGroup>
+                                                                {permissions.map((permission) => (
+                                                                    <FormControlLabel
+                                                                        key={permission.key}
+                                                                        control={
+                                                                            <Checkbox
+                                                                                checked={selectedPermissions.includes(permission.key)}
+                                                                                onChange={() => handlePermissionToggle(permission.key)}
+                                                                                size="small"
+                                                                            />
+                                                                        }
+                                                                        label={
+                                                                            <Box sx={{ ml: 1 }}>
+                                                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                                                    {permission.name}
+                                                                                </Typography>
+                                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                                                    {permission.description}
+                                                                                </Typography>
+                                                                                <Chip 
+                                                                                    size="small" 
+                                                                                    label={`Kod: ${permission.code}`}
+                                                                                    sx={{ mt: 0.5, height: 20, fontSize: '0.7rem' }}
+                                                                                    variant="outlined"
+                                                                                />
+                                                                            </Box>
+                                                                        }
+                                                                        sx={{ 
+                                                                            alignItems: 'flex-start', 
+                                                                            mb: 2,
+                                                                            py: 1,
+                                                                            px: 1,
+                                                                            borderRadius: 1,
+                                                                            '&:hover': {
+                                                                                bgcolor: 'action.hover'
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                ))}
+                                                            </FormGroup>
+                                                        </AccordionDetails>
+                                                    </Accordion>
+                                                );
+                                            })
+                                        )}
+                                    </>
+                                )}
+                            </Paper>
+                        </Box>
+                    )}
                 </DialogContent>
 
                 <Divider />
@@ -228,7 +459,7 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                     <Button
                         onClick={handleAddUser}
                         variant="contained"
-                        disabled={!selectedUser || loading}
+                        disabled={!selectedUser || selectedPermissions.length === 0 || loading}
                         startIcon={loading ? <CircularProgress size={16} /> : <PersonAdd />}
                     >
                         {loading ? 'Ekleniyor...' : 'Kullanıcıyı Ekle'}

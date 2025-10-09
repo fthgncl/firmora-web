@@ -63,15 +63,29 @@ export const usePermissions = () => {
         [permissions]
     );
 
-    const getPermissionsByCategory = useCallback(
-        (category) => {
-            if (!permissions) return {};
-            return Object.entries(permissions)
-                .filter(([_, value]) => value.category === category)
-                .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-        },
-        [permissions]
-    );
+    const getPermissionsByCategory = useCallback(() => {
+        if (!permissions) return {};
+
+        const grouped = {};
+
+        Object.entries(permissions).forEach(([key, value]) => {
+            const category = value.category || "Bilinmeyen";
+
+            if (!grouped[category]) {
+                grouped[category] = [];
+            }
+
+            grouped[category].push({
+                key,
+                code: value.code,
+                name: value.name,
+                description: value.description,
+            });
+        });
+
+        return grouped;
+    }, [permissions]);
+
 
     const getCacheInfo = useCallback(() => {
         return permissionsService.getCacheInfo();

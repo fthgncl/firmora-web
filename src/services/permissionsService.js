@@ -1,4 +1,3 @@
-// src/services/permissionsService.js
 import axios from 'axios';
 
 // Environment variable'lardan cache ayarlarını al
@@ -69,8 +68,8 @@ const getPermissions = async (token) => {
 
     // Önce cache'e bak
     const cached = getCachedPermissions();
+
     if (cached) {
-        console.log('Yetkiler cache\'ten yüklendi');
         return cached;
     }
 
@@ -87,11 +86,9 @@ const getPermissions = async (token) => {
             }
         );
 
-        console.log(response.data);
         if (response.data.status === "success") {
             const permissions = response.data.permissions;
             setCachedPermissions(permissions);
-            console.log('Yetkiler API\'den yüklendi ve cache\'lendi');
             return permissions;
         } else {
             throw new Error(response.data.message || 'Yetki yapılandırması alınamadı');
@@ -174,54 +171,23 @@ const encodePermissionKeys = async (token, permissionKeys) => {
 
     try {
         const permissions = await getPermissions(token);
-        const codes = permissionKeys
+        return permissionKeys
             .map(key => permissions[key]?.code)
             .filter(Boolean)
             .join('');
 
-        return codes;
     } catch (error) {
         console.error('Yetki kodlama hatası:', error);
         return '';
     }
 };
 
-/**
- * Cache bilgilerini getirir
- * @returns {Object|null} Cache bilgisi
- */
-const getCacheInfo = () => {
-    try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (!cached) {
-            return null;
-        }
 
-        const { timestamp } = JSON.parse(cached);
-        const now = Date.now();
-        const age = now - timestamp;
-        const remaining = CACHE_DURATION - age;
-
-        return {
-            timestamp: new Date(timestamp),
-            age: Math.floor(age / 1000 / 60), // Dakika cinsinden
-            remaining: Math.floor(remaining / 1000 / 60), // Dakika cinsinden
-            isExpired: remaining <= 0,
-        };
-    } catch (error) {
-        console.error('Cache bilgi alma hatası:', error);
-        return null;
-    }
-};
-
-export const permissionsService = {
+export const permissionsService ={
     getPermissions,
     getPermissionByKey,
     getPermissionKeyByCode,
     decodePermissionString,
     encodePermissionKeys,
     clearPermissionsCache,
-    getCacheInfo,
 };
-
-export default permissionsService;
