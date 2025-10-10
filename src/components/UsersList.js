@@ -54,7 +54,7 @@ const SORT_ORDERS = [
     { value: 'DESC', label: 'Azalan' },
 ];
 
-export default function UsersList({ companyId, initialLimit = 20, sx }) {
+const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) => {
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
@@ -160,6 +160,11 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
+
+    // Ref ile fetchUsers metodunu dışarı aç
+    React.useImperativeHandle(ref, () => ({
+        refresh: fetchUsers
+    }));
 
     // Arama terimi değiştiğinde sayfayı sıfırla
     useEffect(() => {
@@ -362,4 +367,8 @@ export default function UsersList({ companyId, initialLimit = 20, sx }) {
             </CardContent>
         </Card>
     );
-}
+});
+
+UsersList.displayName = 'UsersList';
+
+export default UsersList;

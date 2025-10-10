@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
     Container,
     Box,
@@ -34,6 +34,7 @@ export default function CompanyPage() {
     const navigate = useNavigate();
     const {showAlert} = useAlert();
 
+    const userListRef = useRef();
     const [loading, setLoading] = useState(true);
     const [company, setCompany] = useState(null);
 
@@ -92,6 +93,12 @@ export default function CompanyPage() {
             currency: currency,
             minimumFractionDigits: 2,
         }).format(balance);
+    };
+
+    const handleUserAdded = () => {
+        if (userListRef.current) {
+            userListRef.current.refresh();
+        }
     };
 
     if (loading) {
@@ -300,13 +307,13 @@ export default function CompanyPage() {
             {/* Kullanıcı Ekleme */}
             <Grid container spacing={3} sx={{mt: 2}}>
                 <Grid item xs={12} md={4}>
-                    <AddUserToCompany companyId={companyId}/>
+                    <AddUserToCompany companyId={companyId} onUserAdded={handleUserAdded}/>
                 </Grid>
             </Grid>
 
             {/* Kullanıcı Listesi */}
             <Grid sx={{mt: 4}}>
-                <UserList companyId={companyId}/>
+                <UserList ref={userListRef} companyId={companyId}/>
             </Grid>
         </Container>
     );

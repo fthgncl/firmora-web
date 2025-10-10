@@ -32,7 +32,7 @@ import { useAlert } from '../contexts/AlertContext';
 import { usePermissions } from '../contexts/PermissionsContext';
 import UserSearchField from './UserSearchField';
 
-export default function AddUserToCompany({ companyId }) {
+export default function AddUserToCompany({ companyId, onUserAdded }) {
     const { token } = useAuth();
     const { showAlert,showSuccess } = useAlert();
     const { getPermissionsByCategory, encodePermissions, loading: permissionsLoading } = usePermissions();
@@ -146,6 +146,11 @@ export default function AddUserToCompany({ companyId }) {
                 setSelectedUser(null);
                 setSelectedPermissions([]);
                 setError('');
+
+                // Kullanıcı listesini yenile
+                if (onUserAdded && typeof onUserAdded === 'function') {
+                    onUserAdded();
+                }
 
             } else {
                 // success: false durumu
