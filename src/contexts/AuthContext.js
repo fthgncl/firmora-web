@@ -14,6 +14,7 @@ export const AuthProvider = ({children}) => {
     const [token, setToken] = useState(null);
 
     // TODO: Oturum kapatıldığında sign-in sayfasına yönlendirilebilinir. Ancak bu durum doğru olur mu bilemiyorum. Müsait zamanda düşün.
+    // TODO: Kullanıcı dil değiştirdiğinde localStrorage'deki metinleri değişmeli. Eski dilde kalmamalı.
     const logout = () => {
         setUser(null);
         setToken(null);
