@@ -182,6 +182,67 @@ const encodePermissionKeys = async (token, permissionKeys) => {
     }
 };
 
+/**
+ * Kullanıcının belirli bir firmadaki yetkilerini kontrol eder
+ * @param {string} token - JWT token
+ * @param {Object} user - Kullanıcı objesi (useAuth'dan gelen)
+ * @param {string} companyId - Firma ID'si
+ * @param {Array<string>} roles - Kontrol edilecek yetki anahtarları (örn: ['sys_admin', 'can_record_expense'])
+ * @param {boolean} fullMatch - true: tüm yetkiler eşleşmeli, false: en az biri eşleşmeli
+ * @returns {Promise<boolean>} Yetki kontrolü sonucu
+ */
+const checkUserRoles = async (token, user, companyId, roles = ['sys_admin'], fullMatch = false) => {
+    try {
+        // Kullanıcı veya permissions kontrolü
+        if (!user || !user.permissions || !Array.isArray(user.permissions)) {
+            console.warn('Kullanıcı veya yetki bilgisi bulunamadı');
+            return false;
+        }
+
+        // Belirtilen firma için kullanıcının yetkilerini bul
+        const companyPermission = user.permissions.find(p => p.companyId === companyId);
+
+        if (!companyPermission || !companyPermission.permissions) {
+            console.warn(`Kullanıcının ${companyId} firmasında yetkisi bulunamadı`);
+            return false;
+        }
+
+        // Kullanıcının yetki kodlarını al (string -> array)
+        const userPermissionCodes = companyPermission.permissions.split('');
+
+        // Sys_admin kontrolü - 'a' kodu varsa tam erişim
+        if (userPermissionCodes.includes('a')) {
+            return true;
+        }
+
+        // Yetki yapılandırmasını al
+        const permissions = await getPermissions(token);
+
+        // İstenen yetkilerin kodlarını bul
+        const requiredCodes = roles
+            .map(role => permissions[role]?.code)
+            .filter(Boolean);
+
+        if (requiredCodes.length === 0) {
+            console.warn('Geçerli yetki kodu bulunamadı');
+            return false;
+        }
+
+        // fullMatch parametresine göre kontrol et
+        if (fullMatch) {
+            // Tüm yetkiler kullanıcıda bulunmalı
+            return requiredCodes.every(code => userPermissionCodes.includes(code));
+        } else {
+            // En az bir yetki kullanıcıda bulunmalı
+            return requiredCodes.some(code => userPermissionCodes.includes(code));
+        }
+
+    } catch (error) {
+        console.error('Yetki kontrolü hatası:', error);
+        return false;
+    }
+};
+
 
 export const permissionsService ={
     getPermissions,
@@ -190,4 +251,5 @@ export const permissionsService ={
     decodePermissionString,
     encodePermissionKeys,
     clearPermissionsCache,
+    checkUserRoles,
 };
