@@ -9,14 +9,23 @@ import {
     Alert,
     Chip,
     Divider,
-    Stack
+    Stack,
+    IconButton,
+    Menu,
+    MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button
 } from '@mui/material';
 import {
     AccountBalance,
     Business,
     CalendarToday,
     TrendingUp,
-    Person
+    Person,
+    MoreVert
 } from '@mui/icons-material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
@@ -27,6 +36,9 @@ export default function AccountList() {
     const [userName, setUserName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedAccount, setSelectedAccount] = useState(null);
+    const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 
     useEffect(() => {
         const fetchAccounts = async () => {
@@ -83,6 +95,25 @@ export default function AccountList() {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }).format(balance);
+    };
+
+    const handleMenuOpen = (event, account) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedAccount(account);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleTransferClick = () => {
+        handleMenuClose();
+        setTransferDialogOpen(true);
+    };
+
+    const handleTransferDialogClose = () => {
+        setTransferDialogOpen(false);
+        setSelectedAccount(null);
     };
 
     if (loading) {
@@ -159,6 +190,21 @@ export default function AccountList() {
                         elevation={2}
                     >
                         <CardContent sx={{p: 3}}>
+                            <Box sx={{position: 'absolute', top: 8, right: 8}}>
+                                <IconButton
+                                    onClick={(e) => handleMenuOpen(e, account)}
+                                    size="small"
+                                    sx={{
+                                        color: 'text.secondary',
+                                        '&:hover': {
+                                            color: 'primary.main',
+                                            backgroundColor: 'action.hover'
+                                        }
+                                    }}
+                                >
+                                    <MoreVert />
+                                </IconButton>
+                            </Box>
                             <Stack spacing={2.5}>
                                 {userName && (
                                     <Box>
@@ -238,7 +284,7 @@ export default function AccountList() {
                                             <Stack direction="row" spacing={1} alignItems="center">
                                                 <CalendarToday sx={{fontSize: 16, color: 'text.secondary'}}/>
                                                 <Typography variant="caption" color="text.secondary">
-                                                    Oluşturulma: {formatDate(account.created_at)}
+                                                    Kayıt Tarihi: {formatDate(account.created_at)}
                                                 </Typography>
                                             </Stack>
                                         </Box>
@@ -249,6 +295,44 @@ export default function AccountList() {
                     </Card>
                 ))}
             </Box>
+
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+            >
+                <MenuItem onClick={handleTransferClick}>
+                    Para Transferi
+                </MenuItem>
+            </Menu>
+
+            <Dialog
+                open={transferDialogOpen}
+                onClose={handleTransferDialogClose}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Para Transferi</DialogTitle>
+                <DialogContent>
+                    {/* İçerik daha sonra eklenecek */}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleTransferDialogClose}>
+                        İptal
+                    </Button>
+                    <Button variant="contained" onClick={handleTransferDialogClose}>
+                        Gönder
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }
