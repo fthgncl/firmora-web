@@ -12,12 +12,7 @@ import {
     Stack,
     IconButton,
     Menu,
-    MenuItem,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button
+    MenuItem
 } from '@mui/material';
 import {
     AccountBalance,
@@ -29,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
+import MoneyTransferDialog from './MoneyTransferDialog';
 
 export default function AccountList() {
     const {token} = useAuth();
@@ -314,25 +310,12 @@ export default function AccountList() {
                 </MenuItem>
             </Menu>
 
-            <Dialog
+            <MoneyTransferDialog
                 open={transferDialogOpen}
                 onClose={handleTransferDialogClose}
-                maxWidth="sm"
-                fullWidth
-            >
-                <DialogTitle>Para Transferi</DialogTitle>
-                <DialogContent>
-                    {/* İçerik daha sonra eklenecek */}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleTransferDialogClose}>
-                        İptal
-                    </Button>
-                    <Button variant="contained" onClick={handleTransferDialogClose}>
-                        Gönder
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                sourceAccount={selectedAccount}
+                fromScope="user"
+            />
         </Container>
     );
 }

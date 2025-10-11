@@ -14,11 +14,6 @@ import {
     Avatar,
     Menu,
     MenuItem,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
 } from '@mui/material';
 import {
     ArrowBack,
@@ -34,6 +29,7 @@ import {useAuth} from '../contexts/AuthContext';
 import {useAlert} from '../contexts/AlertContext';
 import UserList from '../components/UsersList';
 import AddUserToCompany from '../components/AddUserToCompany';
+import MoneyTransferDialog from '../components/MoneyTransferDialog';
 import axios from 'axios';
 
 export default function CompanyPage() {
@@ -376,25 +372,12 @@ export default function CompanyPage() {
                 </MenuItem>
             </Menu>
 
-            <Dialog
+            <MoneyTransferDialog
                 open={transferDialogOpen}
                 onClose={handleTransferDialogClose}
-                maxWidth="sm"
-                fullWidth
-            >
-                <DialogTitle>Para Transferi</DialogTitle>
-                <DialogContent>
-                    {/* İçerik daha sonra eklenecek */}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleTransferDialogClose}>
-                        İptal
-                    </Button>
-                    <Button variant="contained" onClick={handleTransferDialogClose}>
-                        Gönder
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                sourceAccount={company}
+                fromScope="company"
+            />
         </Container>
     );
 }
