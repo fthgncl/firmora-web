@@ -1,284 +1,292 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Container,
     Box,
     Typography,
     Paper,
-    IconButton,
+    Grid,
+    Card,
+    CardActionArea,
+    CardContent,
+    Avatar,
+    Chip,
+    Tooltip,
     CircularProgress,
     Alert,
+    Button,
     useTheme
-} from '@mui/material';
-import {Business, Add} from '@mui/icons-material';
-import axios from 'axios';
-import {useAuth} from '../contexts/AuthContext';
-import {useNavigate} from 'react-router-dom';
-import CreateCompanyDialog from './CreateCompanyDialog';
+} from "@mui/material";
+import { Business, Add } from "@mui/icons-material";
+import axios from "axios";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import CreateCompanyDialog from "./CreateCompanyDialog";
 
 export default function CompanyList() {
-    const {user, token} = useAuth();
+    const { user, token } = useAuth();
     const navigate = useNavigate();
     const theme = useTheme();
 
-    const companyCardStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '160px',
-        height: '130px',
-        margin: '10px',
-        padding: '12px',
-        borderRadius: '12px',
-        boxShadow: theme.shadows[2],
-        transition: 'all 0.3s ease',
-        textAlign: 'center',
-        cursor: 'pointer',
-        backgroundColor: theme.palette.background.paper,
-        '&:hover': {
-            backgroundColor: theme.palette.action.hover,
-            boxShadow: theme.shadows[4],
-            transform: 'translateY(-2px)',
-        },
-        '@media (max-width:768px)': {
-            width: '140px',
-            height: '110px',
-            margin: '8px',
-        },
-        '@media (max-width:480px)': {
-            width: '120px',
-            height: '100px',
-            margin: '6px',
-        },
-    };
-
-    const containerStyle = {
-        border: `1px solid ${theme.palette.divider}`,
-        borderRadius: '16px',
-        padding: '24px',
-        backgroundColor: theme.palette.background.default,
-        marginTop: '32px',
-        '@media (max-width:768px)': {
-            padding: '16px',
-            marginTop: '24px',
-        },
-    };
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [error, setError] = useState("");
     const [openDialog, setOpenDialog] = useState(false);
 
-    // Firma listesini getiren ortak fonksiyon
+    const canCreateMore = useMemo(() => {
+        if (!user) return false;
+        if (typeof user.max_companies !== "number") return true;
+        return companies.length < user.max_companies;
+    }, [companies.length, user]);
+
     const fetchCompanies = async () => {
         try {
             setLoading(true);
-            setError('');
-
+            setError("");
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/companies`, {
-                headers: {
-                    'x-access-token': token
-                }
+                headers: { "x-access-token": token }
             });
-
-            if (response.data.status === 'success') {
-                setCompanies(response.data.companies);
-            }
-        } catch (err) {
-            console.error('Firma listesi yüklenirken hata:', err);
-            if (err.response) {
-                setError(err.response.data.message || 'Firmalar yüklenirken bir hata oluştu');
-            } else if (err.request) {
-                setError('Sunucuya ulaşılamıyor');
+            if (response.data.status === "success") {
+                setCompanies(response.data.companies || []);
             } else {
-                setError('Beklenmeyen bir hata oluştu');
+                setError(response.data.message || "Firmalar yüklenemedi.");
             }
+        } catch {
+            setError("Bağlantı hatası: Sunucuya ulaşılamadı.");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (token) {
-            fetchCompanies();
-        }
-
-        // eslint-disable-next-line
+        if (token) fetchCompanies();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
 
-    const handleCompanyClick = (company) => {
-        navigate(`/company/${company.id}`);
-    };
-
-    const handleAddCompany = () => {
-        setOpenDialog(true);
-    };
-
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-    };
-
+    const handleCompanyClick = (c) => navigate(`/company/${c.id}`);
+    const handleAddCompany = () => setOpenDialog(true);
+    const handleCloseDialog = () => setOpenDialog(false);
     const handleCompanyCreated = () => {
-        // Dialog'u kapat
         handleCloseDialog();
-        // Firma listesini yeniden yükle
         fetchCompanies();
     };
 
-    if (loading) {
-        return (
-            <Container maxWidth="lg">
-                <Paper sx={containerStyle}>
-                    <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px'}}>
-                        <CircularProgress/>
-                    </Box>
-                </Paper>
-            </Container>
-        );
-    }
+    if (!loading && companies.length === 0 && user?.max_companies === 0) return null;
 
-    if (error) {
-        return (
-            <Container maxWidth="lg">
-                <Paper sx={containerStyle}>
-                    <Alert severity="error">{error}</Alert>
-                </Paper>
-            </Container>
-        );
-    }
+    const Shell = ({ children }) => (
+        <Paper
+            elevation={0}
+            sx={{
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 3,
+                p: { xs: 2, sm: 3 },
+                mt: { xs: 2, sm: 3 },
+                bgcolor: theme.palette.background.default
+            }}
+        >
+            {children}
+        </Paper>
+    );
 
-    // Kullanıcının hiç firması yoksa ve 'b' yetkisi yoksa komponenti gösterme
-    if (companies.length === 0 && user.max_companies === 0 ) {
-        return null;
-    }
+    const CompanyCard = ({ company }) => (
+        <Card
+            variant="outlined"
+            sx={{
+                borderRadius: 3,
+                height: "100%",
+                transition: "all .25s ease",
+                "&:hover": {
+                    transform: "translateY(-3px)",
+                    boxShadow: theme.shadows[4],
+                    borderColor: theme.palette.primary.light
+                }
+            }}
+        >
+            <CardActionArea onClick={() => handleCompanyClick(company)} sx={{ height: "100%" }}>
+                <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Avatar
+                        sx={{
+                            bgcolor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
+                            width: 46,
+                            height: 46,
+                            flexShrink: 0
+                        }}
+                    >
+                        <Business fontSize="small" />
+                    </Avatar>
 
-    return (
-        <Container maxWidth="lg">
-            <Paper sx={containerStyle}>
-                <Typography
-                    variant="h5"
-                    component="h2"
-                    sx={{
-                        textAlign: 'center',
-                        mb: 3,
-                        color: 'text.primary',
-                        fontWeight: 600
-                    }}
-                >
-                    Firmalarım
-                </Typography>
-
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        alignItems: 'flex-start'
-                    }}
-                >
-                    {companies.map((company) => (
-                        <Paper
-                            key={company.id}
-                            sx={companyCardStyle}
-                            onClick={() => handleCompanyClick(company)}
-                            elevation={2}
-                        >
-                            <Business
-                                sx={{
-                                    fontSize: '36px',
-                                    color: 'primary.main',
-                                    mb: 0.5
-                                }}
-                            />
+                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                        <Tooltip title={company.company_name || ""} placement="top" arrow>
                             <Typography
-                                variant="h6"
+                                variant="subtitle1"
                                 sx={{
-                                    fontWeight: 600,
-                                    color: 'text.primary',
-                                    mb: 0.3,
-                                    fontSize: '0.85rem',
-                                    lineHeight: 1.2,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    width: '100%'
+                                    fontWeight: 700,
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap"
                                 }}
                             >
                                 {company.company_name}
                             </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: 'text.secondary',
-                                    fontSize: '0.7rem',
-                                    lineHeight: 1.1,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    width: '100%'
-                                }}
-                            >
-                                {company.sector}
-                            </Typography>
-                            <Typography
-                                variant="caption"
-                                sx={{
-                                    color: 'text.disabled',
-                                    fontSize: '0.65rem',
-                                    mt: 0.3
-                                }}
-                            >
-                                {company.currency}
-                            </Typography>
-                        </Paper>
-                    ))}
+                        </Tooltip>
 
-                    {companies.length < user.max_companies && (
-                        <Box
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
                             sx={{
-                                ...companyCardStyle,
-                                border: `2px dashed ${theme.palette.primary.main}`,
-                                backgroundColor: 'transparent',
-                                boxShadow: 'none',
-                                '&:hover': {
-                                    backgroundColor: theme.palette.action.hover,
-                                    borderColor: theme.palette.primary.dark,
-                                    boxShadow: 'none',
-                                    transform: 'translateY(-2px)',
-                                }
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap"
                             }}
-                            onClick={handleAddCompany}
                         >
-                            <IconButton
-                                sx={{
-                                    backgroundColor: 'primary.main',
-                                    color: 'primary.contrastText',
-                                    width: '40px',
-                                    height: '40px',
-                                    mb: 0.5,
-                                    '&:hover': {
-                                        backgroundColor: 'primary.dark',
-                                    }
-                                }}
-                            >
-                                <Add sx={{fontSize: '24px'}}/>
-                            </IconButton>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    color: 'primary.main',
-                                    fontWeight: 500,
-                                    fontSize: '0.75rem',
-                                    lineHeight: 1.2,
-                                    textAlign: 'center'
-                                }}
-                            >
-                                Yeni Firma Oluştur
-                            </Typography>
-                        </Box>
-                    )}
+                            {company.sector || "—"}
+                        </Typography>
 
+                        <Chip
+                            label={company.currency}
+                            size="small"
+                            sx={{
+                                mt: 0.8,
+                                fontWeight: 600,
+                                fontSize: "0.7rem",
+                                bgcolor: theme.palette.mode === "light" ? "grey.100" : "grey.800"
+                            }}
+                        />
+                    </Box>
+                </CardContent>
+            </CardActionArea>
+        </Card>
+    );
+
+    const AddCompanyCard = () => (
+        <Card
+            variant="outlined"
+            sx={{
+                height: "100%",
+                borderRadius: 3,
+                borderStyle: "dashed",
+                borderColor: theme.palette.primary.main,
+                bgcolor: "transparent"
+            }}
+        >
+            <CardActionArea
+                onClick={handleAddCompany}
+                sx={{
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    p: 3
+                }}
+            >
+                <Avatar
+                    sx={{
+                        bgcolor: theme.palette.primary.main,
+                        color: theme.palette.primary.contrastText,
+                        width: 48,
+                        height: 48,
+                        mb: 1
+                    }}
+                >
+                    <Add />
+                </Avatar>
+                <Typography variant="body2" color="primary.main" fontWeight={600}>
+                    Yeni Firma Oluştur
+                </Typography>
+            </CardActionArea>
+        </Card>
+    );
+
+    return (
+        <Container maxWidth="lg">
+            <Shell>
+                {/* Üst Başlık (açıklama satırı kaldırıldı) */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: { xs: "start", sm: "center" },
+                        justifyContent: "space-between",
+                        flexDirection: { xs: "column", sm: "row" },
+                        gap: 1.5,
+                        mb: 2
+                    }}
+                >
+                    <Typography variant="h5" fontWeight={700}>
+                        Firmalarım
+                    </Typography>
+
+                    {canCreateMore && (
+                        <Button variant="contained" startIcon={<Add />} onClick={handleAddCompany}>
+                            Yeni Firma
+                        </Button>
+                    )}
                 </Box>
-            </Paper>
+
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
+
+                {loading ? (
+                    <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : companies.length === 0 ? (
+                    <Box
+                        sx={{
+                            textAlign: "center",
+                            py: 6,
+                            px: 2,
+                            bgcolor:
+                                theme.palette.mode === "light"
+                                    ? "rgba(25,118,210,.04)"
+                                    : "rgba(144,202,249,.06)",
+                            border: `1px dashed ${theme.palette.divider}`,
+                            borderRadius: 3
+                        }}
+                    >
+                        <Avatar
+                            sx={{
+                                bgcolor: theme.palette.primary.main,
+                                color: theme.palette.primary.contrastText,
+                                width: 56,
+                                height: 56,
+                                mb: 1.5,
+                                mx: "auto"
+                            }}
+                        >
+                            <Business />
+                        </Avatar>
+                        <Typography variant="h6" fontWeight={700} gutterBottom>
+                            Henüz firmanız yok
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            Başlamak için yeni bir firma oluşturun.
+                        </Typography>
+                        {canCreateMore && (
+                            <Button variant="contained" startIcon={<Add />} onClick={handleAddCompany}>
+                                Yeni Firma Oluştur
+                            </Button>
+                        )}
+                    </Box>
+                ) : (
+                    <Grid container spacing={2}>
+                        {companies.map((c) => (
+                            <Grid key={c.id} item xs={12} sm={6} md={4} lg={3} xl={2.4}>
+                                <CompanyCard company={c} />
+                            </Grid>
+                        ))}
+
+                        {canCreateMore && (
+                            <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4}>
+                                <AddCompanyCard />
+                            </Grid>
+                        )}
+                    </Grid>
+                )}
+            </Shell>
 
             <CreateCompanyDialog
                 open={openDialog}
