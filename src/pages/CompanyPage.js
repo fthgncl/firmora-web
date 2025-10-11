@@ -12,6 +12,13 @@ import {
     CardContent,
     Chip,
     Avatar,
+    Menu,
+    MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
 } from '@mui/material';
 import {
     ArrowBack,
@@ -20,6 +27,7 @@ import {
     CalendarToday,
     TrendingUp,
     Settings,
+    MoreVert,
 } from '@mui/icons-material';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
@@ -37,6 +45,8 @@ export default function CompanyPage() {
     const userListRef = useRef();
     const [loading, setLoading] = useState(true);
     const [company, setCompany] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 
     useEffect(() => {
         fetchCompanyDetails();
@@ -99,6 +109,23 @@ export default function CompanyPage() {
         if (userListRef.current) {
             userListRef.current.refresh();
         }
+    };
+
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleTransferClick = () => {
+        handleMenuClose();
+        setTransferDialogOpen(true);
+    };
+
+    const handleTransferDialogClose = () => {
+        setTransferDialogOpen(false);
     };
 
     if (loading) {
@@ -176,6 +203,21 @@ export default function CompanyPage() {
                             overflow: 'hidden',
                         }}
                     >
+                        <Box sx={{position: 'absolute', top: 8, right: 8, zIndex: 1}}>
+                            <IconButton
+                                onClick={handleMenuOpen}
+                                size="small"
+                                sx={{
+                                    color: 'rgba(255,255,255,0.9)',
+                                    '&:hover': {
+                                        color: 'white',
+                                        backgroundColor: 'rgba(255,255,255,0.1)'
+                                    }
+                                }}
+                            >
+                                <MoreVert />
+                            </IconButton>
+                        </Box>
                         <CardContent>
                             <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                                 <Avatar sx={{bgcolor: 'rgba(255,255,255,0.2)', mr: 2}}>
@@ -315,6 +357,44 @@ export default function CompanyPage() {
             <Grid sx={{mt: 4}}>
                 <UserList ref={userListRef} companyId={companyId}/>
             </Grid>
+
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+            >
+                <MenuItem onClick={handleTransferClick}>
+                    Para Transferi
+                </MenuItem>
+            </Menu>
+
+            <Dialog
+                open={transferDialogOpen}
+                onClose={handleTransferDialogClose}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Para Transferi</DialogTitle>
+                <DialogContent>
+                    {/* İçerik daha sonra eklenecek */}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleTransferDialogClose}>
+                        İptal
+                    </Button>
+                    <Button variant="contained" onClick={handleTransferDialogClose}>
+                        Gönder
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }
