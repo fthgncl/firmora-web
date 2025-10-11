@@ -20,7 +20,7 @@ export default function ThemeSwitcher() {
 
     return (
         <Box
-            sx={{display: {xs: 'none', sm: 'flex'},alignItems:'center'}}
+            sx={{display: 'flex',alignItems:'center'}}
         >
             <Brightness7Icon/>
             <Switch checked={isSwitchOn} onClick={handleClick}/>
