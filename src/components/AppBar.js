@@ -13,10 +13,7 @@ import {
     ListItemIcon,
     Tooltip,
     Slide,
-    useScrollTrigger,
-    Drawer,
-    List,
-    ListItem,
+    useScrollTrigger
 } from '@mui/material';
 import {
     Logout,
@@ -48,7 +45,6 @@ export default function MenuAppBar() {
     const navigate = useNavigate();
     const { toggleDrawer, drawerOpen } = useAppBar();
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
 
     if (!appBarOpen) return null;
 
@@ -80,10 +76,6 @@ export default function MenuAppBar() {
         return user.username.charAt(0).toUpperCase();
     };
 
-    const toggleMobileDrawer = () => {
-        setMobileDrawerOpen(prev => !prev);
-    };
-
     return (
         <>
             <HideOnScroll>
@@ -112,29 +104,12 @@ export default function MenuAppBar() {
                         </Tooltip>
                     )}
 
-                    {/* Menu Toggle Button - Mobile */}
-                    <Tooltip title="Menü">
-                        <IconButton
-                            color="inherit"
-                            aria-label="toggle mobile drawer"
-                            onClick={toggleMobileDrawer}
-                            edge="start"
-                            sx={{
-                                mr: 1,
-                                display: { xs: 'flex', sm: 'none' },
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                    </Tooltip>
-
                     {/* App Title */}
                     <Typography
                         variant="h6"
                         component="div"
                         onClick={() => navigate('/')}
                         sx={{
-                            flexGrow: 1,
                             fontSize: { xs: '1.1rem', sm: '1.25rem' },
                             fontWeight: 600,
                             letterSpacing: '0.5px',
@@ -152,13 +127,10 @@ export default function MenuAppBar() {
                         direction="row"
                         spacing={1}
                         alignItems="center"
+                        sx={{ ml: 'auto' }}
                     >
-                        <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
-                            <ThemeSwitcher />
-                        </Box>
-                        <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
-                            <LanguageSelector />
-                        </Box>
+                        <ThemeSwitcher />
+                        <LanguageSelector />
 
                         {user && (
                             <>
@@ -289,31 +261,6 @@ export default function MenuAppBar() {
             </AppBar>
         </HideOnScroll>
         <Toolbar />
-
-        {/* Mobile Drawer */}
-        <Drawer
-            anchor="left"
-            open={mobileDrawerOpen}
-            onClose={toggleMobileDrawer}
-            sx={{
-                display: { xs: 'block', sm: 'none' },
-                '& .MuiDrawer-paper': {
-                    width: 250,
-                    boxSizing: 'border-box',
-                    mt: '56px',
-                },
-            }}
-        >
-            <List sx={{ pt: 2 }}>
-                <ListItem sx={{ justifyContent: 'center', py: 2 }}>
-                    <ThemeSwitcher />
-                </ListItem>
-                <Divider />
-                <ListItem sx={{ justifyContent: 'center', py: 2 }}>
-                    <LanguageSelector />
-                </ListItem>
-            </List>
-        </Drawer>
         </>
     );
 }
