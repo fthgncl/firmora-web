@@ -24,6 +24,8 @@ import LanguageSelector from '../components/LanguageSelector';
 import Link from '@mui/material/Link';
 import Copyright from '../components/Copyright';
 import {useHideAppBar} from "../contexts/AppBarContext";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 export default function SignInSide() {
     const { t } = useTranslation();
@@ -36,6 +38,7 @@ export default function SignInSide() {
     const [emailOrUsername, setEmailOrUsername] = useState('');
     const [isResending, setIsResending] = useState(false);
     const [resendMessage, setResendMessage] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
     const {login} = useAuth();
     useHideAppBar();
 
@@ -70,7 +73,7 @@ export default function SignInSide() {
         const loginData = {
             username: data.get('username'),
             password: data.get('password'),
-            rememberMe: false
+            rememberMe: rememberMe
         };
 
         setIsLoading(true);
@@ -184,6 +187,16 @@ export default function SignInSide() {
                                     </IconButton>
                                 </InputAdornment>
                             }}
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                    color="primary"
+                                />
+                            }
+                            label="Beni Hatırla"
                         />
                         {errorMessage && !isEmailNotVerified && (
                             <Typography sx={{textAlign: 'center', color: 'error.main'}}
