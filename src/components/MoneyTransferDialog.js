@@ -272,10 +272,16 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
         setSelectedUser(user);
         formik.setFieldValue('toUserId', user.id);
 
-        // Eğer başka firma transferi ise company ID'yi set et
+        // Eğer başka firma transferi ise ve firma seçiliyse, o firmanın ID'sini kullan
         const currentType = allTransferTypes.find(t => t.value === formik.values.transferType);
-        if (currentType?.requiresOtherCompany && user.companyId) {
-            formik.setFieldValue('toUserCompanyId', user.companyId);
+        if (currentType?.requiresOtherCompany) {
+            if (selectedCompany) {
+                // Firma CompanySearchField ile seçildiyse onun ID'sini kullan
+                formik.setFieldValue('toUserCompanyId', selectedCompany.id);
+            } else if (user.companyId) {
+                // Fallback: Kullanıcıdan gelen companyId'yi kullan
+                formik.setFieldValue('toUserCompanyId', user.companyId);
+            }
         }
     };
 
@@ -294,6 +300,16 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
         formik.setFieldValue('toExternalName', '');
         // eslint-disable-next-line
     }, [formik.values.transferType]);
+
+    // Firma seçimi temizlendiğinde kullanıcı seçimini de temizle
+    useEffect(() => {
+        const currentType = allTransferTypes.find(t => t.value === formik.values.transferType);
+        if (currentType?.requiresOtherCompany && currentType?.requiresUser && !selectedCompany) {
+            setSelectedUser(null);
+            formik.setFieldValue('toUserId', '');
+        }
+        // eslint-disable-next-line
+    }, [selectedCompany]);
 
     const handleTransfer = async (values) => {
         try {
@@ -505,7 +521,80 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                     />
 
                     {/* Dinamik alanlar - Transfer tipine göre */}
-                    {currentTransferType?.requiresUser && (
+                    {/* Başka firmadaki kullanıcıya transfer - önce firma seç, sonra kullanıcı */}
+                    {currentTransferType?.requiresUser && currentTransferType?.requiresOtherCompany && (
+                        <>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                                    1. Hedef Firmayı Seçin
+                                </Typography>
+                                <CompanySearchField
+                                    onCompanySelect={handleCompanySelect}
+                                    excludeCompanyId={sourceAccount?.company?.id || sourceAccount?.id}
+                                    minWidth="100%"
+                                />
+                                {formik.touched.toUserCompanyId && formik.errors.toUserCompanyId && (
+                                    <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>
+                                        {formik.errors.toUserCompanyId}
+                                    </Typography>
+                                )}
+                            </Box>
+
+                            {/* Seçilen firma bilgisi */}
+                            {selectedCompany && (
+                                <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                        Seçilen Firma
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {selectedCompany.company_name}
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                                        <Chip label={selectedCompany.sector} size="small" variant="outlined" />
+                                        <Chip label={selectedCompany.currency} size="small" color="primary" />
+                                    </Box>
+                                </Alert>
+                            )}
+
+                            {/* Firma seçildikten sonra kullanıcı seçimi */}
+                            {selectedCompany && (
+                                <Box sx={{ mb: 3 }}>
+                                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                                        2. Bu Firmadan Kullanıcı Seçin
+                                    </Typography>
+                                    <UserSearchField
+                                        companyId={selectedCompany.id}
+                                        searchScope="company"
+                                        onUserSelect={handleUserSelect}
+                                        minWidth="100%"
+                                    />
+                                    {formik.touched.toUserId && formik.errors.toUserId && (
+                                        <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>
+                                            {formik.errors.toUserId}
+                                        </Typography>
+                                    )}
+                                </Box>
+                            )}
+
+                            {/* Seçilen kullanıcı bilgisi */}
+                            {selectedUser && (
+                                <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                        Seçilen Kullanıcı
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {selectedUser.name} {selectedUser.surname}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {selectedUser.email}
+                                    </Typography>
+                                </Alert>
+                            )}
+                        </>
+                    )}
+
+                    {/* Aynı firmadaki kullanıcıya transfer */}
+                    {currentTransferType?.requiresUser && !currentTransferType?.requiresOtherCompany && (
                         <>
                             <Box sx={{ mb: 3 }}>
                                 <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
@@ -513,7 +602,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                 </Typography>
                                 <UserSearchField
                                     companyId={sourceAccount?.company?.id || sourceAccount?.id}
-                                    searchScope={currentTransferType.requiresOtherCompany ? 'all' : 'company'}
+                                    searchScope="company"
                                     onUserSelect={handleUserSelect}
                                     minWidth="100%"
                                 />
@@ -536,11 +625,6 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                     <Typography variant="caption" color="text.secondary">
                                         {selectedUser.email}
                                     </Typography>
-                                    {selectedUser.companyId && currentTransferType.requiresOtherCompany && (
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                                            Firma ID: {selectedUser.companyId}
-                                        </Typography>
-                                    )}
                                 </Alert>
                             )}
                         </>

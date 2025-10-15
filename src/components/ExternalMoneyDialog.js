@@ -24,19 +24,16 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import { permissionsService } from '../services/permissionsService';
-import UserSearchField from './UserSearchField';
 
 export default function ExternalMoneyDialog({ open, onClose, targetAccount = null, targetScope = 'user' }) {
     const { token, user } = useAuth();
     const { showAlert } = useAlert();
     const [loading, setLoading] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
     const [hasPermission, setHasPermission] = useState(false);
 
     // targetScope'a göre transfer türünü belirle
     const transferType = targetScope === 'user' ? 'external_to_user' : 'external_to_company';
     const requiredPermission = targetScope === 'user' ? 'can_receive_external_to_user' : 'can_receive_external_to_company';
-    const requiresUser = targetScope === 'user';
 
 
     // Yetki kontrolü
@@ -81,7 +78,6 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             .max(255, 'Kaynak adı en fazla 255 karakter olabilir'),
         description: Yup.string()
             .max(255, 'Açıklama en fazla 255 karakter olabilir'),
-        toUserId: requiresUser ? Yup.string().required('Kullanıcı seçiniz') : Yup.string(),
     });
 
     const formik = useFormik({
@@ -89,7 +85,6 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             amount: '',
             fromExternalName: '',
             description: '',
-            toUserId: '',
         },
         validationSchema,
         enableReinitialize: true,
@@ -97,12 +92,6 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             await handleExternalTransfer(values);
         },
     });
-
-    // Kullanıcı seçildiğinde
-    const handleUserSelect = (user) => {
-        setSelectedUser(user);
-        formik.setFieldValue('toUserId', user.id);
-    };
 
     const handleExternalTransfer = async (values) => {
         try {
@@ -118,9 +107,9 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                 currency: targetAccount?.currency || 'EUR',
             };
 
-            // Kullanıcıya gidiyorsa user id ekle
-            if (requiresUser) {
-                requestData.to_user_id = values.toUserId;
+            // Kullanıcıya gidiyorsa, giriş yapan kullanıcının ID'sini kullan
+            if (targetScope === 'user') {
+                requestData.to_user_id = user.id;
             }
 
             // Opsiyonel açıklama
@@ -142,7 +131,6 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             if (response.data.status === 'success') {
                 showAlert('Gelir başarıyla eklendi', 'success');
                 formik.resetForm();
-                setSelectedUser(null);
                 onClose();
             } else {
                 showAlert(response.data.message || 'Gelir eklenemedi', 'error');
@@ -217,11 +205,16 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                     {hasPermission && (
                         <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
                             <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                {targetScope === 'user' ? 'Kullanıcıya Gelir Ekleme' : 'Firmaya Gelir Ekleme'}
+                                {targetScope === 'user' ? 'Kendi Hesabınıza Gelir Ekleme' : 'Firmaya Gelir Ekleme'}
                             </Typography>
                             <Typography variant="body2">
                                 Sistem dışından gelen ödemeleri, müşteri ödemelerini veya banka transferlerini buradan kayıt altına alabilirsiniz.
                             </Typography>
+                            {targetScope === 'user' && (
+                                <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>
+                                    Alıcı: {user.name} {user.surname}
+                                </Typography>
+                            )}
                         </Alert>
                     )}
 
@@ -267,43 +260,6 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                         }}
                         sx={{ mb: 3 }}
                     />
-
-                    {/* Kullanıcı seçimi - Sadece external_to_user için */}
-                    {requiresUser && (
-                        <>
-                            <Box sx={{ mb: 3 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                                    Alıcı Kullanıcı
-                                </Typography>
-                                <UserSearchField
-                                    companyId={targetAccount?.company?.id || targetAccount?.id}
-                                    searchScope="company"
-                                    onUserSelect={handleUserSelect}
-                                    minWidth="100%"
-                                />
-                                {formik.touched.toUserId && formik.errors.toUserId && (
-                                    <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>
-                                        {formik.errors.toUserId}
-                                    </Typography>
-                                )}
-                            </Box>
-
-                            {/* Seçilen kullanıcı bilgisi */}
-                            {selectedUser && (
-                                <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                        Seçilen Kullanıcı
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {selectedUser.name} {selectedUser.surname}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {selectedUser.email}
-                                    </Typography>
-                                </Alert>
-                            )}
-                        </>
-                    )}
 
                     {/* Açıklama */}
                     <TextField
