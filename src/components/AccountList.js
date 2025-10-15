@@ -216,13 +216,35 @@ export default function AccountList() {
                             <Stack spacing={2.5}>
                                 {userName && (
                                     <Box>
-                                        <Stack direction="row" spacing={1} alignItems="center">
-                                            <Person sx={{fontSize: 20, color: 'primary.main'}}/>
-                                            <Typography variant="subtitle1" sx={{fontWeight: 600, color: 'text.primary'}}>
-                                                {userName}
-                                            </Typography>
+                                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                                            <Person sx={{ fontSize: 26, color: 'primary.main' }} />
+
+                                            <Box>
+                                                <Typography
+                                                    variant="subtitle1"
+                                                    sx={{
+                                                        fontWeight: 600,
+                                                        color: 'text.primary',
+                                                        lineHeight: 1.2,
+                                                    }}
+                                                >
+                                                    {userName}
+                                                </Typography>
+
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                        color: (theme) => theme.palette.text.secondary,
+                                                        fontSize: '0.9rem',
+                                                        mt: 0.3,
+                                                    }}
+                                                >
+                                                    {account.company.company_name}
+                                                </Typography>
+                                            </Box>
                                         </Stack>
-                                        <Divider sx={{mt: 1.5}}/>
+
+                                        <Divider sx={{ mt: 1.5 }} />
                                     </Box>
                                 )}
                                 <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
@@ -259,34 +281,65 @@ export default function AccountList() {
 
                                 {account.company && (
                                     <>
-                                        <Box>
-                                            <Stack direction="row" spacing={1} alignItems="center" sx={{mb: 1}}>
-                                                <Business sx={{fontSize: 18, color: 'text.secondary'}}/>
-                                                <Typography
-                                                    variant="body2"
-                                                    color="text.secondary"
-                                                    sx={{fontWeight: 500}}
-                                                >
-                                                    Firma Bilgileri
-                                                </Typography>
-                                            </Stack>
-                                            <Typography
-                                                variant="body1"
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'flex-start',
+                                                gap: 1.5,
+                                                p: 1.5,
+                                                borderRadius: 3,
+                                                background: 'rgba(255,255,255,0.015)',
+                                                border: '1px solid rgba(255,255,255,0.04)',
+                                                transition: 'all 0.3s ease',
+                                                '&:hover': {
+                                                    borderColor: 'rgba(255,255,255,0.1)',
+                                                    background: 'rgba(255,255,255,0.03)',
+                                                },
+                                            }}
+                                        >
+                                            <Business
                                                 sx={{
-                                                    fontWeight: 600,
-                                                    color: 'text.primary',
-                                                    mb: 0.5
+                                                    fontSize: 26,
+                                                    color: 'primary.main',
+                                                    opacity: 0.85,
+                                                    mt: 0.3,
+                                                    flexShrink: 0,
+                                                    filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.25))',
                                                 }}
-                                            >
-                                                {account.company.company_name}
-                                            </Typography>
-                                            <Chip
-                                                label={account.company.sector}
-                                                size="small"
-                                                variant="outlined"
-                                                sx={{fontSize: '0.75rem'}}
                                             />
+
+                                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                <Typography
+                                                    variant="subtitle1"
+                                                    sx={{
+                                                        fontWeight: 600,
+                                                        color: 'text.primary',
+                                                        fontSize: '1rem',
+                                                        letterSpacing: 0.15,
+                                                    }}
+                                                >
+                                                    {account.company.company_name}
+                                                </Typography>
+
+                                                {account.company?.sector && (
+                                                    <Typography
+                                                        variant="caption"
+                                                        sx={{
+                                                            mt: 0.4,
+                                                            fontWeight: 400,
+                                                            fontSize: '0.75rem',
+                                                            color: 'text.secondary',
+                                                            opacity: 0.5,
+                                                            fontStyle: 'italic',
+                                                            letterSpacing: 0.4,
+                                                        }}
+                                                    >
+                                                        {account.company.sector}
+                                                    </Typography>
+                                                )}
+                                            </Box>
                                         </Box>
+
 
                                         <Box>
                                             <Stack direction="row" spacing={1} alignItems="center">
