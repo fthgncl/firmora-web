@@ -9,7 +9,6 @@ import {
     CardActionArea,
     CardContent,
     Avatar,
-    Chip,
     Tooltip,
     CircularProgress,
     Alert,
@@ -178,20 +177,6 @@ export default function CompanyList() {
 
                     {/* Sağ rozet + ok */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Chip
-                            label={company.currency}
-                            size="small"
-                            sx={{
-                                fontWeight: 600,
-                                fontSize: '0.72rem',
-                                height: 24,
-                                color: 'text.primary',
-                                bgcolor: (t) => (t.palette.mode === 'light' ? 'grey.100' : 'grey.800'),
-                                borderColor: (t) => t.palette.divider,
-                                borderWidth: 1,
-                                borderStyle: 'solid',
-                            }}
-                        />
                         <ChevronRight
                             sx={{
                                 fontSize: 22,
