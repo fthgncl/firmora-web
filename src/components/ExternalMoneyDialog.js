@@ -210,11 +210,6 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                             <Typography variant="body2">
                                 Sistem dışından gelen ödemeleri, müşteri ödemelerini veya banka transferlerini buradan kayıt altına alabilirsiniz.
                             </Typography>
-                            {targetScope === 'user' && (
-                                <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>
-                                    Alıcı: {user.name} {user.surname}
-                                </Typography>
-                            )}
                         </Alert>
                     )}
 
