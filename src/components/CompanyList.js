@@ -16,7 +16,7 @@ import {
     Button,
     useTheme
 } from "@mui/material";
-import { Business, Add } from "@mui/icons-material";
+import {Business, Add, ChevronRight} from "@mui/icons-material";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -92,64 +92,113 @@ export default function CompanyList() {
             variant="outlined"
             sx={{
                 borderRadius: 3,
-                height: "100%",
-                transition: "all .25s ease",
-                "&:hover": {
-                    transform: "translateY(-3px)",
-                    boxShadow: theme.shadows[4],
-                    borderColor: theme.palette.primary.light
-                }
+                height: '100%',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all .25s ease',
+                borderColor: (t) => t.palette.divider,
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 6,
+                    borderColor: (t) => t.palette.primary.light,
+                },
+                // Üstte ince premium şerit
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0,
+                    height: 3,
+                    background:
+                        'linear-gradient(90deg, rgba(99,102,241,0.9), rgba(236,72,153,0.9))',
+                },
             }}
         >
-            <CardActionArea onClick={() => handleCompanyClick(company)} sx={{ height: "100%" }}>
-                <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <CardActionArea onClick={() => handleCompanyClick(company)} sx={{ height: '100%' }}>
+                <CardContent
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.75,
+                        py: { xs: 1.8, sm: 2.1 },
+                        px: { xs: 1.8, sm: 2.1 },
+                    }}
+                >
+                    {/* Sol ikon */}
                     <Avatar
                         sx={{
-                            bgcolor: theme.palette.primary.main,
-                            color: theme.palette.primary.contrastText,
-                            width: 46,
-                            height: 46,
-                            flexShrink: 0
+                            bgcolor: (t) => t.palette.primary.main,
+                            color: (t) => t.palette.primary.contrastText,
+                            width: 42,
+                            height: 42,
+                            flexShrink: 0,
+                            boxShadow: (t) =>
+                                t.palette.mode === 'light'
+                                    ? '0 0 0 3px rgba(0,0,0,0.04)'
+                                    : '0 0 0 3px rgba(255,255,255,0.06)',
                         }}
                     >
                         <Business fontSize="small" />
                     </Avatar>
 
+                    {/* Orta metinler */}
                     <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                        <Tooltip title={company.company_name || ""} placement="top" arrow>
+                        <Tooltip title={company.company_name || ''} placement="top" arrow>
                             <Typography
                                 variant="subtitle1"
                                 sx={{
                                     fontWeight: 700,
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap"
+                                    color: 'text.primary',
+                                    lineHeight: 1.1,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
                                 }}
                             >
                                 {company.company_name}
                             </Typography>
                         </Tooltip>
 
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap"
-                            }}
-                        >
-                            {company.sector || "—"}
-                        </Typography>
+                        {/* Sektör: varsa çok düşük vurgu ile */}
+                        {company.sector && (
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: 'text.secondary',
+                                    opacity: 0.55,
+                                    mt: 0.3,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                }}
+                            >
+                                {company.sector}
+                            </Typography>
+                        )}
+                    </Box>
 
+                    {/* Sağ rozet + ok */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Chip
                             label={company.currency}
                             size="small"
                             sx={{
-                                mt: 0.8,
                                 fontWeight: 600,
-                                fontSize: "0.7rem",
-                                bgcolor: theme.palette.mode === "light" ? "grey.100" : "grey.800"
+                                fontSize: '0.72rem',
+                                height: 24,
+                                color: 'text.primary',
+                                bgcolor: (t) => (t.palette.mode === 'light' ? 'grey.100' : 'grey.800'),
+                                borderColor: (t) => t.palette.divider,
+                                borderWidth: 1,
+                                borderStyle: 'solid',
+                            }}
+                        />
+                        <ChevronRight
+                            sx={{
+                                fontSize: 22,
+                                color: 'text.secondary',
+                                opacity: 0.7,
+                                transition: 'transform .2s ease',
+                                '.MuiCardActionArea-root:hover &': { transform: 'translateX(2px)' },
                             }}
                         />
                     </Box>
@@ -162,41 +211,68 @@ export default function CompanyList() {
         <Card
             variant="outlined"
             sx={{
-                height: "100%",
+                height: '100%',
                 borderRadius: 3,
-                borderStyle: "dashed",
-                borderColor: theme.palette.primary.main,
-                bgcolor: "transparent"
+                borderStyle: 'dashed',
+                borderColor: (t) => t.palette.divider,
+                bgcolor: 'transparent',
+                transition: 'all .2s ease',
+                '&:hover': {
+                    borderColor: (t) => t.palette.mode === 'light' ? 'grey.400' : 'grey.600',
+                    boxShadow: 2,
+                    bgcolor: (t) => t.palette.action.hover,
+                },
             }}
         >
             <CardActionArea
                 onClick={handleAddCompany}
                 sx={{
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexDirection: "column",
-                    p: 3
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    p: 3,
+                    gap: 1,
+                    '&:focus-visible': {
+                        outline: '2px solid',
+                        outlineColor: (t) => t.palette.primary.main,
+                        outlineOffset: 2,
+                    },
                 }}
             >
-                <Avatar
+                {/* İkon: dolu arka plan yerine çizgisel, düşük vurgu */}
+                <Box
                     sx={{
-                        bgcolor: theme.palette.primary.main,
-                        color: theme.palette.primary.contrastText,
-                        width: 48,
-                        height: 48,
-                        mb: 1
+                        width: 44,
+                        height: 44,
+                        borderRadius: '50%',
+                        display: 'grid',
+                        placeItems: 'center',
+                        border: '1px solid',
+                        borderColor: (t) => t.palette.divider,
+                        color: 'text.secondary',
+                        opacity: 0.8,
                     }}
                 >
-                    <Add />
-                </Avatar>
-                <Typography variant="body2" color="primary.main" fontWeight={600}>
+                    <Add fontSize="small" />
+                </Box>
+
+                <Typography
+                    variant="body2"
+                    sx={{
+                        color: 'text.secondary',
+                        fontWeight: 600,
+                        letterSpacing: 0.2,
+                        opacity: 0.8,
+                    }}
+                >
                     Yeni Firma Oluştur
                 </Typography>
             </CardActionArea>
         </Card>
     );
+
 
     return (
         <Container maxWidth="lg">
@@ -274,13 +350,13 @@ export default function CompanyList() {
                 ) : (
                     <Grid container spacing={2}>
                         {companies.map((c) => (
-                            <Grid key={c.id} item xs={12} sm={6} md={4} lg={3} xl={2.4}>
+                            <Grid key={c.id} item xs={12} sm={6} md={4} lg={3} xl={3}>
                                 <CompanyCard company={c} />
                             </Grid>
                         ))}
 
                         {canCreateMore && (
-                            <Grid item xs={12} sm={6} md={4} lg={3} xl={2.4}>
+                            <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
                                 <AddCompanyCard />
                             </Grid>
                         )}
