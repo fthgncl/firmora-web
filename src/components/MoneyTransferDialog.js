@@ -35,12 +35,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import { permissionsService } from '../services/permissionsService';
 import UserSearchField from './UserSearchField';
+import CompanySearchField from './CompanySearchField';
 
 export default function MoneyTransferDialog({ open, onClose, sourceAccount = null, fromScope = 'user' }) {
     const { token, user } = useAuth();
     const { showAlert } = useAlert();
     const [loading, setLoading] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedCompany, setSelectedCompany] = useState(null);
     const [permissions, setPermissions] = useState({});
 
     // Tüm transfer senaryoları - API'ye göre
@@ -277,9 +279,16 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
         }
     };
 
-    // Transfer tipi değiştiğinde seçilen kullanıcıyı temizle
+    // Firma seçildiğinde
+    const handleCompanySelect = (company) => {
+        setSelectedCompany(company);
+        formik.setFieldValue('toUserCompanyId', company.id);
+    };
+
+    // Transfer tipi değiştiğinde seçilen kullanıcıyı ve firmayı temizle
     useEffect(() => {
         setSelectedUser(null);
+        setSelectedCompany(null);
         formik.setFieldValue('toUserId', '');
         formik.setFieldValue('toUserCompanyId', '');
         formik.setFieldValue('toExternalName', '');
@@ -325,7 +334,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
             if (transferType.requiresExternal) {
                 requestData.to_external_name = values.toExternalName;
             }
-
+            console.log('Transfer isteği verisi:', requestData);
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/transfers`,
                 requestData,
@@ -538,18 +547,42 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                     )}
 
                     {currentTransferType?.requiresOtherCompany && !currentTransferType?.requiresUser && (
-                        <TextField
-                            fullWidth
-                            label="Hedef Firma ID"
-                            name="toUserCompanyId"
-                            value={formik.values.toUserCompanyId}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.toUserCompanyId && Boolean(formik.errors.toUserCompanyId)}
-                            helperText={formik.touched.toUserCompanyId && formik.errors.toUserCompanyId}
-                            placeholder="COM_xyz789uvw012"
-                            sx={{ mb: 3 }}
-                        />
+                        <>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                                    Hedef Firma
+                                </Typography>
+                                <CompanySearchField
+                                    onCompanySelect={handleCompanySelect}
+                                    excludeCompanyId={sourceAccount?.company?.id || sourceAccount?.id}
+                                    minWidth="100%"
+                                />
+                                {formik.touched.toUserCompanyId && formik.errors.toUserCompanyId && (
+                                    <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>
+                                        {formik.errors.toUserCompanyId}
+                                    </Typography>
+                                )}
+                            </Box>
+
+                            {/* Seçilen firma bilgisi */}
+                            {selectedCompany && (
+                                <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                        Seçilen Firma
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {selectedCompany.company_name}
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                                        <Chip label={selectedCompany.sector} size="small" variant="outlined" />
+                                        <Chip label={selectedCompany.currency} size="small" color="primary" />
+                                    </Box>
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, fontFamily: 'monospace' }}>
+                                        Firma ID: {selectedCompany.id}
+                                    </Typography>
+                                </Alert>
+                            )}
+                        </>
                     )}
 
                     {currentTransferType?.requiresExternal && (
