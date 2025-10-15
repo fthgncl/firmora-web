@@ -280,24 +280,51 @@ export default function CompanyList() {
                 {/* Üst Başlık (açıklama satırı kaldırıldı) */}
                 <Box
                     sx={{
-                        display: "flex",
-                        alignItems: { xs: "start", sm: "center" },
-                        justifyContent: "space-between",
-                        flexDirection: { xs: "column", sm: "row" },
-                        gap: 1.5,
-                        mb: 2
+                        display: 'grid',
+                        gridTemplateColumns: '1fr auto',  // sol başlık, sağ buton
+                        alignItems: 'center',
+                        columnGap: 1.5,
+                        mb: 2,
                     }}
                 >
-                    <Typography variant="h5" fontWeight={700}>
+                    <Typography
+                        variant="h5"
+                        fontWeight={700}
+                        noWrap               // tek satırda kalsın
+                        sx={{ minWidth: 0,  // ellipsis çalışsın
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis' }}
+                    >
                         Firmalarım
                     </Typography>
 
                     {canCreateMore && (
-                        <Button variant="contained" startIcon={<Add />} onClick={handleAddCompany}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<Add />}
+                            onClick={handleAddCompany}
+                            sx={{
+                                color: (t) => t.palette.text.secondary,
+                                borderColor: (t) => t.palette.divider,
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                backgroundColor: 'transparent',
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                    borderColor: (t) => t.palette.text.disabled,
+                                    backgroundColor: (t) =>
+                                        t.palette.mode === 'light'
+                                            ? 'rgba(0,0,0,0.03)'
+                                            : 'rgba(255,255,255,0.04)',
+                                },
+                            }}
+                        >
                             Yeni Firma
                         </Button>
+
                     )}
                 </Box>
+
 
                 {error && (
                     <Alert severity="error" sx={{ mb: 2 }}>
