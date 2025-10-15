@@ -185,175 +185,157 @@ export default function AccountList() {
                 {accounts.map((account) => (
                     <Card
                         key={account.id}
+                        elevation={2}
                         sx={{
                             borderRadius: 3,
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': {
-                                transform: 'translateY(-8px)',
-                                boxShadow: 6
-                            },
+                            overflow: 'hidden',
                             position: 'relative',
-                            overflow: 'visible'
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': { transform: 'translateY(-6px)', boxShadow: 6 },
+                            // İnce üst şerit (ribbon)
+                            '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                inset: 0,
+                                height: 4,
+                                background:
+                                    'linear-gradient(90deg, rgba(99,102,241,0.8), rgba(236,72,153,0.8))',
+                            },
                         }}
-                        elevation={2}
                     >
-                        <CardContent sx={{p: 3}}>
-                            <Box sx={{position: 'absolute', top: 8, right: 8}}>
+                        <CardContent sx={{ pt: 3.5, pb: 2, px: 3 }}>
+                            {/* Başlık: avatar yerine ikon + title/subheader */}
+                            <Box sx={{ position: 'relative' }}>
                                 <IconButton
                                     onClick={(e) => handleMenuOpen(e, account)}
                                     size="small"
                                     sx={{
+                                        position: 'absolute',
+                                        top: -4,
+                                        right: -4,
                                         color: 'text.secondary',
-                                        '&:hover': {
-                                            color: 'primary.main',
-                                            backgroundColor: 'action.hover'
-                                        }
+                                        '&:hover': { color: 'primary.main', backgroundColor: 'action.hover' },
                                     }}
                                 >
                                     <MoreVert />
                                 </IconButton>
-                            </Box>
-                            <Stack spacing={2.5}>
-                                {userName && (
+
+                                <Stack direction="row" spacing={1.5} alignItems="center">
+                                    <Person sx={{ fontSize: 28, color: 'primary.main' }} />
+
                                     <Box>
-                                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                                            <Person sx={{ fontSize: 26, color: 'primary.main' }} />
+                                        {/* Kullanıcı adı */}
+                                        {userName && (
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.1 }}
+                                            >
+                                                {userName}
+                                            </Typography>
+                                        )}
 
-                                            <Box>
-                                                <Typography
-                                                    variant="subtitle1"
-                                                    sx={{
-                                                        fontWeight: 600,
-                                                        color: 'text.primary',
-                                                        lineHeight: 1.2,
-                                                    }}
-                                                >
-                                                    {userName}
-                                                </Typography>
-
-                                                <Typography
-                                                    variant="body2"
-                                                    sx={{
-                                                        color: (theme) => theme.palette.text.secondary,
-                                                        fontSize: '0.9rem',
-                                                        mt: 0.3,
-                                                    }}
-                                                >
-                                                    {account.company.company_name}
-                                                </Typography>
-                                            </Box>
-                                        </Stack>
-
-                                        <Divider sx={{ mt: 1.5 }} />
+                                        {/* Firma adı (userName altı) */}
+                                        <Typography
+                                            variant="body2"
+                                            sx={{ color: 'text.secondary', mt: 0.35 }}
+                                        >
+                                            {account.company?.company_name}
+                                        </Typography>
                                     </Box>
-                                )}
-                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
-                                    <Chip
-                                        label={account.currency}
-                                        size="small"
-                                        color="primary"
-                                        sx={{fontWeight: 600}}
-                                    />
-                                    <TrendingUp sx={{color: 'success.main', fontSize: 28}}/>
-                                </Box>
+                                </Stack>
+                            </Box>
 
-                                <Box>
+                            {/* Meta satırı */}
+                            <Box
+                                sx={{
+                                    mt: 2,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                <Chip
+                                    label={account.currency}
+                                    size="small"
+                                    color="primary"
+                                    sx={{ fontWeight: 600 }}
+                                />
+
+                                <TrendingUp sx={{ color: 'success.main', fontSize: 26 }} />
+                            </Box>
+
+                            {/* Bakiye */}
+                            <Box sx={{ mt: 1.5 }}>
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 0.5, fontWeight: 500 }}
+                                >
+                                    Bakiye
+                                </Typography>
+                                <Typography
+                                    variant="h4"
+                                    sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: '-0.5px' }}
+                                >
+                                    {formatBalance(account.balance, account.currency)}
+                                </Typography>
+                            </Box>
+
+                            <Divider sx={{ my: 2 }} />
+
+                            {/* Firma bloğu (pill) */}
+                            {account.company && (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1.25,
+                                        px: 1.25,
+                                        py: 1,
+                                        borderRadius: 99,
+                                        backgroundColor: 'action.hover',
+                                    }}
+                                >
+                                    <Business sx={{ fontSize: 20, color: 'primary.main', opacity: 0.9 }} />
+
                                     <Typography
                                         variant="body2"
-                                        color="text.secondary"
-                                        sx={{mb: 0.5, fontWeight: 500}}
+                                        sx={{ fontWeight: 600, color: 'text.primary' }}
                                     >
-                                        Bakiye
+                                        {account.company.company_name}
                                     </Typography>
-                                    <Typography
-                                        variant="h4"
-                                        sx={{
-                                            fontWeight: 700,
-                                            color: 'primary.main',
-                                            letterSpacing: '-0.5px'
-                                        }}
-                                    >
-                                        {formatBalance(account.balance, account.currency)}
-                                    </Typography>
-                                </Box>
 
-                                <Divider/>
-
-                                {account.company && (
-                                    <>
-                                        <Box
+                                    {/* Sektör: varsa, çok düşük vurgu ile */}
+                                    {account.company?.sector && (
+                                        <Chip
+                                            label={account.company.sector}
+                                            size="small"
+                                            variant="outlined"
                                             sx={{
-                                                display: 'flex',
-                                                alignItems: 'flex-start',
-                                                gap: 1.5,
-                                                p: 1.5,
-                                                borderRadius: 3,
-                                                background: 'rgba(255,255,255,0.015)',
-                                                border: '1px solid rgba(255,255,255,0.04)',
-                                                transition: 'all 0.3s ease',
-                                                '&:hover': {
-                                                    borderColor: 'rgba(255,255,255,0.1)',
-                                                    background: 'rgba(255,255,255,0.03)',
-                                                },
+                                                ml: 'auto',
+                                                fontSize: '0.72rem',
+                                                height: 24,
+                                                color: 'text.secondary',
+                                                borderColor: (t) => t.palette.divider,
+                                                opacity: 0.55, // dikkat çekmesin
                                             }}
-                                        >
-                                            <Business
-                                                sx={{
-                                                    fontSize: 26,
-                                                    color: 'primary.main',
-                                                    opacity: 0.85,
-                                                    mt: 0.3,
-                                                    flexShrink: 0,
-                                                    filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.25))',
-                                                }}
-                                            />
+                                        />
+                                    )}
+                                </Box>
+                            )}
 
-                                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                <Typography
-                                                    variant="subtitle1"
-                                                    sx={{
-                                                        fontWeight: 600,
-                                                        color: 'text.primary',
-                                                        fontSize: '1rem',
-                                                        letterSpacing: 0.15,
-                                                    }}
-                                                >
-                                                    {account.company.company_name}
-                                                </Typography>
-
-                                                {account.company?.sector && (
-                                                    <Typography
-                                                        variant="caption"
-                                                        sx={{
-                                                            mt: 0.4,
-                                                            fontWeight: 400,
-                                                            fontSize: '0.75rem',
-                                                            color: 'text.secondary',
-                                                            opacity: 0.5,
-                                                            fontStyle: 'italic',
-                                                            letterSpacing: 0.4,
-                                                        }}
-                                                    >
-                                                        {account.company.sector}
-                                                    </Typography>
-                                                )}
-                                            </Box>
-                                        </Box>
-
-
-                                        <Box>
-                                            <Stack direction="row" spacing={1} alignItems="center">
-                                                <CalendarToday sx={{fontSize: 16, color: 'text.secondary'}}/>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    Kayıt Tarihi: {formatDate(account.created_at)}
-                                                </Typography>
-                                            </Stack>
-                                        </Box>
-                                    </>
-                                )}
-                            </Stack>
+                            {/* Kayıt tarihi */}
+                            <Box sx={{ mt: 1.5 }}>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <CalendarToday sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                    <Typography variant="caption" color="text.secondary">
+                                        Kayıt Tarihi: {formatDate(account.created_at)}
+                                    </Typography>
+                                </Stack>
+                            </Box>
                         </CardContent>
                     </Card>
+
                 ))}
             </Box>
 
