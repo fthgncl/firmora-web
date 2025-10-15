@@ -25,6 +25,7 @@ import {
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
 import MoneyTransferDialog from './MoneyTransferDialog';
+import ExternalMoneyDialog from './ExternalMoneyDialog';
 
 export default function AccountList() {
     const {token} = useAuth();
@@ -35,6 +36,7 @@ export default function AccountList() {
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedAccount, setSelectedAccount] = useState(null);
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+    const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
 
     useEffect(() => {
         const fetchAccounts = async () => {
@@ -109,6 +111,16 @@ export default function AccountList() {
 
     const handleTransferDialogClose = () => {
         setTransferDialogOpen(false);
+        setSelectedAccount(null);
+    };
+
+    const handleExternalMoneyClick = () => {
+        handleMenuClose();
+        setExternalMoneyDialogOpen(true);
+    };
+
+    const handleExternalMoneyDialogClose = () => {
+        setExternalMoneyDialogOpen(false);
         setSelectedAccount(null);
     };
 
@@ -308,6 +320,9 @@ export default function AccountList() {
                 <MenuItem onClick={handleTransferClick}>
                     Para Transferi
                 </MenuItem>
+                <MenuItem onClick={handleExternalMoneyClick}>
+                    Gelir Ekle
+                </MenuItem>
             </Menu>
 
             <MoneyTransferDialog
@@ -315,6 +330,13 @@ export default function AccountList() {
                 onClose={handleTransferDialogClose}
                 sourceAccount={selectedAccount}
                 fromScope="user"
+            />
+
+            <ExternalMoneyDialog
+                open={externalMoneyDialogOpen}
+                onClose={handleExternalMoneyDialogClose}
+                targetAccount={selectedAccount}
+                targetScope="user"
             />
         </Container>
     );

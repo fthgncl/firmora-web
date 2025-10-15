@@ -30,6 +30,7 @@ import {useAlert} from '../contexts/AlertContext';
 import UserList from '../components/UsersList';
 import AddUserToCompany from '../components/AddUserToCompany';
 import MoneyTransferDialog from '../components/MoneyTransferDialog';
+import ExternalMoneyDialog from '../components/ExternalMoneyDialog';
 import axios from 'axios';
 
 export default function CompanyPage() {
@@ -43,6 +44,7 @@ export default function CompanyPage() {
     const [company, setCompany] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+    const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
 
     useEffect(() => {
         fetchCompanyDetails();
@@ -122,6 +124,15 @@ export default function CompanyPage() {
 
     const handleTransferDialogClose = () => {
         setTransferDialogOpen(false);
+    };
+
+    const handleExternalMoneyClick = () => {
+        handleMenuClose();
+        setExternalMoneyDialogOpen(true);
+    };
+
+    const handleExternalMoneyDialogClose = () => {
+        setExternalMoneyDialogOpen(false);
     };
 
     if (loading) {
@@ -370,6 +381,9 @@ export default function CompanyPage() {
                 <MenuItem onClick={handleTransferClick}>
                     Para Transferi
                 </MenuItem>
+                <MenuItem onClick={handleExternalMoneyClick}>
+                    Gelir Ekle
+                </MenuItem>
             </Menu>
 
             <MoneyTransferDialog
@@ -377,6 +391,13 @@ export default function CompanyPage() {
                 onClose={handleTransferDialogClose}
                 sourceAccount={company}
                 fromScope="company"
+            />
+
+            <ExternalMoneyDialog
+                open={externalMoneyDialogOpen}
+                onClose={handleExternalMoneyDialogClose}
+                targetAccount={company}
+                targetScope="company"
             />
         </Container>
     );
