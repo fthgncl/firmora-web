@@ -25,6 +25,8 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import { PersonAdd, Close, CheckCircle, Email, Phone, Person, ExpandMore, Security } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
@@ -37,6 +39,9 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
     const { showAlert,showSuccess } = useAlert();
     const { getPermissionsByCategory, encodePermissions, loading: permissionsLoading } = usePermissions();
     const API_URL = `${process.env.REACT_APP_API_URL}/companies/add-user`;
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [open, setOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -234,8 +239,9 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                 onClose={handleClose}
                 maxWidth="md"
                 fullWidth
+                fullScreen={isMobile}
                 PaperProps={{
-                    sx: { borderRadius: 2 }
+                    sx: { borderRadius: isMobile ? 0 : 2 }
                 }}
             >
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
