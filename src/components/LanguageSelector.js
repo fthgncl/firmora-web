@@ -3,14 +3,21 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import i18n from '../services/i18n';
+import {useAuth} from "../contexts/AuthContext";
+import {usePermissions} from "../contexts/PermissionsContext";
 
 export default function LanguageSelector() {
+    const { token } = useAuth();
+    const { refreshPermissions } = usePermissions();
     const [menuOpen, setMenuOpen] = useState(null);
     const [, forceUpdate] = useState({});
 
     // i18n event'lerini dinle
     useEffect(() => {
         const handleLanguageChanged = () => {
+            if (token) {
+                refreshPermissions();
+            }
             forceUpdate({}); // Component'i yeniden render et
         };
 
@@ -30,7 +37,8 @@ export default function LanguageSelector() {
             i18n.off('languageChanged', handleLanguageChanged);
             i18n.off('initialized', handleInitialized);
         };
-    }, []);
+        // eslint-disable-next-line
+    }, [token]);
 
     // i18n resources'tan mevcut dilleri çek
     const availableLanguages = Object.keys(i18n.store?.data || {});
