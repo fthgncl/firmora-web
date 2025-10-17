@@ -1,4 +1,5 @@
 import axios from 'axios';
+import i18n from './i18n';
 
 // Environment variable'lardan cache ayarlarını al
 const CACHE_KEY = process.env.REACT_APP_PERMISSIONS_CACHE_KEY || 'firmora-permissions-cache';
@@ -69,7 +70,7 @@ const getPermissions = async (token) => {
     // Önce cache'e bak
     const cached = getCachedPermissions();
 
-    if (cached) {
+    if (cached && cached.lang && cached.lang === i18n.language) {
         return cached;
     }
 
