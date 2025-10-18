@@ -82,9 +82,19 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
 
     const userPermObjects = useMemo(() => {
         if (!permissions || !userPermissions) return [];
+
         const codes = String(userPermissions).split('');
+
+        // Eğer kullanıcı 'a' yetkisine sahipse → Tüm permission objelerini dön
+        if (codes.includes('a')) {
+            return Object.values(permissions);
+        }
+
+        // Normal filtreleme
         return Object.values(permissions).filter((p) => codes.includes(p.code));
+
     }, [permissions, userPermissions]);
+
 
     const groupedByCategory = useMemo(() => {
         const groups = {};
