@@ -49,7 +49,7 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
     const [canEdit, setCanEdit] = useState(false);
 
     useEffect(() => {
-        if (!userId || !companyId || !user || !token) {
+        if (!userId || !companyId || !user || !token || userId === user.id) {
             setCanEdit(false);
             return;
         }
