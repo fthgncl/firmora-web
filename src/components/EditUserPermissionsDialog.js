@@ -36,7 +36,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import { usePermissions } from '../contexts/PermissionsContext';
 
-export default function EditUserPermissionsDialog({ open, onClose, userId, companyId }) {
+export default function EditUserPermissionsDialog({ open, onClose, userId, companyId, onEditedUser }) {
 
     const { token } = useAuth();
     const { showAlert, showSuccess } = useAlert();
@@ -201,6 +201,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                 const successMessage = response.data.data?.message || 'Kullanıcı yetkileri başarıyla güncellendi';
                 showSuccess(successMessage, 'İşlem Başarılı');
                 handleClose();
+                onEditedUser();
             } else {
                 const errorMessage = response.data?.error || 'Yetkiler güncellenirken hata oluştu';
                 setError(errorMessage);

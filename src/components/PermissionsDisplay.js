@@ -41,7 +41,7 @@ const categoryIcon = (category) => {
     return <InfoOutlinedIcon fontSize="small" sx={{mr: 0.5}}/>;
 };
 
-const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Yetkiler'}) => {
+const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Yetkiler', onEditedUser}) => {
     const {permissions} = usePermissions();
     const {user, token} = useAuth(); // giriş yapan kullanıcı ve token
     const [anchorEl, setAnchorEl] = useState(null);
@@ -242,6 +242,7 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
             </Popover>
 
             <EditUserPermissionsDialog
+                onEditedUser={onEditedUser}
                 open={editDialogOpen}
                 onClose={handleCloseEditDialog}
                 userId={userId}
