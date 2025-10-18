@@ -37,9 +37,10 @@ import { useAlert } from '../contexts/AlertContext';
 import { usePermissions } from '../contexts/PermissionsContext';
 
 export default function EditUserPermissionsDialog({ open, onClose, userId, companyId }) {
+
     const { token } = useAuth();
-    const { showAlert } = useAlert();
-    const { getPermissionsByCategory, decodePermissions, loading: permissionsLoading } = usePermissions();
+    const { showAlert, showSuccess } = useAlert();
+    const { getPermissionsByCategory, decodePermissions, encodePermissions, loading: permissionsLoading } = usePermissions();
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -166,8 +167,81 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
         });
     };
 
-    const handleUpdatePermissions = () => {
-        alert('burada istek yollanacak');
+    const handleUpdatePermissions = async () => {
+        if (selectedPermissions.length === 0) {
+            setError('Lütfen en az bir yetki seçin');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError('');
+
+            // Yetkileri encode et
+            const permissionsString = await encodePermissions(selectedPermissions);
+
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/update-permissions`,
+                {
+                    targetUserId: userId,
+                    companyId: companyId,
+                    permissions: permissionsString,
+                },
+                {
+                    headers: {
+                        'x-access-token': token,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            console.log(response.data);
+
+            if (response.data?.status === "success" ) {
+                const successMessage = response.data.data?.message || 'Kullanıcı yetkileri başarıyla güncellendi';
+                showSuccess(successMessage, 'İşlem Başarılı');
+                handleClose();
+            } else {
+                const errorMessage = response.data?.error || 'Yetkiler güncellenirken hata oluştu';
+                setError(errorMessage);
+                showAlert(errorMessage, 'error');
+            }
+        } catch (err) {
+            console.error('Yetki güncelleme hatası:', err);
+
+            let errorMsg = 'Beklenmeyen bir hata oluştu';
+
+            if (err.response) {
+                const status = err.response.status;
+                const responseMessage = err.response.data?.error || err.response.data?.message;
+
+                switch (status) {
+                    case 400:
+                        errorMsg = responseMessage || 'Geçersiz istek. Lütfen bilgileri kontrol edin.';
+                        break;
+                    case 401:
+                        errorMsg = responseMessage || 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.';
+                        break;
+                    case 403:
+                        errorMsg = responseMessage || 'Bu işlem için yetkiniz bulunmamaktadır';
+                        break;
+                    case 500:
+                        errorMsg = responseMessage || 'Sunucu hatası oluştu';
+                        break;
+                    default:
+                        errorMsg = responseMessage || `Hata oluştu (${status})`;
+                }
+            } else if (err.request) {
+                errorMsg = 'Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin.';
+            } else {
+                errorMsg = err.message || 'Beklenmeyen bir hata oluştu';
+            }
+
+            setError(errorMsg);
+            showAlert(errorMsg, 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -464,9 +538,9 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                     onClick={handleUpdatePermissions}
                     variant="contained"
                     disabled={!userData || selectedPermissions.length === 0 || loading}
-                    startIcon={<Edit />}
+                    startIcon={loading ? <CircularProgress size={16} /> : <Edit />}
                 >
-                    Yetkileri Güncelle
+                    {loading ? 'Güncelleniyor...' : 'Yetkileri Güncelle'}
                 </Button>
             </DialogActions>
         </Dialog>

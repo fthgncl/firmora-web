@@ -350,7 +350,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
             if (transferType.requiresExternal) {
                 requestData.to_external_name = values.toExternalName;
             }
-            console.log('Transfer isteği verisi:', requestData);
+
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/transfers`,
                 requestData,
