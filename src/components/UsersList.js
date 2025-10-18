@@ -338,7 +338,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                         {visibleCols.username && <TableCell>{u.username}</TableCell>}
                                         {visibleCols.permissions && (
                                             <TableCell>
-                                                <PermissionsDisplay userPermissions={getUserPermissions(u.permissions)} />
+                                                <PermissionsDisplay userId={u.id} companyId={companyId} userPermissions={getUserPermissions(u.permissions)} />
                                             </TableCell>
                                         )}
                                         {visibleCols.emailverified && <TableCell>{renderVerifyChip(Boolean(u.emailverified))}</TableCell>}

@@ -1,4 +1,3 @@
-// PermissionsBadgePopover.pro.jsx
 import React, { useMemo, useState, useCallback } from 'react';
 import {
     Badge,
@@ -12,13 +11,17 @@ import {
     ListItemText,
     Chip,
     Stack,
-    Link as MuiLink,
+    IconButton,
+    Tooltip,
 } from '@mui/material';
 import SecurityIcon from '@mui/icons-material/Security';
 import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { usePermissions } from '../contexts/PermissionsContext';
+import EditUserPermissionsDialog from './EditUserPermissionsDialog';
 
 // Kategori -> ikon eşleşmesi
 const categoryIcon = (category) => {
@@ -29,9 +32,10 @@ const categoryIcon = (category) => {
     return <InfoOutlinedIcon fontSize="small" sx={{ mr: 0.5 }} />;
 };
 
-const PermissionsBadgePopover = ({ userPermissions, label = 'Yetkiler' }) => {
+const PermissionsBadgePopover = ({ userId, companyId, userPermissions, label = 'Yetkiler' }) => {
     const { permissions } = usePermissions();
     const [anchorEl, setAnchorEl] = useState(null);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
 
     const userPermObjects = useMemo(() => {
         if (!permissions || !userPermissions) return [];
@@ -48,14 +52,14 @@ const PermissionsBadgePopover = ({ userPermissions, label = 'Yetkiler' }) => {
         return groups;
     }, [userPermObjects]);
 
-    // 👇 Hook'lar (KOŞULSUZ) — erken dönüşten önce
     const handleOpen = useCallback((e) => setAnchorEl(e.currentTarget), []);
     const handleClose = useCallback(() => setAnchorEl(null), []);
     const open = Boolean(anchorEl);
 
-    const totalCount = userPermObjects.length;
+    const handleOpenEditDialog = useCallback(() => setEditDialogOpen(true), []);
+    const handleCloseEditDialog = useCallback(() => setEditDialogOpen(false), []);
 
-    // ✔️ Artık hook’lardan SONRA erken dönüş yapıyoruz
+    const totalCount = userPermObjects.length;
     if (!totalCount) return null;
 
     return (
@@ -91,22 +95,57 @@ const PermissionsBadgePopover = ({ userPermissions, label = 'Yetkiler' }) => {
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 PaperProps={{
                     elevation: 6,
-                    sx: { width: 360, maxWidth: '90vw', borderRadius: 2 }
+                    sx: { width: 380, maxWidth: '92vw', borderRadius: 2, overflow: 'hidden' },
                 }}
             >
-                {/* Üst başlık / özet */}
-                <Box sx={{ p: 1.5, pb: 0.75 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                        Kullanıcı Yetkileri
-                    </Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                        Toplam {totalCount} izin • Kısa özet
-                    </Typography>
-                </Box>
-                <Divider sx={{ my: 1 }} />
+                {/* Üst şerit: başlık solda, aksiyonlar sağda */}
+                <Box
+                    sx={{
+                        px: 1.25,
+                        py: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        bgcolor: 'background.paper',
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 1,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                    }}
+                >
+                    <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                            Kullanıcı Yetkileri
+                        </Typography>
+                        <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                            Toplam {totalCount} izin
+                        </Typography>
+                    </Box>
 
-                {/* Kategori başlıkları (chip olarak hızlı bakış) */}
-                <Box sx={{ px: 1.5, pb: 1 }}>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                        {/* EditUserPermissionsDialog aç */}
+                        <Tooltip title="Kullanıcı izinlerini düzenle" arrow enterDelay={300}>
+                            <IconButton
+                                size="small"
+                                onClick={handleOpenEditDialog}
+                                aria-label="Kullanıcı izinlerini dialog ile düzenle"
+                            >
+                                <EditOutlinedIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+
+                        {/* Kapat (SAĞ ÜST) */}
+                        <Tooltip title="Kapat" arrow enterDelay={300}>
+                            <IconButton size="small" onClick={handleClose} aria-label="Kapat">
+                                <CloseRoundedIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                </Box>
+
+                {/* Kategori başlıkları */}
+                <Box sx={{ px: 1.5, py: 1 }}>
                     <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                         {Object.entries(groupedByCategory).map(([cat, items]) => (
                             <Chip key={cat} size="small" label={`${cat} • ${items.length}`} variant="outlined" />
@@ -155,21 +194,14 @@ const PermissionsBadgePopover = ({ userPermissions, label = 'Yetkiler' }) => {
                         </Box>
                     ))}
                 </Box>
-
-                {/* Alt aksiyon satırı */}
-                <Box sx={{ px: 1.5, py: 1, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                    <MuiLink
-                        component="button"
-                        type="button"
-                        onClick={handleClose}
-                        underline="hover"
-                        variant="caption"
-                        sx={{ opacity: 0.9 }}
-                    >
-                        Kapat
-                    </MuiLink>
-                </Box>
             </Popover>
+
+            <EditUserPermissionsDialog
+                open={editDialogOpen}
+                onClose={handleCloseEditDialog}
+                userId={userId}
+                companyId={companyId}
+            />
         </>
     );
 };
