@@ -133,6 +133,13 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
             if (prev.includes(permissionKey)) {
                 return prev.filter((p) => p !== permissionKey);
             } else {
+                // sys_admin seçilirse tüm yetkileri otomatik seç
+                if (permissionKey === 'sys_admin') {
+                    const allPermissionKeys = Object.values(permissionCategories)
+                        .flat()
+                        .map((p) => p.key);
+                    return [...new Set([...prev, ...allPermissionKeys])];
+                }
                 return [...prev, permissionKey];
             }
         });
