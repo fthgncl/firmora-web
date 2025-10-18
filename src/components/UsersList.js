@@ -33,6 +33,7 @@ import { Refresh, ViewColumn, CheckCircleOutline, ErrorOutline, Search, Clear } 
 import { useAuth } from '../contexts/AuthContext';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
+import PermissionsDisplay from './PermissionsDisplay';
 
 // Kolon tanımları
 const COLUMN_DEFS = [
@@ -41,8 +42,9 @@ const COLUMN_DEFS = [
     { key: 'email', label: 'E-posta' },
     { key: 'phone', label: 'Telefon' },
     { key: 'username', label: 'Kullanıcı adı' },
+    { key: 'permissions', label: 'Yetkiler' },
     { key: 'emailverified', label: 'E-posta Onayı' },
-    { key: 'created_at', label: 'Kayıt tarihi' },
+    { key: 'created_at', label: 'Kayıt tarihi' }
 ];
 
 const SORT_FIELDS = COLUMN_DEFS
@@ -72,7 +74,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     // kolon görünürlük
     const [visibleCols, setVisibleCols] = useState(() =>
         COLUMN_DEFS.reduce(
-            (acc, c) => ({ ...acc, [c.key]: c.key !== 'created_at' }), // Kayıt tarihi varsayılan kapalı
+            (acc, c) => ({ ...acc, [c.key]: !['created_at'].includes(c.key) }), // Sadece kayıt tarihi varsayılan kapalı
             {}
         )
     );
@@ -175,6 +177,19 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     const openColsMenu = (e) => setAnchorEl(e.currentTarget);
     const closeColsMenu = () => setAnchorEl(null);
     const toggleCol = (key) => setVisibleCols(prev => ({ ...prev, [key]: !prev[key] }));
+
+    // Yetkileri companyId'ye göre filtrele ve birleştir
+    const getUserPermissions = (userPermissions) => {
+        if (!userPermissions || !Array.isArray(userPermissions) || userPermissions.length === 0) {
+            return '-';
+        }
+
+        const filtered = userPermissions
+            .filter(item => item.companyId === companyId)
+            .map(item => item.permissions);
+
+        return filtered.length > 0 ? filtered.join('') : '-';
+    };
 
     // Chip + Tarih
     const renderVerifyChip = (flag) =>
@@ -321,6 +336,11 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                         {visibleCols.email && <TableCell>{u.email}</TableCell>}
                                         {visibleCols.phone && <TableCell>{u.phone || '-'}</TableCell>}
                                         {visibleCols.username && <TableCell>{u.username}</TableCell>}
+                                        {visibleCols.permissions && (
+                                            <TableCell>
+                                                <PermissionsDisplay userPermissions={getUserPermissions(u.permissions)} />
+                                            </TableCell>
+                                        )}
                                         {visibleCols.emailverified && <TableCell>{renderVerifyChip(Boolean(u.emailverified))}</TableCell>}
                                         {visibleCols.created_at && <TableCell>{formatDate(u.created_at)}</TableCell>}
                                     </TableRow>
