@@ -1,0 +1,15 @@
+{
+  "company_name": {
+    "min": "Company name must be at least 2 characters",
+    "max": "Company name can be up to 50 characters",
+    "required": "Company name is required"
+  },
+  "sector": {
+    "max": "Sector can be up to 50 characters"
+  },
+  "currency": {
+    "length": "Currency code must be 3 characters",
+    "format": "Currency code must consist of 3 uppercase letters (e.g., USD, EUR, TRY)",
+    "required": "Currency is required"
+  }
+}

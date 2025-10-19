@@ -1,0 +1,15 @@
+{
+  "company_name": {
+    "min": "Der Firmenname muss mindestens 2 Zeichen lang sein",
+    "max": "Der Firmenname darf höchstens 50 Zeichen lang sein",
+    "required": "Firmenname ist erforderlich"
+  },
+  "sector": {
+    "max": "Der Sektor darf höchstens 50 Zeichen lang sein"
+  },
+  "currency": {
+    "length": "Der Währungscode muss 3 Zeichen lang sein",
+    "format": "Der Währungscode muss aus 3 Großbuchstaben bestehen (z. B. USD, EUR, TRY)",
+    "required": "Währung ist erforderlich"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "company_name": {
+    "min": "Firma adı en az 2 karakter olmalıdır",
+    "max": "Firma adı en fazla 50 karakter olabilir",
+    "required": "Firma adı zorunludur"
+  },
+  "sector": {
+    "max": "Sektör en fazla 50 karakter olabilir"
+  },
+  "currency": {
+    "length": "Para birimi kodu 3 karakter olmalıdır",
+    "format": "Para birimi kodu 3 büyük harf olmalıdır (örn: USD, EUR, TRY)",
+    "required": "Para birimi zorunludur"
+  }
+}
