@@ -20,7 +20,7 @@ import {
     AccountBalance,
     CalendarToday,
     Settings,
-    AccountBalanceWalletOutlined,
+    SwapHoriz,
     AddCircleOutline,
 } from '@mui/icons-material';
 import {useNavigate, useParams} from 'react-router-dom';
@@ -173,17 +173,32 @@ export default function CompanyPage() {
                                     >
                                         {/* Sağ üstte üç profesyonel buton */}
                                         <Stack
-                                            direction="row"
+                                            direction={{ xs: 'column-reverse', sm: 'row' }}
                                             spacing={1}
                                             sx={{
                                                 position: 'absolute',
                                                 top: 12,
                                                 right: 12,
+                                                alignItems: 'flex-end',
+                                                '& .MuiIconButton-root': {
+                                                    width: 40,
+                                                    height: 40,
+                                                    color: 'white',
+                                                    backgroundColor: 'rgba(255,255,255,0.15)',
+                                                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.25)' },
+                                                    transition: 'all 0.2s ease',
+                                                },
+                                                '& .MuiSvgIcon-root': {
+                                                    fontSize: 20,
+                                                },
+                                                '@media (max-width:600px)': {
+                                                    right: 8,
+                                                },
                                             }}
                                         >
-                                            <Tooltip title={t('company:menu.moneyTransfer')}>
+
+                                        <Tooltip title={t('company:menu.moneyTransfer')}>
                                                 <IconButton
-                                                    size="small"
                                                     sx={{
                                                         color: 'white',
                                                         backgroundColor: 'rgba(255,255,255,0.15)',
@@ -191,7 +206,7 @@ export default function CompanyPage() {
                                                     }}
                                                     onClick={() => setTransferDialogOpen(true)}
                                                 >
-                                                    <AccountBalanceWalletOutlined fontSize="small" />
+                                                    <SwapHoriz/>
                                                 </IconButton>
                                             </Tooltip>
                                             <Tooltip title={t('company:menu.addIncome')}>
@@ -204,7 +219,7 @@ export default function CompanyPage() {
                                                     }}
                                                     onClick={() => setExternalMoneyDialogOpen(true)}
                                                 >
-                                                    <AddCircleOutline fontSize="small" />
+                                                    <AddCircleOutline />
                                                 </IconButton>
                                             </Tooltip>
                                             <Tooltip title={t('company:goToSettings')}>
@@ -217,7 +232,7 @@ export default function CompanyPage() {
                                                     }}
                                                     onClick={() => navigate(`/company/${companyId}/settings`)}
                                                 >
-                                                    <Settings fontSize="small" />
+                                                    <Settings />
                                                 </IconButton>
                                             </Tooltip>
                                         </Stack>
