@@ -1,0 +1,49 @@
+{
+  "title": "Edit User Permissions",
+  "titles": {
+    "success": "Success"
+  },
+  "sections": {
+    "userInfo": "User Information",
+    "permissionEdit": "Permission Editing"
+  },
+  "labels": {
+    "verified": "Verified",
+    "pending": "Pending",
+    "username": "Username",
+    "code": "Code",
+    "selectedCount": "{{count}} selected"
+  },
+  "loading": {
+    "user": "Loading user information...",
+    "permissions": "Loading permissions..."
+  },
+  "empty": {
+    "noCategories": "No permission categories found."
+  },
+  "actions": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "update": "Update Permissions",
+    "updating": "Updating..."
+  },
+  "messages": {
+    "updated": "User permissions have been updated successfully"
+  },
+  "errors": {
+    "fetchUser": "Failed to retrieve user information",
+    "loadUser": "An error occurred while loading user information",
+    "selectAtLeastOne": "Please select at least one permission",
+    "updateFailed": "An error occurred while updating permissions",
+    "badRequest": "Invalid request. Please check your inputs.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "forbidden": "You do not have permission for this action",
+    "server": "A server error occurred",
+    "network": "Could not reach the server. Please check your internet connection.",
+    "unexpected": "An unexpected error occurred",
+    "defaultWithCode": "An error occurred ({{code}})"
+  },
+  "aria": {
+    "toggleCategory": "Toggle category {{name}}"
+  }
+}

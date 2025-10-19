@@ -35,9 +35,10 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import { usePermissions } from '../contexts/PermissionsContext';
+import { useTranslation } from 'react-i18next';
 
 export default function EditUserPermissionsDialog({ open, onClose, userId, companyId, onEditedUser }) {
-
+    const { t } = useTranslation(['userPermissions']);
     const { token } = useAuth();
     const { showAlert, showSuccess } = useAlert();
     const { getPermissionsByCategory, decodePermissions, encodePermissions, loading: permissionsLoading } = usePermissions();
@@ -58,13 +59,11 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
 
     useEffect(() => {
         if (!open) {
-            // Dialog kapandığında state'i temizle
             setUserData(null);
             setSelectedPermissions([]);
             setError('');
             return;
         }
-
         if (!userId || !companyId) return;
 
         const fetchUserData = async () => {
@@ -96,37 +95,30 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                     const user = response.data.data.users[0];
                     setUserData(user);
 
-                    // Kullanıcının mevcut yetkilerini decode et
                     if (user.permissions && user.permissions.length > 0) {
-                        const userPermission = user.permissions.find(
-                            (p) => p.companyId === companyId
-                        );
+                        const userPermission = user.permissions.find((p) => p.companyId === companyId);
                         if (userPermission?.permissions) {
-                            const decodedPermissions = await decodePermissions(
-                                userPermission.permissions
-                            );
+                            const decodedPermissions = await decodePermissions(userPermission.permissions);
                             setSelectedPermissions(decodedPermissions);
                         }
                     }
                 } else {
-                    setError('Kullanıcı bilgileri alınamadı');
+                    setError(t('errors.fetchUser'));
                 }
-            } catch (error) {
-                console.error('User permissions fetch failed:', error);
-                setError('Kullanıcı bilgileri yüklenirken hata oluştu');
-                showAlert('Kullanıcı bilgileri yüklenirken hata oluştu', 'error');
+            } catch (e) {
+                console.error('User permissions fetch failed:', e);
+                setError(t('errors.loadUser'));
+                showAlert(t('errors.loadUser'), 'error');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchUserData();
-    }, [open, userId, companyId, token, decodePermissions, showAlert]);
+    }, [open, userId, companyId, token, decodePermissions, showAlert, t]);
 
     const handleClose = () => {
-        if (!loading) {
-            onClose();
-        }
+        if (!loading) onClose();
     };
 
     const handlePermissionToggle = (permissionKey) => {
@@ -134,11 +126,8 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
             if (prev.includes(permissionKey)) {
                 return prev.filter((p) => p !== permissionKey);
             } else {
-                // sys_admin seçilirse tüm yetkileri otomatik seç
                 if (permissionKey === 'sys_admin') {
-                    const allPermissionKeys = Object.values(permissionCategories)
-                        .flat()
-                        .map((p) => p.key);
+                    const allPermissionKeys = Object.values(permissionCategories).flat().map((p) => p.key);
                     return [...new Set([...prev, ...allPermissionKeys])];
                 }
                 return [...prev, permissionKey];
@@ -148,9 +137,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
 
     const handleCategoryToggle = (permissions) => {
         const permissionKeys = permissions.map((p) => p.key);
-        const allSelected = permissionKeys.every((key) =>
-            selectedPermissions.includes(key)
-        );
+        const allSelected = permissionKeys.every((key) => selectedPermissions.includes(key));
 
         setSelectedPermissions((prev) => {
             if (allSelected) {
@@ -158,9 +145,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
             } else {
                 const newPermissions = [...prev];
                 permissionKeys.forEach((key) => {
-                    if (!newPermissions.includes(key)) {
-                        newPermissions.push(key);
-                    }
+                    if (!newPermissions.includes(key)) newPermissions.push(key);
                 });
                 return newPermissions;
             }
@@ -169,7 +154,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
 
     const handleUpdatePermissions = async () => {
         if (selectedPermissions.length === 0) {
-            setError('Lütfen en az bir yetki seçin');
+            setError(t('errors.selectAtLeastOne'));
             return;
         }
 
@@ -177,7 +162,6 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
             setLoading(true);
             setError('');
 
-            // Yetkileri encode et
             const permissionsString = await encodePermissions(selectedPermissions);
 
             const response = await axios.post(
@@ -195,22 +179,19 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                 }
             );
 
-            console.log(response.data);
-
-            if (response.data?.status === "success" ) {
-                const successMessage = response.data.data?.message || 'Kullanıcı yetkileri başarıyla güncellendi';
-                showSuccess(successMessage, 'İşlem Başarılı');
+            if (response.data?.status === 'success') {
+                const successMessage = response.data.data?.message || t('messages.updated');
+                showSuccess(successMessage, t('titles.success'));
                 handleClose();
                 onEditedUser();
             } else {
-                const errorMessage = response.data?.error || 'Yetkiler güncellenirken hata oluştu';
+                const errorMessage = response.data?.error || t('errors.updateFailed');
                 setError(errorMessage);
                 showAlert(errorMessage, 'error');
             }
         } catch (err) {
             console.error('Yetki güncelleme hatası:', err);
-
-            let errorMsg = 'Beklenmeyen bir hata oluştu';
+            let errorMsg;
 
             if (err.response) {
                 const status = err.response.status;
@@ -218,24 +199,24 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
 
                 switch (status) {
                     case 400:
-                        errorMsg = responseMessage || 'Geçersiz istek. Lütfen bilgileri kontrol edin.';
+                        errorMsg = responseMessage || t('errors.badRequest');
                         break;
                     case 401:
-                        errorMsg = responseMessage || 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.';
+                        errorMsg = responseMessage || t('errors.sessionExpired');
                         break;
                     case 403:
-                        errorMsg = responseMessage || 'Bu işlem için yetkiniz bulunmamaktadır';
+                        errorMsg = responseMessage || t('errors.forbidden');
                         break;
                     case 500:
-                        errorMsg = responseMessage || 'Sunucu hatası oluştu';
+                        errorMsg = responseMessage || t('errors.server');
                         break;
                     default:
-                        errorMsg = responseMessage || `Hata oluştu (${status})`;
+                        errorMsg = responseMessage || t('errors.defaultWithCode', { code: status });
                 }
             } else if (err.request) {
-                errorMsg = 'Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin.';
+                errorMsg = t('errors.network');
             } else {
-                errorMsg = err.message || 'Beklenmeyen bir hata oluştu';
+                errorMsg = err.message || t('errors.unexpected');
             }
 
             setError(errorMsg);
@@ -252,9 +233,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
             maxWidth="md"
             fullWidth
             fullScreen={isMobile}
-            PaperProps={{
-                sx: { borderRadius: isMobile ? 0 : 2 },
-            }}
+            PaperProps={{ sx: { borderRadius: isMobile ? 0 : 2 } }}
         >
             <DialogTitle
                 sx={{
@@ -265,9 +244,9 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Edit color="primary" />
-                    <Typography variant="h6">Kullanıcı Yetkilerini Düzenle</Typography>
+                    <Typography variant="h6">{t('title')}</Typography>
                 </Box>
-                <IconButton onClick={handleClose} disabled={loading}>
+                <IconButton onClick={handleClose} disabled={loading} aria-label={t('actions.close')}>
                     <Close />
                 </IconButton>
             </DialogTitle>
@@ -288,7 +267,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                     >
                         <CircularProgress />
                         <Typography variant="body2" color="text.secondary">
-                            Kullanıcı bilgileri yükleniyor...
+                            {t('loading.user')}
                         </Typography>
                     </Box>
                 ) : error ? (
@@ -311,7 +290,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                 <Security color="primary" />
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                    Kullanıcı Bilgileri
+                                    {t('sections.userInfo')}
                                 </Typography>
                             </Box>
 
@@ -329,9 +308,9 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                                         {userData.email}
                                     </Typography>
                                     {userData.emailverified ? (
-                                        <Chip size="small" label="Onaylı" color="success" />
+                                        <Chip size="small" label={t('labels.verified')} color="success" />
                                     ) : (
-                                        <Chip size="small" label="Bekliyor" color="warning" />
+                                        <Chip size="small" label={t('labels.pending')} color="warning" />
                                     )}
                                 </Box>
 
@@ -346,7 +325,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
 
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Typography variant="caption" color="text.secondary">
-                                        Kullanıcı Adı:
+                                        {t('labels.username')}:
                                     </Typography>
                                     <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                                         {userData.username}
@@ -356,171 +335,119 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                         </Box>
 
                         {/* Yetki Seçimi */}
-                        <Paper
-                            elevation={0}
-                            sx={{ p: 2, bgcolor: 'background.default', borderRadius: 2 }}
-                        >
+                        <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                                 <Security color="primary" />
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                    Yetki Düzenleme
+                                    {t('sections.permissionEdit')}
                                 </Typography>
                                 <Chip
                                     size="small"
-                                    label={`${selectedPermissions.length} seçili`}
+                                    label={t('labels.selectedCount', { count: selectedPermissions.length })}
                                     color={selectedPermissions.length > 0 ? 'primary' : 'default'}
                                 />
                             </Box>
 
                             {permissionsLoading ? (
-                                <Box
-                                    sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}
-                                >
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
                                     <CircularProgress size={20} />
                                     <Typography variant="body2" color="text.secondary">
-                                        Yetkiler yükleniyor...
+                                        {t('loading.permissions')}
                                     </Typography>
                                 </Box>
                             ) : (
                                 <>
                                     {Object.keys(permissionCategories).length === 0 ? (
                                         <Alert severity="info" sx={{ mt: 2 }}>
-                                            Yetki kategorisi bulunamadı.
+                                            {t('empty.noCategories')}
                                         </Alert>
                                     ) : (
-                                        Object.entries(permissionCategories).map(
-                                            ([categoryName, permissions], index) => {
-                                                const categoryColors = [
-                                                    'primary',
-                                                    'secondary',
-                                                    'success',
-                                                    'warning',
-                                                    'info',
-                                                    'error',
-                                                ];
-                                                const categoryColor =
-                                                    categoryColors[index % categoryColors.length];
+                                        Object.entries(permissionCategories).map(([categoryName, permissions], index) => {
+                                            // const categoryColors = ['primary', 'primary', 'primary', 'primary', 'primary', 'primary']; // Her kategori için farklı renkler kullanılmak istenise açılabilir.
+                                            const categoryColor = 'primary' // categoryColors[index % categoryColors.length];
 
-                                                const selectedCount = permissions.filter((p) =>
-                                                    selectedPermissions.includes(p.key)
-                                                ).length;
+                                            const selectedCount = permissions.filter((p) =>
+                                                selectedPermissions.includes(p.key)
+                                            ).length;
 
-                                                const permissionKeys = permissions.map((p) => p.key);
-                                                const allSelected = permissionKeys.every((key) =>
-                                                    selectedPermissions.includes(key)
-                                                );
-                                                const someSelected = selectedCount > 0 && !allSelected;
+                                            const permissionKeys = permissions.map((p) => p.key);
+                                            const allSelected = permissionKeys.every((key) =>
+                                                selectedPermissions.includes(key)
+                                            );
+                                            const someSelected = selectedCount > 0 && !allSelected;
 
-                                                return (
-                                                    <Accordion
-                                                        key={categoryName}
-                                                        defaultExpanded={index === 0}
+                                            return (
+                                                <Accordion key={categoryName} defaultExpanded={index === 0}>
+                                                    <AccordionSummary
+                                                        expandIcon={<ExpandMore />}
+                                                        sx={{ '& .MuiAccordionSummary-content': { alignItems: 'center', gap: 1 } }}
                                                     >
-                                                        <AccordionSummary
-                                                            expandIcon={<ExpandMore />}
-                                                            sx={{
-                                                                '& .MuiAccordionSummary-content': {
-                                                                    alignItems: 'center',
-                                                                    gap: 1,
-                                                                },
+                                                        <Checkbox
+                                                            checked={allSelected}
+                                                            indeterminate={someSelected}
+                                                            onChange={(e) => {
+                                                                e.stopPropagation();
+                                                                handleCategoryToggle(permissions);
                                                             }}
-                                                        >
-                                                            <Checkbox
-                                                                checked={allSelected}
-                                                                indeterminate={someSelected}
-                                                                onChange={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleCategoryToggle(permissions);
-                                                                }}
-                                                                onClick={(e) => e.stopPropagation()}
-                                                                size="small"
-                                                                sx={{ p: 0, mr: 1 }}
-                                                            />
-                                                            <Typography
-                                                                variant="subtitle2"
-                                                                sx={{ fontWeight: 600 }}
-                                                            >
-                                                                {categoryName}
-                                                            </Typography>
-                                                            <Chip
-                                                                size="small"
-                                                                label={`${selectedCount}/${permissions.length}`}
-                                                                sx={{ ml: 'auto' }}
-                                                                color={
-                                                                    selectedCount > 0
-                                                                        ? categoryColor
-                                                                        : 'default'
-                                                                }
-                                                                variant={
-                                                                    selectedCount > 0
-                                                                        ? 'filled'
-                                                                        : 'outlined'
-                                                                }
-                                                            />
-                                                        </AccordionSummary>
-                                                        <AccordionDetails>
-                                                            <FormGroup>
-                                                                {permissions.map((permission) => (
-                                                                    <FormControlLabel
-                                                                        key={permission.key}
-                                                                        control={
-                                                                            <Checkbox
-                                                                                checked={selectedPermissions.includes(
-                                                                                    permission.key
-                                                                                )}
-                                                                                onChange={() =>
-                                                                                    handlePermissionToggle(
-                                                                                        permission.key
-                                                                                    )
-                                                                                }
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            size="small"
+                                                            sx={{ p: 0, mr: 1 }}
+                                                            inputProps={{ 'aria-label': t('aria.toggleCategory', { name: categoryName }) }}
+                                                        />
+                                                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                                            {categoryName}
+                                                        </Typography>
+                                                        <Chip
+                                                            size="small"
+                                                            label={`${selectedCount}/${permissions.length}`}
+                                                            sx={{ ml: 'auto' }}
+                                                            color={selectedCount > 0 ? categoryColor : 'default'}
+                                                            variant={selectedCount > 0 ? 'filled' : 'outlined'}
+                                                        />
+                                                    </AccordionSummary>
+                                                    <AccordionDetails>
+                                                        <FormGroup>
+                                                            {permissions.map((permission) => (
+                                                                <FormControlLabel
+                                                                    key={permission.key}
+                                                                    control={
+                                                                        <Checkbox
+                                                                            checked={selectedPermissions.includes(permission.key)}
+                                                                            onChange={() => handlePermissionToggle(permission.key)}
+                                                                            size="small"
+                                                                        />
+                                                                    }
+                                                                    label={
+                                                                        <Box sx={{ ml: 1 }}>
+                                                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                                                {permission.name}
+                                                                            </Typography>
+                                                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                                                                                {permission.description}
+                                                                            </Typography>
+                                                                            <Chip
                                                                                 size="small"
+                                                                                label={`${t('labels.code')}: ${permission.code}`}
+                                                                                sx={{ mt: 0.5, height: 20, fontSize: '0.7rem' }}
+                                                                                variant="outlined"
                                                                             />
-                                                                        }
-                                                                        label={
-                                                                            <Box sx={{ ml: 1 }}>
-                                                                                <Typography
-                                                                                    variant="body2"
-                                                                                    sx={{ fontWeight: 600 }}
-                                                                                >
-                                                                                    {permission.name}
-                                                                                </Typography>
-                                                                                <Typography
-                                                                                    variant="caption"
-                                                                                    color="text.secondary"
-                                                                                    sx={{ display: 'block' }}
-                                                                                >
-                                                                                    {permission.description}
-                                                                                </Typography>
-                                                                                <Chip
-                                                                                    size="small"
-                                                                                    label={`Kod: ${permission.code}`}
-                                                                                    sx={{
-                                                                                        mt: 0.5,
-                                                                                        height: 20,
-                                                                                        fontSize: '0.7rem',
-                                                                                    }}
-                                                                                    variant="outlined"
-                                                                                />
-                                                                            </Box>
-                                                                        }
-                                                                        sx={{
-                                                                            alignItems: 'flex-start',
-                                                                            mb: 2,
-                                                                            py: 1,
-                                                                            px: 1,
-                                                                            borderRadius: 1,
-                                                                            '&:hover': {
-                                                                                bgcolor: 'action.hover',
-                                                                            },
-                                                                        }}
-                                                                    />
-                                                                ))}
-                                                            </FormGroup>
-                                                        </AccordionDetails>
-                                                    </Accordion>
-                                                );
-                                            }
-                                        )
+                                                                        </Box>
+                                                                    }
+                                                                    sx={{
+                                                                        alignItems: 'flex-start',
+                                                                        mb: 2,
+                                                                        py: 1,
+                                                                        px: 1,
+                                                                        borderRadius: 1,
+                                                                        '&:hover': { bgcolor: 'action.hover' },
+                                                                    }}
+                                                                />
+                                                            ))}
+                                                        </FormGroup>
+                                                    </AccordionDetails>
+                                                </Accordion>
+                                            );
+                                        })
                                     )}
                                 </>
                             )}
@@ -533,7 +460,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
 
             <DialogActions sx={{ px: 3, py: 2 }}>
                 <Button onClick={handleClose} disabled={loading}>
-                    İptal
+                    {t('actions.cancel')}
                 </Button>
                 <Button
                     onClick={handleUpdatePermissions}
@@ -541,7 +468,7 @@ export default function EditUserPermissionsDialog({ open, onClose, userId, compa
                     disabled={!userData || selectedPermissions.length === 0 || loading}
                     startIcon={loading ? <CircularProgress size={16} /> : <Edit />}
                 >
-                    {loading ? 'Güncelleniyor...' : 'Yetkileri Güncelle'}
+                    {loading ? t('actions.updating') : t('actions.update')}
                 </Button>
             </DialogActions>
         </Dialog>

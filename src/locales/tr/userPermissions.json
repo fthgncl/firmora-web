@@ -1,0 +1,49 @@
+{
+  "title": "Kullanıcı Yetkilerini Düzenle",
+  "titles": {
+    "success": "İşlem Başarılı"
+  },
+  "sections": {
+    "userInfo": "Kullanıcı Bilgileri",
+    "permissionEdit": "Yetki Düzenleme"
+  },
+  "labels": {
+    "verified": "Onaylı",
+    "pending": "Bekliyor",
+    "username": "Kullanıcı Adı",
+    "code": "Kod",
+    "selectedCount": "{{count}} seçili"
+  },
+  "loading": {
+    "user": "Kullanıcı bilgileri yükleniyor...",
+    "permissions": "Yetkiler yükleniyor..."
+  },
+  "empty": {
+    "noCategories": "Yetki kategorisi bulunamadı."
+  },
+  "actions": {
+    "close": "Kapat",
+    "cancel": "İptal",
+    "update": "Yetkileri Güncelle",
+    "updating": "Güncelleniyor..."
+  },
+  "messages": {
+    "updated": "Kullanıcı yetkileri başarıyla güncellendi"
+  },
+  "errors": {
+    "fetchUser": "Kullanıcı bilgileri alınamadı",
+    "loadUser": "Kullanıcı bilgileri yüklenirken hata oluştu",
+    "selectAtLeastOne": "Lütfen en az bir yetki seçin",
+    "updateFailed": "Yetkiler güncellenirken hata oluştu",
+    "badRequest": "Geçersiz istek. Lütfen bilgileri kontrol edin.",
+    "sessionExpired": "Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.",
+    "forbidden": "Bu işlem için yetkiniz bulunmamaktadır",
+    "server": "Sunucu hatası oluştu",
+    "network": "Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin.",
+    "unexpected": "Beklenmeyen bir hata oluştu",
+    "defaultWithCode": "Hata oluştu ({{code}})"
+  },
+  "aria": {
+    "toggleCategory": "{{name}} kategorisini seç/kaldır"
+  }
+}

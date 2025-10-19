@@ -1,0 +1,49 @@
+{
+  "title": "Benutzerberechtigungen bearbeiten",
+  "titles": {
+    "success": "Erfolg"
+  },
+  "sections": {
+    "userInfo": "Benutzerinformationen",
+    "permissionEdit": "Berechtigungen bearbeiten"
+  },
+  "labels": {
+    "verified": "Bestätigt",
+    "pending": "Ausstehend",
+    "username": "Benutzername",
+    "code": "Code",
+    "selectedCount": "{{count}} ausgewählt"
+  },
+  "loading": {
+    "user": "Benutzerinformationen werden geladen...",
+    "permissions": "Berechtigungen werden geladen..."
+  },
+  "empty": {
+    "noCategories": "Keine Berechtigungskategorien gefunden."
+  },
+  "actions": {
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "update": "Berechtigungen aktualisieren",
+    "updating": "Wird aktualisiert..."
+  },
+  "messages": {
+    "updated": "Benutzerberechtigungen wurden erfolgreich aktualisiert"
+  },
+  "errors": {
+    "fetchUser": "Benutzerinformationen konnten nicht abgerufen werden",
+    "loadUser": "Beim Laden der Benutzerinformationen ist ein Fehler aufgetreten",
+    "selectAtLeastOne": "Bitte wählen Sie mindestens eine Berechtigung aus",
+    "updateFailed": "Beim Aktualisieren der Berechtigungen ist ein Fehler aufgetreten",
+    "badRequest": "Ungültige Anfrage. Bitte Eingaben prüfen.",
+    "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+    "forbidden": "Sie haben keine Berechtigung für diese Aktion",
+    "server": "Ein Serverfehler ist aufgetreten",
+    "network": "Server konnte nicht erreicht werden. Bitte Internetverbindung prüfen.",
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten",
+    "defaultWithCode": "Es ist ein Fehler aufgetreten ({{code}})"
+  },
+  "aria": {
+    "toggleCategory": "Kategorie {{name}} umschalten"
+  }
+}
