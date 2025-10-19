@@ -1,3 +1,6 @@
 {
-  "rightsReserved": "All rights reserved."
+  "rightsReserved": "All rights reserved.",
+  "phoneInput": {
+    "placeholder": "Phone number"
+  }
 }

@@ -1,12 +1,31 @@
-import React, { forwardRef } from 'react';
+// src/components/PhoneInputField.js
+import React, { forwardRef, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import tr from 'react-phone-number-input/locale/tr'
+import { useTranslation } from 'react-i18next';
+
+// Dil paketleri
+import tr from 'react-phone-number-input/locale/tr';
+import en from 'react-phone-number-input/locale/en';
+import de from 'react-phone-number-input/locale/de';
 
 // Telefon girişi için özel bileşen - MUI TextField ile entegre olacak şekilde
 const PhoneInputField = forwardRef(function PhoneInputField(props, ref) {
     const { defaultCountry, onChange, value, disabled, placeholder, error, touched, ...other } = props;
+    const { i18n, t } = useTranslation();
+
+    // Aktif dil için uygun label seti
+    const labels = useMemo(() => {
+        switch (i18n.language) {
+            case 'tr':
+                return tr;
+            case 'de':
+                return de;
+            default:
+                return en;
+        }
+    }, [i18n.language]);
 
     return (
         <Box
@@ -25,7 +44,10 @@ const PhoneInputField = forwardRef(function PhoneInputField(props, ref) {
                     },
                     '&:focus-within': {
                         borderColor: (touched && error) ? 'error.main' : 'primary.main',
-                        boxShadow: (theme) => `0 0 0 2px ${(touched && error) ? theme.palette.error.main + '20' : theme.palette.primary.main + '20'}`,
+                        boxShadow: (theme) =>
+                            `0 0 0 2px ${(touched && error)
+                                ? theme.palette.error.main + '20'
+                                : theme.palette.primary.main + '20'}`,
                     },
                 },
                 '& .PhoneInputCountry': {
@@ -57,17 +79,17 @@ const PhoneInputField = forwardRef(function PhoneInputField(props, ref) {
                         color: 'text.secondary',
                         opacity: 1,
                     },
-                }
+                },
             }}
         >
             <PhoneInput
                 defaultCountry={defaultCountry}
                 international
-                labels={tr}
+                labels={labels}
                 value={value}
                 onChange={onChange}
                 disabled={disabled}
-                placeholder={placeholder || "Telefon numarası"}
+                placeholder={placeholder || t('phoneInput.placeholder', 'Telefon numarası')}
                 ref={ref}
                 {...other}
             />

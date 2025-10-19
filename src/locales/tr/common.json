@@ -1,3 +1,6 @@
 {
-  "rightsReserved": "Tüm hakları saklıdır."
+  "rightsReserved": "Tüm hakları saklıdır.",
+  "phoneInput": {
+    "placeholder": "Telefon numarası"
+  }
 }
