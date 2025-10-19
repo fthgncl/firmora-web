@@ -1,0 +1,51 @@
+{
+  "card": {
+    "title": "Benutzer hinzufügen",
+    "subheader": "Neuen Benutzer zum Unternehmen hinzufügen",
+    "openDialog": "Benutzer suchen und hinzufügen"
+  },
+  "dialog": {
+    "title": "Benutzer zum Unternehmen hinzufügen",
+    "searchHint": "Zum Suchen Vorname, Nachname, E-Mail, Telefon oder Benutzername eingeben."
+  },
+  "selectedUser": {
+    "title": "Ausgewählter Benutzer"
+  },
+  "labels": {
+    "verified": "Bestätigt",
+    "pending": "Ausstehend",
+    "username": "Benutzername:"
+  },
+  "permissions": {
+    "title": "Berechtigungen auswählen",
+    "selectedCount": "{{count}} ausgewählt",
+    "loading": "Berechtigungen werden geladen...",
+    "noCategory": "Keine Berechtigungskategorien gefunden.",
+    "code": "Code: {{code}}"
+  },
+  "actions": {
+    "cancel": "Abbrechen",
+    "adding": "Wird hinzugefügt...",
+    "addUser": "Benutzer hinzufügen"
+  },
+  "messages": {
+    "successTitle": "Erfolg",
+    "addSuccess": "Benutzer wurde dem Unternehmen erfolgreich hinzugefügt"
+  },
+  "errors": {
+    "selectUser": "Bitte wählen Sie einen Benutzer aus",
+    "selectAtLeastOnePermission": "Bitte wählen Sie mindestens eine Berechtigung aus",
+    "addFailed": "Beim Hinzufügen des Benutzers ist ein Fehler aufgetreten",
+    "consoleAddError": "Fehler beim Hinzufügen des Benutzers:",
+    "badRequest": "Ungültige Anfrage. Bitte prüfen Sie die Angaben.",
+    "forbidden": "Sie sind für diese Aktion nicht berechtigt",
+    "notFound": "Benutzer oder Unternehmen wurde nicht gefunden",
+    "server": "Serverfehler ist aufgetreten",
+    "httpWithCode": "Es ist ein Fehler aufgetreten ({{status}})",
+    "noResponse": "Server konnte nicht erreicht werden. Bitte prüfen Sie Ihre Internetverbindung."
+  },
+  "aria": {
+    "close": "Dialog schließen",
+    "toggleCategory": "Kategoriewahl umschalten: {{category}}"
+  }
+}

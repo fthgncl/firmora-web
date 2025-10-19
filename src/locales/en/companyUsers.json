@@ -1,0 +1,51 @@
+{
+  "card": {
+    "title": "Add User",
+    "subheader": "Add a new user to the company",
+    "openDialog": "Search and Add User"
+  },
+  "dialog": {
+    "title": "Add User to Company",
+    "searchHint": "To search, enter first name, last name, email, phone or username."
+  },
+  "selectedUser": {
+    "title": "Selected User"
+  },
+  "labels": {
+    "verified": "Verified",
+    "pending": "Pending",
+    "username": "Username:"
+  },
+  "permissions": {
+    "title": "Permission Selection",
+    "selectedCount": "{{count}} selected",
+    "loading": "Loading permissions...",
+    "noCategory": "No permission categories found.",
+    "code": "Code: {{code}}"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "adding": "Adding...",
+    "addUser": "Add User"
+  },
+  "messages": {
+    "successTitle": "Success",
+    "addSuccess": "User has been added to the company successfully"
+  },
+  "errors": {
+    "selectUser": "Please select a user",
+    "selectAtLeastOnePermission": "Please select at least one permission",
+    "addFailed": "An error occurred while adding the user",
+    "consoleAddError": "Add user error:",
+    "badRequest": "Invalid request. Please check the details.",
+    "forbidden": "You are not authorized to perform this action",
+    "notFound": "User or company not found",
+    "server": "A server error occurred",
+    "httpWithCode": "An error occurred ({{status}})",
+    "noResponse": "Could not reach the server. Please check your internet connection."
+  },
+  "aria": {
+    "close": "Close dialog",
+    "toggleCategory": "Toggle category selection: {{category}}"
+  }
+}

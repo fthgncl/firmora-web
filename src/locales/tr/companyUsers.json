@@ -1,0 +1,51 @@
+{
+  "card": {
+    "title": "Kullanıcı Ekle",
+    "subheader": "Şirkete yeni kullanıcı ekleyin",
+    "openDialog": "Kullanıcı Ara ve Ekle"
+  },
+  "dialog": {
+    "title": "Şirkete Kullanıcı Ekle",
+    "searchHint": "Kullanıcı aramak için ad, soyad, e-posta, telefon veya kullanıcı adı girebilirsiniz."
+  },
+  "selectedUser": {
+    "title": "Seçilen Kullanıcı"
+  },
+  "labels": {
+    "verified": "Onaylı",
+    "pending": "Bekliyor",
+    "username": "Kullanıcı Adı:"
+  },
+  "permissions": {
+    "title": "Yetki Seçimi",
+    "selectedCount": "{{count}} seçili",
+    "loading": "Yetkiler yükleniyor...",
+    "noCategory": "Yetki kategorisi bulunamadı.",
+    "code": "Kod: {{code}}"
+  },
+  "actions": {
+    "cancel": "İptal",
+    "adding": "Ekleniyor...",
+    "addUser": "Kullanıcıyı Ekle"
+  },
+  "messages": {
+    "successTitle": "İşlem Başarılı",
+    "addSuccess": "Kullanıcı başarıyla firmaya eklendi"
+  },
+  "errors": {
+    "selectUser": "Lütfen bir kullanıcı seçin",
+    "selectAtLeastOnePermission": "Lütfen en az bir yetki seçin",
+    "addFailed": "Kullanıcı eklenirken hata oluştu",
+    "consoleAddError": "Kullanıcı ekleme hatası:",
+    "badRequest": "Geçersiz istek. Lütfen bilgileri kontrol edin.",
+    "forbidden": "Bu işlem için yetkiniz bulunmamaktadır",
+    "notFound": "Kullanıcı veya firma bulunamadı",
+    "server": "Sunucu hatası oluştu",
+    "httpWithCode": "Hata oluştu ({{status}})",
+    "noResponse": "Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin."
+  },
+  "aria": {
+    "close": "Pencereyi kapat",
+    "toggleCategory": "Kategori seçim durumunu değiştir: {{category}}"
+  }
+}

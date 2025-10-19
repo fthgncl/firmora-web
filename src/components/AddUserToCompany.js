@@ -1,4 +1,3 @@
-// src/components/AddUserToCompany.js
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import {
@@ -33,10 +32,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import { usePermissions } from '../contexts/PermissionsContext';
 import UserSearchField from './UserSearchField';
+import { useTranslation } from 'react-i18next';
 
 export default function AddUserToCompany({ companyId, onUserAdded }) {
+    const { t } = useTranslation(['companyUsers']);
     const { token } = useAuth();
-    const { showAlert,showSuccess } = useAlert();
+    const { showAlert, showSuccess } = useAlert();
     const { getPermissionsByCategory, encodePermissions, loading: permissionsLoading } = usePermissions();
     const API_URL = `${process.env.REACT_APP_API_URL}/companies/add-user`;
 
@@ -117,12 +118,12 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
 
     const handleAddUser = async () => {
         if (!selectedUser) {
-            setError('Lütfen bir kullanıcı seçin');
+            setError(t('companyUsers:errors.selectUser'));
             return;
         }
 
         if (selectedPermissions.length === 0) {
-            setError('Lütfen en az bir yetki seçin');
+            setError(t('companyUsers:errors.selectAtLeastOnePermission'));
             return;
         }
 
@@ -147,11 +148,9 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                 }
             );
 
-            // API dökümanına göre başarılı yanıt kontrolü
             if (response.data && response.data.status === "success") {
-                // API'den dönen mesajı kullan
-                const successMessage = response.data.message || 'Kullanıcı başarıyla firmaya eklendi';
-                showSuccess(successMessage, 'İşlem Başarılı');
+                const successMessage = response.data.message || t('companyUsers:messages.addSuccess');
+                showSuccess(successMessage, t('companyUsers:messages.successTitle'));
 
                 // Dialog'u kapat ve state'i temizle
                 setOpen(false);
@@ -159,54 +158,43 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                 setSelectedPermissions([]);
                 setError('');
 
-                // Kullanıcı listesini yenile
                 if (onUserAdded && typeof onUserAdded === 'function') {
                     onUserAdded();
                 }
 
             } else {
-                // success: false durumu
-                const errorMessage = response.data?.message || 'Kullanıcı eklenirken hata oluştu';
+                const errorMessage = response.data?.message || t('companyUsers:errors.addFailed');
                 setError(errorMessage);
                 showAlert(errorMessage, 'error');
             }
         } catch (err) {
-            console.error('Kullanıcı ekleme hatası:', err);
-            // TODO: Dil yapılandırılmasını düzeltirken burayı temizle
-            // HTTP hata kodlarına göre mesaj belirleme
-            let errorMsg = 'Beklenmeyen bir hata oluştu';
+            console.error(t('companyUsers:errors.consoleAddError'), err);
+            let errorMsg;
 
             if (err.response) {
-                // Sunucudan yanıt geldi ama hata kodu döndü
                 const status = err.response.status;
                 const responseMessage = err.response.data?.message;
 
                 switch (status) {
                     case 400:
-                        // Gerekli alanlar eksik veya kullanıcı zaten firmada mevcut
-                        errorMsg = responseMessage || 'Geçersiz istek. Lütfen bilgileri kontrol edin.';
+                        errorMsg = responseMessage || t('companyUsers:errors.badRequest');
                         break;
                     case 403:
-                        // Yetkisiz erişim
-                        errorMsg = responseMessage || 'Bu işlem için yetkiniz bulunmamaktadır';
+                        errorMsg = responseMessage || t('companyUsers:errors.forbidden');
                         break;
                     case 404:
-                        // Kullanıcı veya firma bulunamadı
-                        errorMsg = responseMessage || 'Kullanıcı veya firma bulunamadı';
+                        errorMsg = responseMessage || t('companyUsers:errors.notFound');
                         break;
                     case 500:
-                        // Sunucu hatası
-                        errorMsg = responseMessage || 'Sunucu hatası oluştu';
+                        errorMsg = responseMessage || t('companyUsers:errors.server');
                         break;
                     default:
-                        errorMsg = responseMessage || `Hata oluştu (${status})`;
+                        errorMsg = responseMessage || t('companyUsers:errors.httpWithCode', { status });
                 }
             } else if (err.request) {
-                // İstek gönderildi ama yanıt alınamadı
-                errorMsg = 'Sunucuya bağlanılamadı. İnternet bağlantınızı kontrol edin.';
+                errorMsg = t('companyUsers:errors.noResponse');
             } else {
-                // İstek oluşturulurken hata oluştu
-                errorMsg = err.message || 'Beklenmeyen bir hata oluştu';
+                errorMsg = err.message || t('companyUsers:errors.unexpected');
             }
 
             setError(errorMsg);
@@ -220,8 +208,8 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
         <>
             <Card>
                 <CardHeader
-                    title="Kullanıcı Ekle"
-                    subheader="Şirkete yeni kullanıcı ekleyin"
+                    title={t('companyUsers:card.title')}
+                    subheader={t('companyUsers:card.subheader')}
                     avatar={
                         <Avatar sx={{ bgcolor: 'primary.main' }}>
                             <PersonAdd />
@@ -236,7 +224,7 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                         fullWidth
                         size="large"
                     >
-                        Kullanıcı Ara ve Ekle
+                        {t('companyUsers:card.openDialog')}
                     </Button>
                 </CardContent>
             </Card>
@@ -254,9 +242,9 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <PersonAdd color="primary" />
-                        <Typography variant="h6">Şirkete Kullanıcı Ekle</Typography>
+                        <Typography variant="h6">{t('companyUsers:dialog.title')}</Typography>
                     </Box>
-                    <IconButton onClick={handleClose} disabled={loading}>
+                    <IconButton onClick={handleClose} disabled={loading} aria-label={t('companyUsers:aria.close')}>
                         <Close />
                     </IconButton>
                 </DialogTitle>
@@ -272,7 +260,7 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
 
                     <Box sx={{ mb: 3 }}>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                            Kullanıcı aramak için ad, soyad, e-posta, telefon veya kullanıcı adı girebilirsiniz.
+                            {t('companyUsers:dialog.searchHint')}
                         </Typography>
                         <UserSearchField
                             companyId={companyId}
@@ -294,7 +282,7 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                 <CheckCircle color="success" />
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                    Seçilen Kullanıcı
+                                    {t('companyUsers:selectedUser.title')}
                                 </Typography>
                             </Box>
 
@@ -312,9 +300,9 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                                         {selectedUser.email}
                                     </Typography>
                                     {selectedUser.emailverified ? (
-                                        <Chip size="small" label="Onaylı" color="success" />
+                                        <Chip size="small" label={t('companyUsers:labels.verified')} color="success" />
                                     ) : (
-                                        <Chip size="small" label="Bekliyor" color="warning" />
+                                        <Chip size="small" label={t('companyUsers:labels.pending')} color="warning" />
                                     )}
                                 </Box>
 
@@ -329,7 +317,7 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
 
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Typography variant="caption" color="text.secondary">
-                                        Kullanıcı Adı:
+                                        {t('companyUsers:labels.username')}
                                     </Typography>
                                     <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                                         {selectedUser.username}
@@ -345,11 +333,11 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                                     <Security color="primary" />
                                     <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                        Yetki Seçimi
+                                        {t('companyUsers:permissions.title')}
                                     </Typography>
-                                    <Chip 
-                                        size="small" 
-                                        label={`${selectedPermissions.length} seçili`}
+                                    <Chip
+                                        size="small"
+                                        label={t('companyUsers:permissions.selectedCount', { count: selectedPermissions.length })}
                                         color={selectedPermissions.length > 0 ? 'primary' : 'default'}
                                     />
                                 </Box>
@@ -358,39 +346,39 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
                                         <CircularProgress size={20} />
                                         <Typography variant="body2" color="text.secondary">
-                                            Yetkiler yükleniyor...
+                                            {t('companyUsers:permissions.loading')}
                                         </Typography>
                                     </Box>
                                 ) : (
                                     <>
                                         {Object.keys(permissionCategories).length === 0 ? (
                                             <Alert severity="info" sx={{ mt: 2 }}>
-                                                Yetki kategorisi bulunamadı.
+                                                {t('companyUsers:permissions.noCategory')}
                                             </Alert>
                                         ) : (
                                             Object.entries(permissionCategories).map(([categoryName, permissions], index) => {
-                                                const categoryColors = ['primary', 'secondary', 'success', 'warning', 'info', 'error'];
-                                                const categoryColor = categoryColors[index % categoryColors.length];
+                                                // const categoryColors = ['primary', 'primary', 'primary', 'primary', 'primary', 'primary']; // Her kategori için farklı renkler kullanılmak istenise açılabilir.
+                                                const categoryColor = 'primary' // categoryColors[index % categoryColors.length];
 
-                                                const selectedCount = permissions.filter(p => 
+                                                const selectedCount = permissions.filter(p =>
                                                     selectedPermissions.includes(p.key)
                                                 ).length;
 
                                                 const permissionKeys = permissions.map(p => p.key);
-                                                const allSelected = permissionKeys.every(key => 
+                                                const allSelected = permissionKeys.every(key =>
                                                     selectedPermissions.includes(key)
                                                 );
                                                 const someSelected = selectedCount > 0 && !allSelected;
 
                                                 return (
                                                     <Accordion key={categoryName} defaultExpanded={index === 0}>
-                                                        <AccordionSummary 
+                                                        <AccordionSummary
                                                             expandIcon={<ExpandMore />}
-                                                            sx={{ 
-                                                                '& .MuiAccordionSummary-content': { 
+                                                            sx={{
+                                                                '& .MuiAccordionSummary-content': {
                                                                     alignItems: 'center',
                                                                     gap: 1
-                                                                } 
+                                                                }
                                                             }}
                                                         >
                                                             <Checkbox
@@ -403,12 +391,13 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                                                                 onClick={(e) => e.stopPropagation()}
                                                                 size="small"
                                                                 sx={{ p: 0, mr: 1 }}
+                                                                inputProps={{ 'aria-label': t('companyUsers:aria.toggleCategory', { category: categoryName }) }}
                                                             />
                                                             <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                                                                 {categoryName}
                                                             </Typography>
-                                                            <Chip 
-                                                                size="small" 
+                                                            <Chip
+                                                                size="small"
                                                                 label={`${selectedCount}/${permissions.length}`}
                                                                 sx={{ ml: 'auto' }}
                                                                 color={selectedCount > 0 ? categoryColor : 'default'}
@@ -435,23 +424,21 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                                                                                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                                                                                     {permission.description}
                                                                                 </Typography>
-                                                                                <Chip 
-                                                                                    size="small" 
-                                                                                    label={`Kod: ${permission.code}`}
+                                                                                <Chip
+                                                                                    size="small"
+                                                                                    label={t('companyUsers:permissions.code', { code: permission.code })}
                                                                                     sx={{ mt: 0.5, height: 20, fontSize: '0.7rem' }}
                                                                                     variant="outlined"
                                                                                 />
                                                                             </Box>
                                                                         }
-                                                                        sx={{ 
-                                                                            alignItems: 'flex-start', 
+                                                                        sx={{
+                                                                            alignItems: 'flex-start',
                                                                             mb: 2,
                                                                             py: 1,
                                                                             px: 1,
                                                                             borderRadius: 1,
-                                                                            '&:hover': {
-                                                                                bgcolor: 'action.hover'
-                                                                            }
+                                                                            '&:hover': { bgcolor: 'action.hover' }
                                                                         }}
                                                                     />
                                                                 ))}
@@ -472,7 +459,7 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
 
                 <DialogActions sx={{ px: 3, py: 2 }}>
                     <Button onClick={handleClose} disabled={loading}>
-                        İptal
+                        {t('companyUsers:actions.cancel')}
                     </Button>
                     <Button
                         onClick={handleAddUser}
@@ -480,7 +467,7 @@ export default function AddUserToCompany({ companyId, onUserAdded }) {
                         disabled={!selectedUser || selectedPermissions.length === 0 || loading}
                         startIcon={loading ? <CircularProgress size={16} /> : <PersonAdd />}
                     >
-                        {loading ? 'Ekleniyor...' : 'Kullanıcıyı Ekle'}
+                        {loading ? t('companyUsers:actions.adding') : t('companyUsers:actions.addUser')}
                     </Button>
                 </DialogActions>
             </Dialog>
