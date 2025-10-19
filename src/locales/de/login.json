@@ -1,0 +1,25 @@
+{
+  "title": "Anmelden",
+  "username": "E-Mail oder Benutzername",
+  "password": "Passwort",
+  "rememberMe": "Angemeldet bleiben",
+  "loginButton": "Anmelden",
+  "noAccount": "Noch kein Konto?",
+  "signUp": "Registrieren",
+  "aria": {
+    "togglePassword": "Passwortsichtbarkeit umschalten"
+  },
+  "errors": {
+    "defaultError": "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Daten.",
+    "serverError": "Server ist nicht erreichbar.",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+    "emailNotVerified": "Ihre E-Mail-Adresse ist nicht verifiziert."
+  },
+  "resend": {
+    "button": "Bestätigungs-E-Mail erneut senden",
+    "success": "Bestätigungs-E-Mail wurde erfolgreich versendet.",
+    "failed": "E-Mail konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "tryAgain": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+  },
+  "successWord": "erfolgreich"
+}

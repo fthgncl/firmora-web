@@ -1,0 +1,25 @@
+{
+  "title": "Sign In",
+  "username": "Email or username",
+  "password": "Password",
+  "rememberMe": "Remember me",
+  "loginButton": "Sign In",
+  "noAccount": "Don’t have an account?",
+  "signUp": "Sign Up",
+  "aria": {
+    "togglePassword": "Toggle password visibility"
+  },
+  "errors": {
+    "defaultError": "Unable to sign in. Please check your credentials.",
+    "serverError": "Cannot reach the server.",
+    "unexpectedError": "An unexpected error occurred.",
+    "emailNotVerified": "Your email address is not verified."
+  },
+  "resend": {
+    "button": "Resend Verification Email",
+    "success": "Verification email sent successfully.",
+    "failed": "Failed to send email. Please try again.",
+    "tryAgain": "An error occurred. Please try again."
+  },
+  "successWord": "successfully"
+}

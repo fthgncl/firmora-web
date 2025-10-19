@@ -28,7 +28,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
 export default function SignInSide() {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['login']);
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
@@ -52,15 +52,15 @@ export default function SignInSide() {
             });
 
             if (response.data.status === "success") {
-                setResendMessage(response.data.message || 'Doğrulama e-postası başarıyla gönderildi.');
+                setResendMessage(response.data.message || t('login:resend.success'));
                 setErrorMessage('');
                 setIsEmailNotVerified(false);
             }
         } catch (error) {
             if (error.response) {
-                setResendMessage(error.response.data.message || 'E-posta gönderilemedi. Lütfen tekrar deneyiniz.');
+                setResendMessage(error.response.data.message || t('login:resend.failed'));
             } else {
-                setResendMessage('Bir hata oluştu. Lütfen tekrar deneyiniz.');
+                setResendMessage(t('login:resend.tryAgain'));
             }
         } finally {
             setIsResending(false);
@@ -88,24 +88,20 @@ export default function SignInSide() {
         } catch (error) {
 
             if (error.response) {
-                // E-posta doğrulanmamış hatası (403)
                 if (error.response.status === 403) {
                     setIsEmailNotVerified(true);
                     setEmailOrUsername(loginData.username);
-                    setErrorMessage(error.response.data.message || 'E-posta adresiniz doğrulanmamış.');
+                    setErrorMessage(error.response.data.message || t('login:errors.emailNotVerified'));
                 } else {
                     setIsEmailNotVerified(false);
-                    // API'den dönen hata mesajı
-                    setErrorMessage(error.response.data.message || t('login.errors.defaultError'));
+                    setErrorMessage(error.response.data.message || t('login:errors.defaultError'));
                 }
             } else if (error.request) {
-                // Network hatası
                 setIsEmailNotVerified(false);
-                setErrorMessage(t('login.errors.serverError'));
+                setErrorMessage(t('login:errors.serverError'));
             } else {
-                // Diğer hatalar
                 setIsEmailNotVerified(false);
-                setErrorMessage(t('login.errors.unexpectedError'));
+                setErrorMessage(t('login:errors.unexpectedError'));
             }
         } finally {
             setIsLoading(false);
@@ -152,7 +148,7 @@ export default function SignInSide() {
                         <LockOutlinedIcon/>
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        {t('login.title')}
+                        {t('login:title')}
                     </Typography>
                     <Box component="form" noValidate onSubmit={handleSubmit} sx={{mt: 1}}>
                         <TextField
@@ -160,7 +156,7 @@ export default function SignInSide() {
                             required
                             fullWidth
                             id="username"
-                            label={t('login.username')}
+                            label={t('login:username')}
                             name="username"
                             autoComplete="username"
                             autoFocus
@@ -170,22 +166,23 @@ export default function SignInSide() {
                             required
                             fullWidth
                             name="password"
-                            label={t('login.password')}
+                            label={t('login:password')}
                             type={showPassword ? 'text' : 'password'}
                             id="password"
                             autoComplete="current-password"
-
                             InputProps={{
-                                endAdornment: <InputAdornment position="end">
-                                    <IconButton
-                                        tabIndex={-1}
-                                        aria-label="toggle password visibility"
-                                        onClick={() => setShowPassword(true)}
-                                        onMouseDown={() => setShowPassword(false)}
-                                    >
-                                        {showPassword ? <VisibilityOff/> : <Visibility/>}
-                                    </IconButton>
-                                </InputAdornment>
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            tabIndex={-1}
+                                            aria-label={t('login:aria.togglePassword')}
+                                            onClick={() => setShowPassword(true)}
+                                            onMouseDown={() => setShowPassword(false)}
+                                        >
+                                            {showPassword ? <VisibilityOff/> : <Visibility/>}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
                             }}
                         />
                         <FormControlLabel
@@ -196,7 +193,7 @@ export default function SignInSide() {
                                     color="primary"
                                 />
                             }
-                            label="Beni Hatırla"
+                            label={t('login:rememberMe')}
                         />
                         {errorMessage && !isEmailNotVerified && (
                             <Typography sx={{textAlign: 'center', color: 'error.main'}}
@@ -216,13 +213,16 @@ export default function SignInSide() {
                                     color="warning"
                                     sx={{ mb: 2 }}
                                 >
-                                    {isResending ? <CircularProgress size={24} color="inherit"/> : 'Doğrulama E-postasını Tekrar Gönder'}
+                                    {isResending ? <CircularProgress size={24} color="inherit"/> : t('login:resend.button')}
                                 </Button>
                             </Box>
                         )}
 
                         {resendMessage && (
-                            <Alert severity={resendMessage.includes('başarıyla') ? 'success' : 'error'} sx={{ mt: 2, mb: 2 }}>
+                            <Alert
+                                severity={resendMessage.toLowerCase().includes(t('login:successWord').toLowerCase()) ? 'success' : 'error'}
+                                sx={{ mt: 2, mb: 2 }}
+                            >
                                 {resendMessage}
                             </Alert>
                         )}
@@ -234,18 +234,20 @@ export default function SignInSide() {
                             variant="contained"
                             sx={{mt: 3, mb: 2}}
                         >
-                            {isLoading ? <CircularProgress color="inherit"/> : <>{t('login.loginButton')}</>}
+                            {isLoading ? <CircularProgress color="inherit"/> : <>{t('login:loginButton')}</>}
                         </Button>
                         <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
-                            Hesabınız yok mu?{' '}
+                            {t('login:noAccount')}{' '}
                             <Link
                                 component="button"
+                                type="button"
                                 variant="body2"
                                 onClick={() => navigate('/sign-up')}
                                 sx={{ cursor: 'pointer' }}
                             >
-                                Kayıt Olun
+                                {t('login:signUp')}
                             </Link>
+
                         </Typography>
                     </Box>
                     <Copyright />

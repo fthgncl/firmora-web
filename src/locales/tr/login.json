@@ -1,0 +1,25 @@
+{
+  "title": "Giriş Yap",
+  "username": "E-posta veya kullanıcı adı",
+  "password": "Şifre",
+  "rememberMe": "Beni Hatırla",
+  "loginButton": "Giriş Yap",
+  "noAccount": "Hesabınız yok mu?",
+  "signUp": "Kayıt Olun",
+  "aria": {
+    "togglePassword": "Şifre görünürlüğünü değiştir"
+  },
+  "errors": {
+    "defaultError": "Giriş yapılamadı. Lütfen bilgilerinizi kontrol ediniz.",
+    "serverError": "Sunucuya ulaşılamıyor.",
+    "unexpectedError": "Beklenmeyen bir hata oluştu.",
+    "emailNotVerified": "E-posta adresiniz doğrulanmamış."
+  },
+  "resend": {
+    "button": "Doğrulama E-postasını Tekrar Gönder",
+    "success": "Doğrulama e-postası başarıyla gönderildi.",
+    "failed": "E-posta gönderilemedi. Lütfen tekrar deneyiniz.",
+    "tryAgain": "Bir hata oluştu. Lütfen tekrar deneyiniz."
+  },
+  "successWord": "başarıyla"
+}
