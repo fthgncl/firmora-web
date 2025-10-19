@@ -38,6 +38,7 @@ import {
     Clear,
     PersonAdd,
     Group,
+    Phone
 } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
@@ -71,6 +72,16 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
+    const formatPhoneForTel = (val) => {
+        if (!val) return null;
+        let s = String(val).trim();
+        if (s.startsWith('00')) s = '+' + s.slice(2);
+        s = s.replace(/[^\d+]/g, '');
+        if (!s.startsWith('+')) s = '+' + s;
+        if (s.replace(/\D/g, '').length < 8) return null;
+        return s;
+    };
+
     const [openAddDialog, setOpenAddDialog] = useState(false);
 
     // table state
@@ -87,7 +98,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     // column visibility
     const [visibleCols, setVisibleCols] = useState(() =>
         COLUMN_DEFS.reduce(
-            (acc, c) => ({ ...acc, [c.key]: !['created_at'].includes(c.key) }),
+            (acc, c) => ({ ...acc, [c.key]: !['created_at', 'email', 'emailverified'].includes(c.key) }),
             {}
         )
     );
@@ -368,46 +379,59 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
             {/* Araç Çubuğu */}
             <Box
                 sx={{
-                    px: 2.5, py: 1.5,
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: '1fr auto' },
-                    gap: 1.2,
-                    alignItems: 'center'
+                    px: 2.5,
+                    py: 1.5,
+                    display: 'flex',
+                    flexWrap: 'wrap',                 // ⭐ sığmayınca alt satıra geç
+                    alignItems: 'center',
+                    columnGap: 1.2,
+                    rowGap: 1.2,
                 }}
             >
-                {/* Arama kapsülü */}
-                <Paper
-                    elevation={0}
+                {/* Sol: Arama */}
+                <Box sx={{ flex: '1 1 320px', minWidth: { xs: '100%', sm: 320 } }}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 999,
+                            border: (t) => `1px solid ${t.palette.divider}`,
+                            bgcolor: 'background.paper',
+                            width: '100%',               // ⭐ genişliği ebeveyne yayılsın
+                        }}
+                    >
+                        <Search fontSize="small" style={{ opacity: 0.75 }} />
+                        <TextField
+                            variant="standard"
+                            fullWidth
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder={t('list.search.placeholder')}
+                            InputProps={{ disableUnderline: true }}
+                            sx={{ mx: 1 }}
+                        />
+                        {searchTerm && (
+                            <IconButton size="small" onClick={() => setSearchTerm('')}>
+                                <Clear fontSize="small" />
+                            </IconButton>
+                        )}
+                    </Paper>
+                </Box>
+
+                {/* Sağ: Sıralama/Filtreler */}
+                <Box
                     sx={{
                         display: 'flex',
-                        alignItems: 'center',
-                        px: 1.5,
-                        py: 0.5,
-                        borderRadius: 999,
-                        border: (t) => `1px solid ${t.palette.divider}`,
-                        bgcolor: 'background.paper'
+                        gap: 1,
+                        flex: '0 1 420px',              // ⭐ genişlik payı, sığmazsa alta
+                        minWidth: { xs: '100%', sm: 320 }, // xs’de tam satır, sm’de esnek
+                        justifyContent: { xs: 'flex-start', md: 'flex-end' },
                     }}
                 >
-                    <Search fontSize="small" style={{ opacity: 0.75 }} />
-                    <TextField
-                        variant="standard"
-                        fullWidth
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder={t('list.search.placeholder')}
-                        InputProps={{ disableUnderline: true }}
-                        sx={{ mx: 1 }}
-                    />
-                    {searchTerm && (
-                        <IconButton size="small" onClick={() => setSearchTerm('')}>
-                            <Clear fontSize="small" />
-                        </IconButton>
-                    )}
-                </Paper>
-
-                {/* Sıralama alanları */}
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: { xs: 'space-between', md: 'flex-end' } }}>
-                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                    <FormControl size="small" sx={{ minWidth: 160, flex: '1 1 160px' }}>
                         <Select
                             value={sortBy}
                             onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
@@ -418,7 +442,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         </Select>
                     </FormControl>
 
-                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                    <FormControl size="small" sx={{ minWidth: 120, flex: '1 1 120px' }}>
                         <Select
                             value={sortOrder}
                             onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}
@@ -444,7 +468,8 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     'tbody tr': {
                         transition: 'background-color 120ms ease, transform 120ms ease',
                         '&:hover': { bgcolor: 'action.hover' }
-                    }
+                    },
+                    '& thead th, & tbody td': { textAlign: 'center' }
                 }}>
                     <TableHead>
                         <TableRow>
@@ -514,7 +539,35 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                             />
                                         </TableCell>
                                     )}
-                                    {visibleCols.phone && <TableCell>{u.phone || '-'}</TableCell>}
+                                    {visibleCols.phone && (
+                                        <TableCell>
+                                            {u.phone ? (() => {
+                                                const tel = formatPhoneForTel(u.phone);
+                                                return tel ? (
+                                                    <Tooltip title={u.phone}>
+                                                        <IconButton
+                                                            size="small"
+                                                            component="a"
+                                                            href={`tel:${tel}`}
+                                                            onClick={(e) => e.stopPropagation()} // satır tıklamasını tetikleme
+                                                            aria-label={t('list.callUser')}
+                                                            sx={{
+                                                                border: (theme) => `1px solid ${theme.palette.divider}`,
+                                                                bgcolor: 'action.hover',
+                                                                '&:hover': { bgcolor: 'action.selected' }
+                                                            }}
+                                                        >
+                                                            <Phone fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Typography variant="body2" color="text.secondary">-</Typography>
+                                                );
+                                            })() : (
+                                                <Typography variant="body2" color="text.secondary">-</Typography>
+                                            )}
+                                        </TableCell>
+                                    )}
                                     {visibleCols.email && <TableCell>{u.email}</TableCell>}
                                     {visibleCols.emailverified && <TableCell>{renderVerifyChip(Boolean(u.emailverified))}</TableCell>}
                                     {visibleCols.created_at && <TableCell>{formatDate(u.created_at)}</TableCell>}

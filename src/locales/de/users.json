@@ -11,6 +11,7 @@
   "list": {
     "title": "Benutzer",
     "addUser": "Benutzer hinzufügen",
+    "callUser": "Benutzer anrufen",
     "columns": {
       "name": "Vorname",
       "surname": "Nachname",

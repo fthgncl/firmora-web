@@ -11,6 +11,7 @@
   "list": {
     "title": "Kullanıcılar",
     "addUser": "Kullanıcı Ekle",
+    "callUser": "Kullanıcıyı ara",
     "columns": {
       "name": "Ad",
       "surname": "Soyad",
