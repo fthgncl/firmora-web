@@ -101,7 +101,7 @@ export default function UserSearchField({
 
     const renderVerifyChip = (verified) => {
         if (verified) {
-            return <Chip size="small" color="success" label={t('users.verify.verified')} />;
+            return <Chip size="small" color="success" label={t('users:verify.verified')} />;
         }
         return (
             <Chip
