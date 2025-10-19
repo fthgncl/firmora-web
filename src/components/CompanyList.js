@@ -20,8 +20,10 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CreateCompanyDialog from "./CreateCompanyDialog";
+import { useTranslation } from "react-i18next";
 
 export default function CompanyList() {
+    const { t } = useTranslation(['companies']);
     const { user, token } = useAuth();
     const navigate = useNavigate();
     const theme = useTheme();
@@ -47,10 +49,10 @@ export default function CompanyList() {
             if (response.data.status === "success") {
                 setCompanies(response.data.companies || []);
             } else {
-                setError(response.data.message || "Firmalar yüklenemedi.");
+                setError(response.data.message || t('companies:errors.loadFailed'));
             }
         } catch {
-            setError("Bağlantı hatası: Sunucuya ulaşılamadı.");
+            setError(t('companies:errors.network'));
         } finally {
             setLoading(false);
         }
@@ -101,7 +103,6 @@ export default function CompanyList() {
                     boxShadow: 6,
                     borderColor: (t) => t.palette.primary.light,
                 },
-                // Üstte ince premium şerit
                 '&::before': {
                     content: '""',
                     position: 'absolute',
@@ -122,7 +123,6 @@ export default function CompanyList() {
                         px: { xs: 1.8, sm: 2.1 },
                     }}
                 >
-                    {/* Sol ikon */}
                     <Avatar
                         sx={{
                             bgcolor: (t) => t.palette.primary.main,
@@ -139,7 +139,6 @@ export default function CompanyList() {
                         <Business fontSize="small" />
                     </Avatar>
 
-                    {/* Orta metinler */}
                     <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                         <Tooltip title={company.company_name || ''} placement="top" arrow>
                             <Typography
@@ -157,7 +156,6 @@ export default function CompanyList() {
                             </Typography>
                         </Tooltip>
 
-                        {/* Sektör: varsa çok düşük vurgu ile */}
                         {company.sector && (
                             <Typography
                                 variant="body2"
@@ -175,7 +173,6 @@ export default function CompanyList() {
                         )}
                     </Box>
 
-                    {/* Sağ rozet + ok */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <ChevronRight
                             sx={{
@@ -226,7 +223,6 @@ export default function CompanyList() {
                     },
                 }}
             >
-                {/* İkon: dolu arka plan yerine çizgisel, düşük vurgu */}
                 <Box
                     sx={{
                         width: 44,
@@ -252,21 +248,19 @@ export default function CompanyList() {
                         opacity: 0.8,
                     }}
                 >
-                    Yeni Firma Oluştur
+                    {t('companies:actions.createNewCompany')}
                 </Typography>
             </CardActionArea>
         </Card>
     );
 
-
     return (
         <Container maxWidth="lg">
             <Shell>
-                {/* Üst Başlık (açıklama satırı kaldırıldı) */}
                 <Box
                     sx={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr auto',  // sol başlık, sağ buton
+                        gridTemplateColumns: '1fr auto',
                         alignItems: 'center',
                         columnGap: 1.5,
                         mb: 2,
@@ -275,12 +269,10 @@ export default function CompanyList() {
                     <Typography
                         variant="h5"
                         fontWeight={700}
-                        noWrap               // tek satırda kalsın
-                        sx={{ minWidth: 0,  // ellipsis çalışsın
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis' }}
+                        noWrap
+                        sx={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
                     >
-                        Firmalarım
+                        {t('companies:title')}
                     </Typography>
 
                     {canCreateMore && (
@@ -304,12 +296,11 @@ export default function CompanyList() {
                                 },
                             }}
                         >
-                            Yeni Firma
+                            {t('companies:actions.newCompany')}
                         </Button>
 
                     )}
                 </Box>
-
 
                 {error && (
                     <Alert severity="error" sx={{ mb: 2 }}>
@@ -348,14 +339,14 @@ export default function CompanyList() {
                             <Business />
                         </Avatar>
                         <Typography variant="h6" fontWeight={700} gutterBottom>
-                            Henüz firmanız yok
+                            {t('companies:empty.title')}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                            Başlamak için yeni bir firma oluşturun.
+                            {t('companies:empty.description')}
                         </Typography>
                         {canCreateMore && (
                             <Button variant="contained" startIcon={<Add />} onClick={handleAddCompany}>
-                                Yeni Firma Oluştur
+                                {t('companies:actions.createNewCompany')}
                             </Button>
                         )}
                     </Box>

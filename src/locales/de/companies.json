@@ -1,0 +1,15 @@
+{
+  "title": "Meine Unternehmen",
+  "actions": {
+    "newCompany": "Neues Unternehmen",
+    "createNewCompany": "Neues Unternehmen erstellen"
+  },
+  "empty": {
+    "title": "Sie haben noch kein Unternehmen",
+    "description": "Erstellen Sie ein neues Unternehmen, um zu starten."
+  },
+  "errors": {
+    "loadFailed": "Unternehmen konnten nicht geladen werden.",
+    "network": "Verbindungsfehler: Server konnte nicht erreicht werden."
+  }
+}

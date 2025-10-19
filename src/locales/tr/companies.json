@@ -1,0 +1,15 @@
+{
+  "title": "Firmalarım",
+  "actions": {
+    "newCompany": "Yeni Firma",
+    "createNewCompany": "Yeni Firma Oluştur"
+  },
+  "empty": {
+    "title": "Henüz firmanız yok",
+    "description": "Başlamak için yeni bir firma oluşturun."
+  },
+  "errors": {
+    "loadFailed": "Firmalar yüklenemedi.",
+    "network": "Bağlantı hatası: Sunucuya ulaşılamadı."
+  }
+}

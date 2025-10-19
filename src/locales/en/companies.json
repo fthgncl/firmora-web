@@ -1,0 +1,15 @@
+{
+  "title": "My Companies",
+  "actions": {
+    "newCompany": "New Company",
+    "createNewCompany": "Create New Company"
+  },
+  "empty": {
+    "title": "You have no companies yet",
+    "description": "Create a new company to get started."
+  },
+  "errors": {
+    "loadFailed": "Failed to load companies.",
+    "network": "Connection error: Could not reach the server."
+  }
+}
