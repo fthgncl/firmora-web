@@ -38,10 +38,10 @@ import PermissionsDisplay from './PermissionsDisplay';
 const COLUMN_DEFS = [
     { key: 'name', label: 'Ad' },
     { key: 'surname', label: 'Soyad' },
-    { key: 'email', label: 'E-posta' },
-    { key: 'phone', label: 'Telefon' },
     { key: 'username', label: 'Kullanıcı adı' },
     { key: 'permissions', label: 'Yetkiler' },
+    { key: 'phone', label: 'Telefon' },
+    { key: 'email', label: 'E-posta' },
     { key: 'emailverified', label: 'E-posta Onayı' },
     { key: 'created_at', label: 'Kayıt tarihi' }
 ];
@@ -332,14 +332,14 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     <TableRow key={u.id}>
                                         {visibleCols.name && <TableCell>{u.name}</TableCell>}
                                         {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
-                                        {visibleCols.email && <TableCell>{u.email}</TableCell>}
-                                        {visibleCols.phone && <TableCell>{u.phone || '-'}</TableCell>}
                                         {visibleCols.username && <TableCell>{u.username}</TableCell>}
                                         {visibleCols.permissions && (
                                             <TableCell>
                                                 <PermissionsDisplay onEditedUser={fetchUsers} userId={u.id} companyId={companyId} userPermissions={getUserPermissions(u.permissions)} />
                                             </TableCell>
                                         )}
+                                        {visibleCols.phone && <TableCell>{u.phone || '-'}</TableCell>}
+                                        {visibleCols.email && <TableCell>{u.email}</TableCell>}
                                         {visibleCols.emailverified && <TableCell>{renderVerifyChip(Boolean(u.emailverified))}</TableCell>}
                                         {visibleCols.created_at && <TableCell>{formatDate(u.created_at)}</TableCell>}
                                     </TableRow>
