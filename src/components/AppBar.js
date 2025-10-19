@@ -88,8 +88,8 @@ export default function MenuAppBar() {
                     <Toolbar sx={{ gap: 1, minHeight: { xs: 56, sm: 64 } }}>
                     {/* Menu Toggle Button - Desktop */}
                     {user && (
-                        <Tooltip title={drawerOpen ? 'Menüyü Kapat' : 'Menüyü Aç'}>
-                            <IconButton
+                        <Tooltip title={drawerOpen ? t('appbar:menuClose') : t('appbar:menuOpen')}>
+                        <IconButton
                                 color="inherit"
                                 aria-label="toggle drawer"
                                 onClick={toggleDrawer}
@@ -135,7 +135,7 @@ export default function MenuAppBar() {
                         {user && (
                             <>
                                 {/* User Menu Button */}
-                                <Tooltip title="Hesap">
+                                <Tooltip title={t('appbar:account')}>
                                     <IconButton
                                         size="large"
                                         aria-label="kullanıcı menüsü"
@@ -230,7 +230,7 @@ export default function MenuAppBar() {
                                             <Person fontSize="small" />
                                         </ListItemIcon>
                                         <Typography variant="body2">
-                                            {t('profile') || 'Profil'}
+                                            {t('appbar:profile')}
                                         </Typography>
                                     </MenuItem>
 
@@ -239,7 +239,7 @@ export default function MenuAppBar() {
                                             <Settings fontSize="small" />
                                         </ListItemIcon>
                                         <Typography variant="body2">
-                                            {t('settings') || 'Ayarlar'}
+                                            {t('appbar:settings')}
                                         </Typography>
                                     </MenuItem>
 
@@ -250,7 +250,7 @@ export default function MenuAppBar() {
                                             <Logout fontSize="small" color="error" />
                                         </ListItemIcon>
                                         <Typography variant="body2">
-                                            {t('auth.logout')}
+                                            {t('auth:logout')}
                                         </Typography>
                                     </MenuItem>
                                 </Menu>
