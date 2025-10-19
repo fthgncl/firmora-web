@@ -1,0 +1,22 @@
+{
+  "pageTitle": "Email Verification",
+  "pageSubtitle": "Email verification to activate your account",
+  "loading": {
+    "title": "Verifying",
+    "subtitle": "We’re verifying your email address, please wait…"
+  },
+  "error": {
+    "title": "Verification Failed"
+  },
+  "success": {
+    "title": "Email Verified Successfully!",
+    "defaultMessage": "Your account has been activated. You can now use all features."
+  },
+  "buttons": {
+    "home": "Home",
+    "signIn": "Sign In"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again later."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "pageTitle": "E-Mail-Bestätigung",
+  "pageSubtitle": "E-Mail-Bestätigung zur Aktivierung Ihres Kontos",
+  "loading": {
+    "title": "Wird überprüft",
+    "subtitle": "Ihre E-Mail-Adresse wird überprüft, bitte warten…"
+  },
+  "error": {
+    "title": "Bestätigung fehlgeschlagen"
+  },
+  "success": {
+    "title": "E-Mail erfolgreich bestätigt!",
+    "defaultMessage": "Ihr Konto wurde aktiviert. Sie können nun alle Funktionen nutzen."
+  },
+  "buttons": {
+    "home": "Startseite",
+    "signIn": "Anmelden"
+  },
+  "errors": {
+    "generic": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+  }
+}

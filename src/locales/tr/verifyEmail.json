@@ -1,0 +1,22 @@
+{
+  "pageTitle": "E-posta Doğrulama",
+  "pageSubtitle": "Hesabınızı aktifleştirmek için e-posta doğrulaması",
+  "loading": {
+    "title": "Doğrulama İşlemi Yapılıyor",
+    "subtitle": "E-posta adresiniz doğrulanıyor, lütfen bekleyiniz..."
+  },
+  "error": {
+    "title": "Doğrulama Başarısız"
+  },
+  "success": {
+    "title": "E-posta Başarıyla Doğrulandı!",
+    "defaultMessage": "Hesabınız aktif hale getirildi. Artık tüm özelliklerden faydalanabilirsiniz."
+  },
+  "buttons": {
+    "home": "Ana Sayfa",
+    "signIn": "Giriş Yap"
+  },
+  "errors": {
+    "generic": "Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz."
+  }
+}
