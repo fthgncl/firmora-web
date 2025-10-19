@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
     Dialog,
     DialogTitle,
@@ -28,18 +29,19 @@ import {
     SwapHoriz,
     TrendingUp,
 } from '@mui/icons-material';
-import { useFormik } from 'formik';
+import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
-import { useAlert } from '../contexts/AlertContext';
-import { permissionsService } from '../services/permissionsService';
+import {useAuth} from '../contexts/AuthContext';
+import {useAlert} from '../contexts/AlertContext';
+import {permissionsService} from '../services/permissionsService';
 import UserSearchField from './UserSearchField';
 import CompanySearchField from './CompanySearchField';
 
-export default function MoneyTransferDialog({ open, onClose, sourceAccount = null, fromScope = 'user' }) {
-    const { token, user } = useAuth();
-    const { showAlert } = useAlert();
+export default function MoneyTransferDialog({open, onClose, sourceAccount = null, fromScope = 'user'}) {
+    const {t, i18n} = useTranslation(['transfers']);
+    const {token, user} = useAuth();
+    const {showAlert} = useAlert();
     const [loading, setLoading] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedCompany, setSelectedCompany] = useState(null);
@@ -50,45 +52,45 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
         // COMPANY kaynaklı transferler
         {
             value: 'company_to_user_same',
-            label: 'Aynı Firmadaki Kullanıcıya',
-            icon: <Person />,
+            label: t('transfers:types.company_to_user_same.label'),
+            icon: <Person/>,
             fromScope: 'company',
             toScope: 'user',
             permission: 'can_transfer_company_to_same_company_user',
-            description: 'Firma hesabından aynı firmadaki kullanıcıya transfer',
+            description: t('transfers:types.company_to_user_same.description'),
             requiresUser: true,
             requiresOtherCompany: false,
         },
         {
             value: 'company_to_user_other',
-            label: 'Başka Firmadaki Kullanıcıya',
-            icon: <Business />,
+            label: t('transfers:types.company_to_user_other.label'),
+            icon: <Business/>,
             fromScope: 'company',
             toScope: 'user',
             permission: 'can_transfer_company_to_other_company_user',
-            description: 'Firma hesabından başka firmadaki kullanıcıya transfer',
+            description: t('transfers:types.company_to_user_other.description'),
             requiresUser: true,
             requiresOtherCompany: true,
         },
         {
             value: 'company_to_company_other',
-            label: 'Başka Firmaya',
-            icon: <Business />,
+            label: t('transfers:types.company_to_company_other.label'),
+            icon: <Business/>,
             fromScope: 'company',
             toScope: 'company',
             permission: 'can_transfer_company_to_other_company',
-            description: 'Firma hesabından başka bir firmaya transfer',
+            description: t('transfers:types.company_to_company_other.description'),
             requiresUser: false,
             requiresOtherCompany: true,
         },
         {
             value: 'company_to_external',
-            label: 'Harici Alıcıya',
-            icon: <AccountBalance />,
+            label: t('transfers:types.company_to_external.label'),
+            icon: <AccountBalance/>,
             fromScope: 'company',
             toScope: 'external',
             permission: 'can_transfer_company_to_other_company',
-            description: 'Firma hesabından sistem dışı alıcıya transfer',
+            description: t('transfers:types.company_to_external.description'),
             requiresUser: false,
             requiresOtherCompany: false,
             requiresExternal: true,
@@ -96,56 +98,56 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
         // USER kaynaklı transferler
         {
             value: 'user_to_user_same',
-            label: 'Aynı Firmadaki Kullanıcıya',
-            icon: <Person />,
+            label: t('transfers:types.user_to_user_same.label'),
+            icon: <Person/>,
             fromScope: 'user',
             toScope: 'user',
             permission: 'can_transfer_user_to_same_company_user',
-            description: 'Kullanıcı hesabından aynı firmadaki kullanıcıya transfer',
+            description: t('transfers:types.user_to_user_same.description'),
             requiresUser: true,
             requiresOtherCompany: false,
         },
         {
             value: 'user_to_user_other',
-            label: 'Başka Firmadaki Kullanıcıya',
-            icon: <Business />,
+            label: t('transfers:types.user_to_user_other.label'),
+            icon: <Business/>,
             fromScope: 'user',
             toScope: 'user',
             permission: 'can_transfer_user_to_other_company_user',
-            description: 'Kullanıcı hesabından başka firmadaki kullanıcıya transfer',
+            description: t('transfers:types.user_to_user_other.description'),
             requiresUser: true,
             requiresOtherCompany: true,
         },
         {
             value: 'user_to_company_same',
-            label: 'Kendi Firmasına',
-            icon: <TrendingUp />,
+            label: t('transfers:types.user_to_company_same.label'),
+            icon: <TrendingUp/>,
             fromScope: 'user',
             toScope: 'company',
             permission: 'can_transfer_user_to_own_company',
-            description: 'Kullanıcı hesabından kendi firmasına transfer',
+            description: t('transfers:types.user_to_company_same.description'),
             requiresUser: false,
             requiresOtherCompany: false,
         },
         {
             value: 'user_to_company_other',
-            label: 'Başka Firmaya',
-            icon: <SwapHoriz />,
+            label: t('transfers:types.user_to_company_other.label'),
+            icon: <SwapHoriz/>,
             fromScope: 'user',
             toScope: 'company',
             permission: 'can_transfer_user_to_other_company',
-            description: 'Kullanıcı hesabından başka firmaya transfer',
+            description: t('transfers:types.user_to_company_other.description'),
             requiresUser: false,
             requiresOtherCompany: true,
         },
         {
             value: 'user_to_external',
-            label: 'Harici Alıcıya',
-            icon: <AccountBalance />,
+            label: t('transfers:types.user_to_external.label'),
+            icon: <AccountBalance/>,
             fromScope: 'user',
             toScope: 'external',
             permission: 'can_transfer_user_to_other_company',
-            description: 'Kullanıcı hesabından sistem dışı alıcıya transfer',
+            description: t('transfers:types.user_to_external.description'),
             requiresUser: false,
             requiresOtherCompany: false,
             requiresExternal: true,
@@ -205,41 +207,41 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
     // Form validasyon şeması
     const validationSchema = Yup.object({
-        transferType: Yup.string().required('Transfer tipi seçiniz'),
+        transferType: Yup.string().required(t('transfers:validations.transferTypeRequired')),
         amount: Yup.number()
-            .required('Tutar giriniz')
-            .positive('Tutar pozitif olmalıdır')
-            .test('max-decimals', 'En fazla 2 ondalık basamak olabilir', function(value) {
+            .required(t('transfers:validations.amountRequired'))
+            .positive(t('transfers:validations.amountPositive'))
+            .test('max-decimals', t('transfers:validations.maxDecimals'), function (value) {
                 if (!value) return true;
                 const decimals = (value.toString().split('.')[1] || '').length;
                 return decimals <= 2;
             })
-            .test('max-balance', 'Yetersiz bakiye', function(value) {
+            .test('max-balance', t('transfers:validations.insufficientBalance'), function(value) {
                 if (!sourceAccount) return true;
                 return value <= sourceAccount.balance;
             }),
         description: Yup.string()
-            .max(255, 'Açıklama en fazla 255 karakter olabilir'),
+            .max(255, t('transfers:validations.descriptionMax')),
         toUserId: Yup.string().when('transferType', {
             is: (val) => {
                 const type = allTransferTypes.find(t => t.value === val);
                 return type?.requiresUser;
             },
-            then: (schema) => schema.required('Kullanıcı seçiniz'),
+            then: (schema) => schema.required(t('transfers:validations.selectUser')),
         }),
         toUserCompanyId: Yup.string().when('transferType', {
             is: (val) => {
                 const type = allTransferTypes.find(t => t.value === val);
                 return type?.requiresOtherCompany;
             },
-            then: (schema) => schema.required('Firma ID gerekli'),
+            then: (schema) => schema.required(t('transfers:validations.companyIdRequired')),
         }),
         toExternalName: Yup.string().when('transferType', {
             is: (val) => {
                 const type = allTransferTypes.find(t => t.value === val);
                 return type?.requiresExternal;
             },
-            then: (schema) => schema.required('Alıcı adı giriniz'),
+            then: (schema) => schema.required(t('transfers:validations.externalNameRequired')),
         }),
     });
 
@@ -317,7 +319,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
             const transferType = allTransferTypes.find(t => t.value === values.transferType);
             if (!transferType) {
-                throw new Error('Geçersiz transfer tipi');
+                throw new Error('Unkown transfer type');
             }
 
             const requestData = {
@@ -363,12 +365,12 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
             );
 
             if (response.data.status === 'success') {
-                showAlert('Transfer başarıyla oluşturuldu', 'success');
+                showAlert(response.data.message || t('transfers:messages.success'), 'success');
                 formik.resetForm();
                 setSelectedUser(null);
                 onClose();
             } else {
-                showAlert(response.data.message || 'Transfer oluşturulamadı', 'error');
+                showAlert(response.data.message || t('transfers:messages.createFailed'), 'error');
             }
         } catch (error) {
             console.error('Transfer hatası:', error);
@@ -377,7 +379,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
             } else if (error.message) {
                 showAlert(error.message, 'error');
             } else {
-                showAlert('Transfer sırasında bir hata oluştu', 'error');
+                showAlert(t('transfers:messages.genericError'), 'error');
             }
         } finally {
             setLoading(false);
@@ -404,7 +406,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                 }
             }}
         >
-            <DialogTitle sx={{ 
+            <DialogTitle sx={{
                 fontWeight: 700,
                 fontSize: '1.5rem',
                 borderBottom: 1,
@@ -414,9 +416,9 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                 alignItems: 'center',
                 justifyContent: 'space-between',
             }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Send color="primary" />
-                    Para Transferi
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 1.5}}>
+                    <Send color="primary"/>
+                    {t('transfers:title')}
                 </Box>
                 <IconButton
                     onClick={onClose}
@@ -429,31 +431,31 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                         }
                     }}
                 >
-                    <Close />
+                    <Close/>
                 </IconButton>
             </DialogTitle>
 
             <form onSubmit={formik.handleSubmit}>
-                <DialogContent sx={{ mt: 2 }}>
+                <DialogContent sx={{mt: 2}}>
                     {/* Kaynak hesap bilgisi */}
                     {sourceAccount && (
-                        <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                Gönderen: {fromScope === 'user' ? 'Kişisel Hesap' : 'Firma Hesabı'}
+                        <Alert severity="info" sx={{mb: 3, borderRadius: 2}}>
+                            <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
+                                {t('transfers:info.sender')}: {fromScope === 'user' ? t('transfers:info.personalAccount') : t('transfers:info.companyAccount')}
                             </Typography>
                             <Typography variant="body2">
-                                Mevcut Bakiye: {new Intl.NumberFormat('tr-TR', {
-                                    style: 'currency',
-                                    currency: sourceAccount.currency || 'EUR',
-                                }).format(sourceAccount.balance)}
+                                {t('transfers:info.currentBalance')}: {new Intl.NumberFormat(i18n.language === 'tr' ? 'tr-TR' : i18n.language === 'de' ? 'de-DE' : 'en-US', {
+                                style: 'currency',
+                                currency: sourceAccount.currency || 'EUR',
+                            }).format(sourceAccount.balance)}
                             </Typography>
                         </Alert>
                     )}
 
                     {/* Transfer tipi seçimi */}
-                    <FormControl component="fieldset" fullWidth sx={{ mb: 3 }}>
-                        <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600 }}>
-                            Transfer Tipi
+                    <FormControl component="fieldset" fullWidth sx={{mb: 3}}>
+                        <FormLabel component="legend" sx={{mb: 2, fontWeight: 600}}>
+                            {t('transfers:fields.transferType')}
                         </FormLabel>
                         <RadioGroup
                             name="transferType"
@@ -461,23 +463,23 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                             onChange={formik.handleChange}
                         >
                             {transferTypes.map((type) => (
-                                <Box key={type.value} sx={{ mb: 1 }}>
+                                <Box key={type.value} sx={{mb: 1}}>
                                     <FormControlLabel
                                         value={type.value}
                                         disabled={isTransferTypeDisabled(type.value)}
-                                        control={<Radio />}
+                                        control={<Radio/>}
                                         label={
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                                 {type.icon}
                                                 <Box>
-                                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                                    <Typography variant="body1" sx={{fontWeight: 500}}>
                                                         {type.label}
                                                         {isTransferTypeDisabled(type.value) && (
-                                                            <Chip 
-                                                                label="Yetki Yok" 
-                                                                size="small" 
-                                                                color="error" 
-                                                                sx={{ ml: 1, height: 20 }}
+                                                            <Chip
+                                                                label={t('transfers:labels.noPermission')}
+                                                                size="small"
+                                                                color="error"
+                                                                sx={{ml: 1, height: 20}}
                                                             />
                                                         )}
                                                     </Typography>
@@ -492,7 +494,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                             ))}
                         </RadioGroup>
                         {formik.touched.transferType && formik.errors.transferType && (
-                            <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                            <Typography color="error" variant="caption" sx={{mt: 1}}>
                                 {formik.errors.transferType}
                             </Typography>
                         )}
@@ -501,10 +503,10 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                     {/* Tutar */}
                     <TextField
                         fullWidth
-                        label="Tutar"
+                        label={t('transfers:fields.amount')}
                         name="amount"
                         type="number"
-                        inputProps={{ step: '0.01', min: '0' }}
+                        inputProps={{step: '0.01', min: '0'}}
                         value={formik.values.amount}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
@@ -517,16 +519,16 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                 </InputAdornment>
                             ),
                         }}
-                        sx={{ mb: 3 }}
+                        sx={{mb: 3}}
                     />
 
                     {/* Dinamik alanlar - Transfer tipine göre */}
                     {/* Başka firmadaki kullanıcıya transfer - önce firma seç, sonra kullanıcı */}
                     {currentTransferType?.requiresUser && currentTransferType?.requiresOtherCompany && (
                         <>
-                            <Box sx={{ mb: 3 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                                    1. Hedef Firmayı Seçin
+                            <Box sx={{mb: 3}}>
+                                <Typography variant="subtitle2" sx={{mb: 1, fontWeight: 600}}>
+                                    {t('transfers:steps.selectTargetCompany')}
                                 </Typography>
                                 <CompanySearchField
                                     onCompanySelect={handleCompanySelect}
@@ -534,7 +536,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                     minWidth="100%"
                                 />
                                 {formik.touched.toUserCompanyId && formik.errors.toUserCompanyId && (
-                                    <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>
+                                    <Typography color="error" variant="caption" sx={{mt: 0.5, display: 'block'}}>
                                         {formik.errors.toUserCompanyId}
                                     </Typography>
                                 )}
@@ -542,25 +544,25 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
                             {/* Seçilen firma bilgisi */}
                             {selectedCompany && (
-                                <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                        Seçilen Firma
+                                <Alert severity="info" sx={{mb: 3, borderRadius: 2}}>
+                                    <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
+                                        {t('transfers:labels.selectedCompany')}
                                     </Typography>
                                     <Typography variant="body2">
                                         {selectedCompany.company_name}
                                     </Typography>
-                                    <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
-                                        <Chip label={selectedCompany.sector} size="small" variant="outlined" />
-                                        <Chip label={selectedCompany.currency} size="small" color="primary" />
+                                    <Box sx={{display: 'flex', gap: 1, mt: 0.5}}>
+                                        <Chip label={selectedCompany.sector} size="small" variant="outlined"/>
+                                        <Chip label={selectedCompany.currency} size="small" color="primary"/>
                                     </Box>
                                 </Alert>
                             )}
 
                             {/* Firma seçildikten sonra kullanıcı seçimi */}
                             {selectedCompany && (
-                                <Box sx={{ mb: 3 }}>
-                                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                                        2. Bu Firmadan Kullanıcı Seçin
+                                <Box sx={{mb: 3}}>
+                                    <Typography variant="subtitle2" sx={{mb: 1, fontWeight: 600}}>
+                                        {t('transfers:steps.selectUserFromCompany')}
                                     </Typography>
                                     <UserSearchField
                                         companyId={selectedCompany.id}
@@ -569,7 +571,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                         minWidth="100%"
                                     />
                                     {formik.touched.toUserId && formik.errors.toUserId && (
-                                        <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>
+                                        <Typography color="error" variant="caption" sx={{mt: 0.5, display: 'block'}}>
                                             {formik.errors.toUserId}
                                         </Typography>
                                     )}
@@ -578,9 +580,9 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
                             {/* Seçilen kullanıcı bilgisi */}
                             {selectedUser && (
-                                <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                        Seçilen Kullanıcı
+                                <Alert severity="success" sx={{mb: 3, borderRadius: 2}}>
+                                    <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
+                                        {t('transfers:labels.selectedUser')}
                                     </Typography>
                                     <Typography variant="body2">
                                         {selectedUser.name} {selectedUser.surname}
@@ -596,9 +598,9 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                     {/* Aynı firmadaki kullanıcıya transfer */}
                     {currentTransferType?.requiresUser && !currentTransferType?.requiresOtherCompany && (
                         <>
-                            <Box sx={{ mb: 3 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                                    Alıcı Kullanıcı
+                            <Box sx={{mb: 3}}>
+                                <Typography variant="subtitle2" sx={{mb: 1, fontWeight: 600}}>
+                                    {t('transfers:fields.receiverUser')}
                                 </Typography>
                                 <UserSearchField
                                     companyId={sourceAccount?.company?.id || sourceAccount?.id}
@@ -607,7 +609,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                     minWidth="100%"
                                 />
                                 {formik.touched.toUserId && formik.errors.toUserId && (
-                                    <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>
+                                    <Typography color="error" variant="caption" sx={{mt: 0.5, display: 'block'}}>
                                         {formik.errors.toUserId}
                                     </Typography>
                                 )}
@@ -615,9 +617,9 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
                             {/* Seçilen kullanıcı bilgisi */}
                             {selectedUser && (
-                                <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                        Seçilen Kullanıcı
+                                <Alert severity="success" sx={{mb: 3, borderRadius: 2}}>
+                                    <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
+                                        {t('transfers:labels.selectedUser')}
                                     </Typography>
                                     <Typography variant="body2">
                                         {selectedUser.name} {selectedUser.surname}
@@ -632,9 +634,9 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
                     {currentTransferType?.requiresOtherCompany && !currentTransferType?.requiresUser && (
                         <>
-                            <Box sx={{ mb: 3 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                                    Hedef Firma
+                            <Box sx={{mb: 3}}>
+                                <Typography variant="subtitle2" sx={{mb: 1, fontWeight: 600}}>
+                                    {t('transfers:fields.targetCompany')}
                                 </Typography>
                                 <CompanySearchField
                                     onCompanySelect={handleCompanySelect}
@@ -642,7 +644,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                     minWidth="100%"
                                 />
                                 {formik.touched.toUserCompanyId && formik.errors.toUserCompanyId && (
-                                    <Typography color="error" variant="caption" sx={{ mt: 0.5, display: 'block' }}>
+                                    <Typography color="error" variant="caption" sx={{mt: 0.5, display: 'block'}}>
                                         {formik.errors.toUserCompanyId}
                                     </Typography>
                                 )}
@@ -650,19 +652,20 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
                             {/* Seçilen firma bilgisi */}
                             {selectedCompany && (
-                                <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                        Seçilen Firma
+                                <Alert severity="success" sx={{mb: 3, borderRadius: 2}}>
+                                    <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
+                                        {t('transfers:labels.selectedCompany')}
                                     </Typography>
                                     <Typography variant="body2">
                                         {selectedCompany.company_name}
                                     </Typography>
-                                    <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
-                                        <Chip label={selectedCompany.sector} size="small" variant="outlined" />
-                                        <Chip label={selectedCompany.currency} size="small" color="primary" />
+                                    <Box sx={{display: 'flex', gap: 1, mt: 0.5}}>
+                                        <Chip label={selectedCompany.sector} size="small" variant="outlined"/>
+                                        <Chip label={selectedCompany.currency} size="small" color="primary"/>
                                     </Box>
-                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, fontFamily: 'monospace' }}>
-                                        Firma ID: {selectedCompany.id}
+                                    <Typography variant="caption" color="text.secondary"
+                                                sx={{display: 'block', mt: 0.5, fontFamily: 'monospace'}}>
+                                        {t('transfers:labels.companyId')}: {selectedCompany.id}
                                     </Typography>
                                 </Alert>
                             )}
@@ -672,22 +675,22 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                     {currentTransferType?.requiresExternal && (
                         <TextField
                             fullWidth
-                            label="Alıcı Adı / Firma Adı"
+                            label={t('transfers:fields.externalName')}
                             name="toExternalName"
                             value={formik.values.toExternalName}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.touched.toExternalName && Boolean(formik.errors.toExternalName)}
                             helperText={formik.touched.toExternalName && formik.errors.toExternalName}
-                            placeholder="Tedarikçi A.Ş."
-                            sx={{ mb: 3 }}
+                            placeholder={t('transfers:placeholders.externalName')}
+                            sx={{mb: 3}}
                         />
                     )}
 
                     {/* Açıklama */}
                     <TextField
                         fullWidth
-                        label="Açıklama (Opsiyonel)"
+                        label={t('transfers:fields.description')}
                         name="description"
                         multiline
                         rows={3}
@@ -696,44 +699,44 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                         onBlur={formik.handleBlur}
                         error={formik.touched.description && Boolean(formik.errors.description)}
                         helperText={formik.touched.description && formik.errors.description}
-                        placeholder="Transfer açıklaması..."
-                        inputProps={{ maxLength: 255 }}
+                        placeholder={t('transfers:placeholders.description')}
+                        inputProps={{maxLength: 255}}
                     />
                 </DialogContent>
 
-                <DialogActions sx={{ 
-                    px: 3, 
+                <DialogActions sx={{
+                    px: 3,
                     pb: 3,
                     gap: 1,
                     borderTop: 1,
                     borderColor: 'divider',
                     pt: 2,
                 }}>
-                    <Button 
+                    <Button
                         onClick={onClose}
                         variant="outlined"
                         disabled={loading}
-                        sx={{ 
+                        sx={{
                             borderRadius: 2,
                             textTransform: 'none',
                             fontWeight: 600,
                         }}
                     >
-                        İptal
+                        {t('transfers:actions.cancel')}
                     </Button>
-                    <Button 
+                    <Button
                         type="submit"
                         variant="contained"
                         disabled={loading || !formik.isValid || !formik.values.transferType}
-                        startIcon={loading ? <CircularProgress size={20} /> : <Send />}
-                        sx={{ 
+                        startIcon={loading ? <CircularProgress size={20}/> : <Send/>}
+                        sx={{
                             borderRadius: 2,
                             textTransform: 'none',
                             fontWeight: 600,
                             px: 3,
                         }}
                     >
-                        {loading ? 'Gönderiliyor...' : 'Gönder'}
+                        {loading ? t('transfers:actions.sending') : t('transfers:actions.send')}
                     </Button>
                 </DialogActions>
             </form>

@@ -1,0 +1,90 @@
+{
+  "title": "Überweisung",
+  "fields": {
+    "transferType": "Überweisungstyp",
+    "amount": "Betrag",
+    "receiverUser": "Empfänger (Benutzer)",
+    "targetCompany": "Zielunternehmen",
+    "externalName": "Empfänger- / Firmenname",
+    "description": "Beschreibung (optional)"
+  },
+  "placeholders": {
+    "externalName": "Lieferant GmbH",
+    "description": "Überweisungsbeschreibung..."
+  },
+  "labels": {
+    "noPermission": "Keine Berechtigung",
+    "selectedUser": "Ausgewählter Benutzer",
+    "selectedCompany": "Ausgewähltes Unternehmen",
+    "companyId": "Unternehmens-ID"
+  },
+  "steps": {
+    "selectTargetCompany": "1. Zielunternehmen auswählen",
+    "selectUserFromCompany": "2. Benutzer aus diesem Unternehmen auswählen"
+  },
+  "info": {
+    "sender": "Absender",
+    "personalAccount": "Persönliches Konto",
+    "companyAccount": "Unternehmenskonto",
+    "currentBalance": "Aktueller Kontostand"
+  },
+  "actions": {
+    "cancel": "Abbrechen",
+    "send": "Senden",
+    "sending": "Wird gesendet..."
+  },
+  "messages": {
+    "success": "Überweisung wurde erfolgreich erstellt.",
+    "createFailed": "Überweisung konnte nicht erstellt werden.",
+    "genericError": "Während der Überweisung ist ein Fehler aufgetreten."
+  },
+  "validations": {
+    "transferTypeRequired": "Bitte einen Überweisungstyp auswählen",
+    "amountRequired": "Bitte einen Betrag eingeben",
+    "amountPositive": "Der Betrag muss positiv sein",
+    "maxDecimals": "Maximal 2 Dezimalstellen erlaubt",
+    "insufficientBalance": "Unzureichendes Guthaben",
+    "descriptionMax": "Die Beschreibung darf maximal 255 Zeichen lang sein",
+    "selectUser": "Bitte einen Benutzer auswählen",
+    "companyIdRequired": "Unternehmens-ID ist erforderlich",
+    "externalNameRequired": "Bitte den Empfängernamen eingeben"
+  },
+  "types": {
+    "company_to_user_same": {
+      "label": "Benutzer in demselben Unternehmen",
+      "description": "Überweisung vom Unternehmenskonto an einen Benutzer im selben Unternehmen"
+    },
+    "company_to_user_other": {
+      "label": "Benutzer in einem anderen Unternehmen",
+      "description": "Überweisung vom Unternehmenskonto an einen Benutzer in einem anderen Unternehmen"
+    },
+    "company_to_company_other": {
+      "label": "An ein anderes Unternehmen",
+      "description": "Überweisung vom Unternehmenskonto an ein anderes Unternehmen"
+    },
+    "company_to_external": {
+      "label": "Externer Empfänger",
+      "description": "Überweisung vom Unternehmenskonto an einen externen Empfänger"
+    },
+    "user_to_user_same": {
+      "label": "Benutzer in demselben Unternehmen",
+      "description": "Überweisung vom Benutzerkonto an einen Benutzer im selben Unternehmen"
+    },
+    "user_to_user_other": {
+      "label": "Benutzer in einem anderen Unternehmen",
+      "description": "Überweisung vom Benutzerkonto an einen Benutzer in einem anderen Unternehmen"
+    },
+    "user_to_company_same": {
+      "label": "An eigenes Unternehmen",
+      "description": "Überweisung vom Benutzerkonto an das eigene Unternehmen"
+    },
+    "user_to_company_other": {
+      "label": "An ein anderes Unternehmen",
+      "description": "Überweisung vom Benutzerkonto an ein anderes Unternehmen"
+    },
+    "user_to_external": {
+      "label": "Externer Empfänger",
+      "description": "Überweisung vom Benutzerkonto an einen externen Empfänger"
+    }
+  }
+}

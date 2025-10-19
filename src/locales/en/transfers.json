@@ -1,0 +1,90 @@
+{
+  "title": "Money Transfer",
+  "fields": {
+    "transferType": "Transfer Type",
+    "amount": "Amount",
+    "receiverUser": "Receiver User",
+    "targetCompany": "Target Company",
+    "externalName": "Recipient / Company Name",
+    "description": "Description (Optional)"
+  },
+  "placeholders": {
+    "externalName": "Supplier Inc.",
+    "description": "Transfer description..."
+  },
+  "labels": {
+    "noPermission": "No Permission",
+    "selectedUser": "Selected User",
+    "selectedCompany": "Selected Company",
+    "companyId": "Company ID"
+  },
+  "steps": {
+    "selectTargetCompany": "1. Select Target Company",
+    "selectUserFromCompany": "2. Select a User from this Company"
+  },
+  "info": {
+    "sender": "Sender",
+    "personalAccount": "Personal Account",
+    "companyAccount": "Company Account",
+    "currentBalance": "Current Balance"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "send": "Send",
+    "sending": "Sending..."
+  },
+  "messages": {
+    "success": "Transfer created successfully.",
+    "createFailed": "Failed to create transfer.",
+    "genericError": "An error occurred during the transfer."
+  },
+  "validations": {
+    "transferTypeRequired": "Please select a transfer type",
+    "amountRequired": "Please enter an amount",
+    "amountPositive": "Amount must be positive",
+    "maxDecimals": "At most 2 decimal places allowed",
+    "insufficientBalance": "Insufficient balance",
+    "descriptionMax": "Description can be at most 255 characters",
+    "selectUser": "Please select a user",
+    "companyIdRequired": "Company ID is required",
+    "externalNameRequired": "Please enter recipient name"
+  },
+  "types": {
+    "company_to_user_same": {
+      "label": "To a User in the Same Company",
+      "description": "Transfer from company account to a user in the same company"
+    },
+    "company_to_user_other": {
+      "label": "To a User in Another Company",
+      "description": "Transfer from company account to a user in another company"
+    },
+    "company_to_company_other": {
+      "label": "To Another Company",
+      "description": "Transfer from company account to another company"
+    },
+    "company_to_external": {
+      "label": "To External Recipient",
+      "description": "Transfer from company account to an external recipient"
+    },
+    "user_to_user_same": {
+      "label": "To a User in the Same Company",
+      "description": "Transfer from user account to a user in the same company"
+    },
+    "user_to_user_other": {
+      "label": "To a User in Another Company",
+      "description": "Transfer from user account to a user in another company"
+    },
+    "user_to_company_same": {
+      "label": "To Own Company",
+      "description": "Transfer from user account to own company"
+    },
+    "user_to_company_other": {
+      "label": "To Another Company",
+      "description": "Transfer from user account to another company"
+    },
+    "user_to_external": {
+      "label": "To External Recipient",
+      "description": "Transfer from user account to an external recipient"
+    }
+  }
+}
