@@ -3,7 +3,6 @@ import {
     Container,
     Box,
     Typography,
-    Paper,
     Grid,
     CircularProgress,
     Alert,
@@ -12,17 +11,17 @@ import {
     CardContent,
     Chip,
     Avatar,
-    Menu,
-    MenuItem,
+    Stack,
+    Tooltip,
 } from '@mui/material';
 import {
     ArrowBack,
     Business,
     AccountBalance,
     CalendarToday,
-    TrendingUp,
     Settings,
-    MoreVert,
+    AccountBalanceWalletOutlined,
+    AddCircleOutline,
 } from '@mui/icons-material';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
@@ -44,7 +43,6 @@ export default function CompanyPage() {
     const userListRef = useRef();
     const [loading, setLoading] = useState(true);
     const [company, setCompany] = useState(null);
-    const [anchorEl, setAnchorEl] = useState(null);
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
 
@@ -83,13 +81,7 @@ export default function CompanyPage() {
             }
         } catch (err) {
             console.error(t('company:errors.consoleLoadError'), err);
-            if (err.response && err.response.data) {
-                showAlert(err.response.data.message || t('company:errors.loadErrorGeneric'), 'error');
-            } else if (err.request) {
-                showAlert(t('company:errors.serverUnreachable'), 'error');
-            } else {
-                showAlert(t('company:errors.unexpected'), 'error');
-            }
+            showAlert(t('company:errors.loadErrorGeneric'), 'error');
             navigate('/');
         } finally {
             setLoading(false);
@@ -114,35 +106,7 @@ export default function CompanyPage() {
     };
 
     const handleUserAdded = () => {
-        if (userListRef.current) {
-            userListRef.current.refresh();
-        }
-    };
-
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleTransferClick = () => {
-        handleMenuClose();
-        setTransferDialogOpen(true);
-    };
-
-    const handleTransferDialogClose = () => {
-        setTransferDialogOpen(false);
-    };
-
-    const handleExternalMoneyClick = () => {
-        handleMenuClose();
-        setExternalMoneyDialogOpen(true);
-    };
-
-    const handleExternalMoneyDialogClose = () => {
-        setExternalMoneyDialogOpen(false);
+        if (userListRef.current) userListRef.current.refresh();
     };
 
     if (loading) {
@@ -165,6 +129,8 @@ export default function CompanyPage() {
         );
     }
 
+    const hasSector = !!(company.sector && String(company.sector).trim().length);
+
     return (
         <Container maxWidth="xl" sx={{mt: 4, mb: 4}}>
             {/* Header */}
@@ -172,199 +138,180 @@ export default function CompanyPage() {
                 <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
                     <IconButton
                         onClick={() => navigate('/')}
-                        sx={{
-                            bgcolor: 'background.paper',
-                            boxShadow: 1,
-                            '&:hover': {bgcolor: 'action.hover'}
-                        }}
+                        sx={{bgcolor: 'background.paper', boxShadow: 1, '&:hover': {bgcolor: 'action.hover'}}}
                         aria-label={t('company:aria.back')}
                     >
                         <ArrowBack/>
                     </IconButton>
+
                     <Avatar sx={{width: 56, height: 56, bgcolor: 'primary.main'}}>
                         <Business sx={{fontSize: 32}}/>
                     </Avatar>
+
                     <Box>
                         <Typography variant="h4" component="h1" sx={{fontWeight: 700, mb: 0.5}}>
                             {company.company_name}
                         </Typography>
-                        <Chip
-                            label={company.sector}
-                            size="small"
-                            color="primary"
-                            variant="outlined"
-                        />
+                        {hasSector && (
+                            <Chip label={company.sector} size="small" color="primary" variant="outlined" />
+                        )}
                     </Box>
                 </Box>
-                <IconButton
-                    onClick={() => navigate(`/company/${companyId}/settings`)}
-                    sx={{
-                        bgcolor: 'background.paper',
-                        boxShadow: 1,
-                        '&:hover': {bgcolor: 'action.hover'}
-                    }}
-                    aria-label={t('company:aria.settings')}
-                >
-                    <Settings/>
-                </IconButton>
             </Box>
 
-            {/* Stats Cards */}
+            {/* Firma Özeti Kartı */}
             <Grid container spacing={3} sx={{mb: 4}}>
-                {/* Balance Card */}
-                <Grid item xs={12} md={6} lg={4}>
-                    <Card
-                        sx={{
-                            height: '100%',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            color: 'white',
-                            position: 'relative',
-                            overflow: 'hidden',
-                        }}
-                    >
-                        <Box sx={{position: 'absolute', top: 8, right: 8, zIndex: 1}}>
-                            <IconButton
-                                onClick={handleMenuOpen}
-                                size="small"
-                                sx={{
-                                    color: 'rgba(255,255,255,0.9)',
-                                    '&:hover': {
-                                        color: 'white',
-                                        backgroundColor: 'rgba(255,255,255,0.1)'
-                                    }
-                                }}
-                                aria-label={t('company:aria.more')}
-                            >
-                                <MoreVert />
-                            </IconButton>
-                        </Box>
+                <Grid item xs={12}>
+                    <Card sx={{overflow: 'hidden', position: 'relative'}}>
                         <CardContent>
-                            <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
-                                <Avatar sx={{bgcolor: 'rgba(255,255,255,0.2)', mr: 2}}>
-                                    <AccountBalance/>
-                                </Avatar>
-                                <Typography variant="h6" sx={{fontWeight: 600}}>
-                                    {t('company:currentBalance')}
-                                </Typography>
-                            </Box>
-                            <Typography variant="h3" sx={{fontWeight: 700, mb: 1}}>
-                                {formatBalance(company.balance, company.currency)}
-                            </Typography>
-                            <Typography variant="body2" sx={{opacity: 0.9}}>
-                                {t('company:currencyStatus', { currency: company.currency })}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                            <Grid container spacing={3}>
+                                {/* Sol: Bakiye ve butonlar */}
+                                <Grid item xs={12} md={5}>
+                                    <Box
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 2,
+                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            color: 'white',
+                                            position: 'relative',
+                                        }}
+                                    >
+                                        {/* Sağ üstte üç profesyonel buton */}
+                                        <Stack
+                                            direction="row"
+                                            spacing={1}
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 12,
+                                                right: 12,
+                                            }}
+                                        >
+                                            <Tooltip title={t('company:menu.moneyTransfer')}>
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{
+                                                        color: 'white',
+                                                        backgroundColor: 'rgba(255,255,255,0.15)',
+                                                        '&:hover': {backgroundColor: 'rgba(255,255,255,0.25)'},
+                                                    }}
+                                                    onClick={() => setTransferDialogOpen(true)}
+                                                >
+                                                    <AccountBalanceWalletOutlined fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title={t('company:menu.addIncome')}>
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{
+                                                        color: 'white',
+                                                        backgroundColor: 'rgba(255,255,255,0.15)',
+                                                        '&:hover': {backgroundColor: 'rgba(255,255,255,0.25)'},
+                                                    }}
+                                                    onClick={() => setExternalMoneyDialogOpen(true)}
+                                                >
+                                                    <AddCircleOutline fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title={t('company:goToSettings')}>
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{
+                                                        color: 'white',
+                                                        backgroundColor: 'rgba(255,255,255,0.15)',
+                                                        '&:hover': {backgroundColor: 'rgba(255,255,255,0.25)'},
+                                                    }}
+                                                    onClick={() => navigate(`/company/${companyId}/settings`)}
+                                                >
+                                                    <Settings fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Stack>
 
-                {/* Company Info Card */}
-                <Grid item xs={12} md={6} lg={4}>
-                    <Card sx={{height: '100%'}}>
-                        <CardContent>
-                            <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
-                                <Avatar sx={{bgcolor: 'primary.main', mr: 2}}>
-                                    <Business/>
-                                </Avatar>
-                                <Typography variant="h6" sx={{fontWeight: 600}}>
-                                    {t('company:companyInfo')}
-                                </Typography>
-                            </Box>
-                            <Box sx={{mb: 2}}>
-                                <Typography variant="body2" color="text.secondary" gutterBottom>
-                                    {t('company:companyName')}
-                                </Typography>
-                                <Typography variant="body1" sx={{fontWeight: 600, mb: 2}}>
-                                    {company.company_name}
-                                </Typography>
-                            </Box>
-                            <Box>
-                                <Typography variant="body2" color="text.secondary" gutterBottom>
-                                    {t('company:sector')}
-                                </Typography>
-                                <Typography variant="body1" sx={{fontWeight: 600}}>
-                                    {company.sector}
-                                </Typography>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                                        <Stack direction="row" alignItems="center" spacing={1.5} sx={{mb: 1, mt: 1}}>
+                                            <Avatar sx={{bgcolor: 'rgba(255,255,255,0.2)'}}>
+                                                <AccountBalance/>
+                                            </Avatar>
+                                            <Typography variant="h6" sx={{fontWeight: 600}}>
+                                                {t('company:currentBalance')}
+                                            </Typography>
+                                        </Stack>
 
-                {/* Date Info Card */}
-                <Grid item xs={12} md={6} lg={4}>
-                    <Card sx={{height: '100%'}}>
-                        <CardContent>
-                            <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
-                                <Avatar sx={{bgcolor: 'success.main', mr: 2}}>
-                                    <CalendarToday/>
-                                </Avatar>
-                                <Typography variant="h6" sx={{fontWeight: 600}}>
-                                    {t('company:creationDate')}
-                                </Typography>
-                            </Box>
-                            <Typography variant="h5" sx={{fontWeight: 700, mb: 1}}>
-                                {formatDate(company.created_at)}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {t('company:registeredAt')}
-                            </Typography>
+                                        <Typography variant="h3" sx={{fontWeight: 800, lineHeight: 1.1}}>
+                                            {formatBalance(company.balance, company.currency)}
+                                        </Typography>
+
+                                        <Typography variant="body2" sx={{opacity: 0.9, mt: 0.5}}>
+                                            {t('company:currencyStatus', { currency: company.currency })}
+                                        </Typography>
+
+                                        <Stack direction="row" spacing={1} sx={{mt: 2, flexWrap: 'wrap'}}>
+                                            <Chip
+                                                size="small"
+                                                color={company.balance >= 0 ? 'success' : 'error'}
+                                                label={company.balance >= 0 ? t('company:positive') : t('company:negative')}
+                                                variant="filled"
+                                                sx={{color: 'white'}}
+                                            />
+                                            <Chip
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{borderColor: 'rgba(255,255,255,0.5)', color: 'white'}}
+                                                label={company.currency}
+                                            />
+                                        </Stack>
+                                    </Box>
+                                </Grid>
+
+                                {/* Sağ: Firma Bilgileri */}
+                                <Grid item xs={12} md={7}>
+                                    <Stack spacing={1.5} sx={{height: '100%'}}>
+                                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                                            <Avatar sx={{bgcolor: 'primary.main'}}><Business/></Avatar>
+                                            <Typography variant="h6" sx={{fontWeight: 700}}>
+                                                {t('company:companyInfo')}
+                                            </Typography>
+                                        </Stack>
+
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="overline" color="text.secondary">
+                                                    {t('company:companyName')}
+                                                </Typography>
+                                                <Typography variant="body1" sx={{fontWeight: 600}}>
+                                                    {company.company_name}
+                                                </Typography>
+                                            </Grid>
+
+                                            {hasSector && (
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography variant="overline" color="text.secondary">
+                                                        {t('company:sector')}
+                                                    </Typography>
+                                                    <Typography variant="body1" sx={{fontWeight: 600}}>
+                                                        {company.sector}
+                                                    </Typography>
+                                                </Grid>
+                                            )}
+
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="overline" color="text.secondary">
+                                                    {t('company:creationDate')}
+                                                </Typography>
+                                                <Stack direction="row" alignItems="center" spacing={1}>
+                                                    <CalendarToday fontSize="small" color="success"/>
+                                                    <Typography variant="body1" sx={{fontWeight: 600}}>
+                                                        {formatDate(company.created_at)}
+                                                    </Typography>
+                                                </Stack>
+                                            </Grid>
+                                        </Grid>
+                                    </Stack>
+                                </Grid>
+                            </Grid>
                         </CardContent>
                     </Card>
                 </Grid>
             </Grid>
-
-            {/* Additional Info */}
-            <Paper sx={{p: 4}}>
-                <Box sx={{display: 'flex', alignItems: 'center', mb: 3}}>
-                    <TrendingUp sx={{fontSize: 28, color: 'primary.main', mr: 1.5}}/>
-                    <Typography variant="h5" sx={{fontWeight: 600}}>
-                        {t('company:summary')}
-                    </Typography>
-                </Box>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Box>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
-                                {t('company:companyId')}
-                            </Typography>
-                            <Typography variant="body1" sx={{fontWeight: 600, fontFamily: 'monospace'}}>
-                                {company.id}
-                            </Typography>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Box>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
-                                {t('company:currency')}
-                            </Typography>
-                            <Typography variant="body1" sx={{fontWeight: 600}}>
-                                {company.currency}
-                            </Typography>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Box>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
-                                {t('company:balanceStatus')}
-                            </Typography>
-                            <Chip
-                                label={company.balance >= 0 ? t('company:positive') : t('company:negative')}
-                                color={company.balance >= 0 ? 'success' : 'error'}
-                                size="small"
-                            />
-                        </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Box>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
-                                {t('company:sector')}
-                            </Typography>
-                            <Typography variant="body1" sx={{fontWeight: 600}}>
-                                {company.sector}
-                            </Typography>
-                        </Box>
-                    </Grid>
-                </Grid>
-            </Paper>
 
             {/* Kullanıcı Ekleme */}
             <Grid container spacing={3} sx={{mt: 2}}>
@@ -378,37 +325,16 @@ export default function CompanyPage() {
                 <UserList ref={userListRef} companyId={companyId}/>
             </Grid>
 
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-            >
-                <MenuItem onClick={handleTransferClick}>
-                    {t('company:menu.moneyTransfer')}
-                </MenuItem>
-                <MenuItem onClick={handleExternalMoneyClick}>
-                    {t('company:menu.addIncome')}
-                </MenuItem>
-            </Menu>
-
+            {/* Dialoglar */}
             <MoneyTransferDialog
                 open={transferDialogOpen}
-                onClose={handleTransferDialogClose}
+                onClose={() => setTransferDialogOpen(false)}
                 sourceAccount={company}
                 fromScope="company"
             />
-
             <ExternalMoneyDialog
                 open={externalMoneyDialogOpen}
-                onClose={handleExternalMoneyDialogClose}
+                onClose={() => setExternalMoneyDialogOpen(false)}
                 targetAccount={company}
                 targetScope="company"
             />
