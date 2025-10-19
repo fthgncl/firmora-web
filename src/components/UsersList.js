@@ -3,8 +3,6 @@ import axios from 'axios';
 import {
     Box,
     Card,
-    CardHeader,
-    CardContent,
     IconButton,
     Table,
     TableHead,
@@ -27,18 +25,27 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Button,               // ⬅️ eklendi
+    Button,
+    Paper,
+    Avatar
 } from '@mui/material';
-import { Refresh, ViewColumn, CheckCircleOutline, ErrorOutline, Search, Clear, PersonAdd } from '@mui/icons-material'; // ⬅️ PersonAdd eklendi
+import {
+    Refresh,
+    ViewColumn,
+    CheckCircleOutline,
+    ErrorOutline,
+    Search,
+    Clear,
+    PersonAdd,
+    ShieldMoon,
+} from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '../contexts/AuthContext';
 import PermissionsDisplay from './PermissionsDisplay';
-import AddUserDialog from './AddUserDialog'; // ⬅️ dialog import
+import AddUserDialog from './AddUserDialog';
 
-// Kolon tanımları (i18n key’leriyle)
 const COLUMN_DEFS = [
     { key: 'name',          labelKey: 'list.columns.name' },
     { key: 'surname',       labelKey: 'list.columns.surname' },
@@ -60,14 +67,13 @@ const SORT_ORDERS = [
 ];
 
 const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) => {
-    const { t } = useTranslation(['users']); // users namespace
+    const { t } = useTranslation(['users']);
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
-    // dialog state ⬇️
     const [openAddDialog, setOpenAddDialog] = useState(false);
 
-    // tablo state
+    // table state
     const [rows, setRows] = useState([]);
     const [limit, setLimit] = useState(initialLimit);
     const [page, setPage] = useState(0);
@@ -78,7 +84,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     const [errorMsg, setErrorMsg] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
 
-    // kolon görünürlük
+    // column visibility
     const [visibleCols, setVisibleCols] = useState(() =>
         COLUMN_DEFS.reduce(
             (acc, c) => ({ ...acc, [c.key]: !['created_at'].includes(c.key) }),
@@ -89,17 +95,15 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
 
     const offset = useMemo(() => page * limit, [page, limit]);
 
-    // Arama terimine göre filtrelenmiş satırlar (client-side)
     const filteredRows = useMemo(() => {
         if (!searchTerm.trim()) return rows;
-
-        const lowerSearch = searchTerm.toLowerCase().trim();
+        const q = searchTerm.toLowerCase().trim();
         return rows.filter(user =>
-            (user.name || '').toLowerCase().includes(lowerSearch) ||
-            (user.surname || '').toLowerCase().includes(lowerSearch) ||
-            (user.email || '').toLowerCase().includes(lowerSearch) ||
-            (user.phone || '').toLowerCase().includes(lowerSearch) ||
-            (user.username || '').toLowerCase().includes(lowerSearch)
+            (user.name || '').toLowerCase().includes(q) ||
+            (user.surname || '').toLowerCase().includes(q) ||
+            (user.email || '').toLowerCase().includes(q) ||
+            (user.phone || '').toLowerCase().includes(q) ||
+            (user.username || '').toLowerCase().includes(q)
         );
     }, [rows, searchTerm]);
 
@@ -159,37 +163,25 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
         }
     }, [API_URL, authHeaders, companyId, limit, offset, sortBy, sortOrder]);
 
-    useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
+    useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
-    // Ref ile fetchUsers metodunu dışarı aç
-    React.useImperativeHandle(ref, () => ({
-        refresh: fetchUsers,
-    }));
+    React.useImperativeHandle(ref, () => ({ refresh: fetchUsers }));
 
-    // Arama terimi değişince sayfayı sıfırla
-    useEffect(() => {
-        setPage(0);
-    }, [searchTerm]);
+    useEffect(() => { setPage(0); }, [searchTerm]);
 
-    // Görünüm menüsü
+    // column view menu
     const openColsMenu = (e) => setAnchorEl(e.currentTarget);
     const closeColsMenu = () => setAnchorEl(null);
     const toggleCol = (key) => setVisibleCols(prev => ({ ...prev, [key]: !prev[key] }));
 
-    // Yetkileri companyId'ye göre filtreleyip birleştir
     const getUserPermissions = (userPermissions) => {
         if (!userPermissions || !Array.isArray(userPermissions) || userPermissions.length === 0) return '-';
-
         const filtered = userPermissions
             .filter(item => item.companyId === companyId)
             .map(item => item.permissions);
-
         return filtered.length > 0 ? filtered.join('') : '-';
     };
 
-    // Chip + Tarih
     const renderVerifyChip = (flag) =>
         flag ? (
             <Chip size="small" color="success" icon={<CheckCircleOutline />} label={t('list.verify.verified')} />
@@ -198,224 +190,284 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
         );
 
     const formatDate = (d) =>
-        d
-            ? new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
-            : '-';
+        d ? new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
 
     return (
-        <Card sx={{ ...sx }}>
-            <CardHeader
-                title={t('list.title')}
-                action={
-                    <Button
-                        variant="contained"
-                        size="small"
-                        startIcon={<PersonAdd />}
-                        onClick={() => setOpenAddDialog(true)}   // ⬅️ dialogu aç
-                    >
-                        {t('list.addUser')}
-                    </Button>
-                }
-            />
-
-            <CardContent>
-                {/* Kontroller */}
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', md: 'row' },
-                        gap: { xs: 2, md: 1 },
-                        mb: 2,
-                        alignItems: { xs: 'stretch', md: 'center' },
-                    }}
-                >
-                    {/* Sol: Sıralama */}
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                        <FormControl size="small" sx={{ minWidth: 120 }}>
-                            <Select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(0); }}>
-                                {SORT_FIELDS.map(f => (
-                                    <MenuItem key={f.value} value={f.value}>{t(`users:${f.labelKey}`)}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <FormControl size="small" sx={{ minWidth: 100 }}>
-                            <Select value={sortOrder} onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}>
-                                {SORT_ORDERS.map(o => (
-                                    <MenuItem key={o.value} value={o.value}>{t(`users:${o.labelKey}`)}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <Tooltip title={t('list.view.tooltip')}>
-                            <IconButton onClick={openColsMenu} size="small">
-                                <ViewColumn />
-                            </IconButton>
-                        </Tooltip>
-                        <Popover
-                            open={Boolean(anchorEl)}
-                            anchorEl={anchorEl}
-                            onClose={closeColsMenu}
-                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                            PaperProps={{ sx: { width: 240, p: 1 } }}
-                        >
-                            <Typography variant="subtitle2" sx={{ px: 1, pb: 0.5 }}>
-                                {t('list.view.columnsTitle')}
-                            </Typography>
-                            <Divider sx={{ mb: 0.5 }} />
-                            {COLUMN_DEFS.map(c => (
-                                <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
-                                    <ListItemIcon>
-                                        <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1} disableRipple />
-                                    </ListItemIcon>
-                                    <ListItemText primary={t(`users:${c.labelKey}`)} />
-                                </ListItemButton>
-                            ))}
-                        </Popover>
-                    </Box>
-
-                    {/* Sağ: Arama + Yenile */}
-                    <Box sx={{ display: 'flex', gap: 1, flex: { xs: '1', md: '0 1 auto' }, alignItems: 'center' }}>
-                        <Box sx={{ flex: 1, minWidth: { xs: '100%', md: 320 }, maxWidth: { md: 480 } }}>
-                            <TextField
-                                fullWidth
-                                size="small"
-                                placeholder={t('list.search.placeholder')}
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Search fontSize="small" />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: searchTerm ? (
-                                        <InputAdornment position="end">
-                                            <IconButton size="small" onClick={() => setSearchTerm('')}>
-                                                <Clear fontSize="small" />
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ) : null,
-                                }}
-                            />
-                        </Box>
-
-                        <Tooltip title={t('list.refresh')}>
-                            <IconButton onClick={fetchUsers} size="small">
-                                <Refresh />
-                            </IconButton>
-                        </Tooltip>
-                    </Box>
+        <Card
+            sx={{
+                p: 0,
+                overflow: 'hidden',
+                borderRadius: 3,
+                backdropFilter: 'blur(8px)',
+                bgcolor: (theme) => theme.palette.mode === 'dark'
+                    ? 'rgba(25,28,34,0.65)'
+                    : 'rgba(255,255,255,0.75)',
+                border: (t) => `1px solid ${t.palette.divider}`,
+                ...sx
+            }}
+        >
+            {/* Başlık Şeridi */}
+            <Box
+                sx={{
+                    position: 'relative',
+                    px: 2.5, py: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    background: (t) => `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.light} 40%, transparent 100%)`,
+                    color: 'primary.contrastText'
+                }}
+            >
+                <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.15)', width: 40, height: 40 }}>
+                    <ShieldMoon />
+                </Avatar>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="h6" noWrap>{t('list.title')}</Typography>
+                    <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                        {t('list.total', { total })} • {t('list.rowsPerPage')} {limit}
+                    </Typography>
                 </Box>
 
-                {/* Hata mesajı */}
-                {errorMsg && <Alert severity="error" sx={{ mb: 2 }}>{errorMsg}</Alert>}
+                <Tooltip title={t('list.view.tooltip')}>
+                    <IconButton
+                        onClick={openColsMenu}
+                        sx={{ color: 'inherit', bgcolor: 'rgba(255,255,255,0.12)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}
+                    >
+                        <ViewColumn />
+                    </IconButton>
+                </Tooltip>
 
-                <TableContainer sx={{ overflowX: 'auto' }}>
-                    <Table size="small" sx={{ minWidth: { xs: 600, md: 'auto' } }}>
-                        <TableHead>
+                <Tooltip title={t('list.refresh')}>
+                    <IconButton
+                        onClick={fetchUsers}
+                        sx={{ ml: 1, color: 'inherit', bgcolor: 'rgba(255,255,255,0.12)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}
+                    >
+                        <Refresh />
+                    </IconButton>
+                </Tooltip>
+
+                {/* Yüzen Ekle Butonu */}
+                 <Button
+                   variant="contained"
+                   startIcon={<PersonAdd />}
+                   onClick={() => setOpenAddDialog(true)}
+                   sx={{ borderRadius: 999, textTransform: 'none', px: 2, boxShadow: 2, ml: 1 }}
+                 >
+                   {t('list.addUser', 'Kullanıcı Ekle')}
+                 </Button>
+            </Box>
+
+            {/* Araç Çubuğu */}
+            <Box
+                sx={{
+                    px: 2.5, py: 1.5,
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: '1fr auto' },
+                    gap: 1.2,
+                    alignItems: 'center'
+                }}
+            >
+                {/* Arama kapsülü */}
+                <Paper
+                    elevation={0}
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 999,
+                        border: (t) => `1px solid ${t.palette.divider}`,
+                        bgcolor: 'background.paper'
+                    }}
+                >
+                    <Search fontSize="small" style={{ opacity: 0.75 }} />
+                    <TextField
+                        variant="standard"
+                        fullWidth
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder={t('list.search.placeholder')}
+                        InputProps={{ disableUnderline: true }}
+                        sx={{ mx: 1 }}
+                    />
+                    {searchTerm && (
+                        <IconButton size="small" onClick={() => setSearchTerm('')}>
+                            <Clear fontSize="small" />
+                        </IconButton>
+                    )}
+                </Paper>
+
+                {/* Sıralama alanları */}
+                <Box sx={{ display: 'flex', gap: 1, justifyContent: { xs: 'space-between', md: 'flex-end' } }}>
+                    <FormControl size="small" sx={{ minWidth: 160 }}>
+                        <Select
+                            value={sortBy}
+                            onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
+                        >
+                            {SORT_FIELDS.map(f => (
+                                <MenuItem key={f.value} value={f.value}>{t(`users:${f.labelKey}`)}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                        <Select
+                            value={sortOrder}
+                            onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}
+                        >
+                            {SORT_ORDERS.map(o => (
+                                <MenuItem key={o.value} value={o.value}>{t(`users:${o.labelKey}`)}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
+            </Box>
+
+            <Divider />
+
+            {/* Hata */}
+            {errorMsg && <Alert severity="error" sx={{ m: 2 }}>{errorMsg}</Alert>}
+
+            {/* Tablo */}
+            <TableContainer sx={{ overflowX: 'auto' }}>
+                <Table size="small" sx={{
+                    minWidth: { xs: 700, md: 'auto' },
+                    'thead th': { fontWeight: 700, whiteSpace: 'nowrap' },
+                    'tbody tr': {
+                        transition: 'background-color 120ms ease, transform 120ms ease',
+                        '&:hover': { bgcolor: 'action.hover' }
+                    }
+                }}>
+                    <TableHead>
+                        <TableRow>
+                            {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
+                                <TableCell key={c.key}>{t(`users:${c.labelKey}`)}</TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                        {loading ? (
                             <TableRow>
-                                {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
-                                    <TableCell key={c.key}>{t(`users:${c.labelKey}`)}</TableCell>
-                                ))}
+                                <TableCell colSpan={COLUMN_DEFS.length}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <CircularProgress size={18} />
+                                        <Typography variant="body2" color="text.secondary">{t('list.loading')}</Typography>
+                                    </Box>
+                                </TableCell>
                             </TableRow>
-                        </TableHead>
-
-                        <TableBody>
-                            {loading ? (
-                                <TableRow>
-                                    <TableCell colSpan={COLUMN_DEFS.length}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <CircularProgress size={18} />
-                                            <Typography variant="body2" color="text.secondary">{t('list.loading')}</Typography>
+                        ) : paginatedRows.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={COLUMN_DEFS.length}>
+                                    <Box
+                                        sx={{
+                                            py: 6,
+                                            textAlign: 'center',
+                                            color: 'text.secondary'
+                                        }}
+                                    >
+                                        {/* Minimal inline SVG illüstrasyonu */}
+                                        <Box sx={{ display: 'inline-block', mb: 2 }}>
+                                            <svg width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Empty">
+                                                <circle cx="48" cy="48" r="44" fill="none" stroke="currentColor" opacity="0.2" strokeWidth="2"/>
+                                                <circle cx="36" cy="42" r="8" fill="currentColor" opacity="0.15"/>
+                                                <circle cx="60" cy="42" r="8" fill="currentColor" opacity="0.15"/>
+                                                <path d="M30 62c6 6 30 6 36 0" stroke="currentColor" strokeWidth="2" opacity="0.25" fill="none" strokeLinecap="round"/>
+                                            </svg>
                                         </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ) : paginatedRows.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={COLUMN_DEFS.length}>
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="subtitle1" sx={{ mb: 0.5 }}>
                                             {searchTerm ? t('list.noResultsForSearch') : t('list.noRecords')}
                                         </Typography>
-                                    </TableCell>
+                                        <Typography variant="body2" sx={{ mb: 2 }}>{t('list.search.placeholder')}</Typography>
+                                        <Button
+                                            startIcon={<PersonAdd />}
+                                            variant="contained"
+                                            onClick={() => setOpenAddDialog(true)}
+                                            sx={{ borderRadius: 999 }}
+                                        >
+                                            {t('list.addUser', 'Kullanıcı Ekle')}
+                                        </Button>
+                                    </Box>
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            paginatedRows.map(u => (
+                                <TableRow key={u.id} hover>
+                                    {visibleCols.name && <TableCell>{u.name}</TableCell>}
+                                    {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
+                                    {visibleCols.username && <TableCell>{u.username}</TableCell>}
+                                    {visibleCols.permissions && (
+                                        <TableCell>
+                                            <PermissionsDisplay
+                                                onEditedUser={fetchUsers}
+                                                userId={u.id}
+                                                companyId={companyId}
+                                                userPermissions={getUserPermissions(u.permissions)}
+                                            />
+                                        </TableCell>
+                                    )}
+                                    {visibleCols.phone && <TableCell>{u.phone || '-'}</TableCell>}
+                                    {visibleCols.email && <TableCell>{u.email}</TableCell>}
+                                    {visibleCols.emailverified && <TableCell>{renderVerifyChip(Boolean(u.emailverified))}</TableCell>}
+                                    {visibleCols.created_at && <TableCell>{formatDate(u.created_at)}</TableCell>}
                                 </TableRow>
-                            ) : (
-                                paginatedRows.map(u => (
-                                    <TableRow key={u.id}>
-                                        {visibleCols.name && <TableCell>{u.name}</TableCell>}
-                                        {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
-                                        {visibleCols.username && <TableCell>{u.username}</TableCell>}
-                                        {visibleCols.permissions && (
-                                            <TableCell>
-                                                <PermissionsDisplay
-                                                    onEditedUser={fetchUsers}
-                                                    userId={u.id}
-                                                    companyId={companyId}
-                                                    userPermissions={getUserPermissions(u.permissions)}
-                                                />
-                                            </TableCell>
-                                        )}
-                                        {visibleCols.phone && <TableCell>{u.phone || '-'}</TableCell>}
-                                        {visibleCols.email && <TableCell>{u.email}</TableCell>}
-                                        {visibleCols.emailverified && <TableCell>{renderVerifyChip(Boolean(u.emailverified))}</TableCell>}
-                                        {visibleCols.created_at && <TableCell>{formatDate(u.created_at)}</TableCell>}
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
-                <Box
+            {/* Alt bar */}
+            <Box sx={{ px: 2, py: 1.5 }}>
+                <TablePagination
+                    component="div"
+                    count={filteredTotal}
+                    page={page}
+                    onPageChange={(_, newPage) => setPage(newPage)}
+                    rowsPerPage={limit}
+                    onRowsPerPageChange={(e) => { setLimit(parseInt(e.target.value, 10)); setPage(0); }}
+                    rowsPerPageOptions={[10, 20, 50, 100]}
+                    labelRowsPerPage={t('list.rowsPerPage')}
+                    labelDisplayedRows={({ from, to, count }) => t('list.displayedRows', { from, to, count })}
                     sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        alignItems: { xs: 'flex-start', sm: 'center' },
-                        justifyContent: 'space-between',
-                        mt: 2,
-                        gap: 1,
+                        '.MuiTablePagination-toolbar': { flexWrap: 'wrap', minHeight: { xs: 'auto', sm: 52 } },
                     }}
-                >
-                    <Typography variant="body2" color="text.secondary">
-                        {searchTerm
-                            ? t('list.totalFiltered', { filtered: filteredTotal, total })
-                            : t('list.total', { total })}
-                    </Typography>
+                />
+            </Box>
 
-                    <TablePagination
-                        component="div"
-                        count={filteredTotal}
-                        page={page}
-                        onPageChange={(_, newPage) => setPage(newPage)}
-                        rowsPerPage={limit}
-                        onRowsPerPageChange={(e) => { setLimit(parseInt(e.target.value, 10)); setPage(0); }}
-                        rowsPerPageOptions={[10, 20, 50, 100]}
-                        labelRowsPerPage={t('list.rowsPerPage')}
-                        labelDisplayedRows={({ from, to, count }) =>
-                            t('list.displayedRows', { from, to, count })
-                        }
-                        sx={{
-                            '.MuiTablePagination-toolbar': {
-                                flexWrap: 'wrap',
-                                minHeight: { xs: 'auto', sm: 52 },
-                            },
-                        }}
-                    />
-                </Box>
-            </CardContent>
+            {/* Kolon menüsü */}
+            <Popover
+                open={Boolean(anchorEl)}
+                anchorEl={anchorEl}
+                onClose={closeColsMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                PaperProps={{ sx: { width: 260, p: 1 } }}
+            >
+                <Typography variant="subtitle2" sx={{ px: 1, pb: 0.5 }}>
+                    {t('list.view.columnsTitle')}
+                </Typography>
+                <Divider sx={{ mb: 0.5 }} />
+                {COLUMN_DEFS.map(c => (
+                    <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
+                        <ListItemIcon>
+                            <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1} disableRipple />
+                        </ListItemIcon>
+                        <ListItemText primary={t(`users:${c.labelKey}`)} />
+                    </ListItemButton>
+                ))}
+            </Popover>
 
-            {/* AddUserDialog mount noktası */}
+            {/* AddUserDialog */}
             <AddUserDialog
                 open={openAddDialog}
                 onClose={() => setOpenAddDialog(false)}
                 companyId={companyId}
-                onUserAdded={fetchUsers}       // ⬅️ ekleme sonrası tabloyu yenile
+                onUserAdded={fetchUsers}
             />
         </Card>
     );
 });
 
 UsersList.displayName = 'UsersList';
-
 export default UsersList;
