@@ -27,14 +27,16 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
+    Button,               // ⬅️ eklendi
 } from '@mui/material';
-import { Refresh, ViewColumn, CheckCircleOutline, ErrorOutline, Search, Clear } from '@mui/icons-material';
+import { Refresh, ViewColumn, CheckCircleOutline, ErrorOutline, Search, Clear, PersonAdd } from '@mui/icons-material'; // ⬅️ PersonAdd eklendi
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '../contexts/AuthContext';
 import PermissionsDisplay from './PermissionsDisplay';
+import AddUserDialog from './AddUserDialog'; // ⬅️ dialog import
 
 // Kolon tanımları (i18n key’leriyle)
 const COLUMN_DEFS = [
@@ -62,6 +64,9 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
+    // dialog state ⬇️
+    const [openAddDialog, setOpenAddDialog] = useState(false);
+
     // tablo state
     const [rows, setRows] = useState([]);
     const [limit, setLimit] = useState(initialLimit);
@@ -76,7 +81,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     // kolon görünürlük
     const [visibleCols, setVisibleCols] = useState(() =>
         COLUMN_DEFS.reduce(
-            (acc, c) => ({ ...acc, [c.key]: !['created_at'].includes(c.key) }), // Sadece kayıt tarihi varsayılan kapalı
+            (acc, c) => ({ ...acc, [c.key]: !['created_at'].includes(c.key) }),
             {}
         )
     );
@@ -199,7 +204,19 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
 
     return (
         <Card sx={{ ...sx }}>
-            <CardHeader title={t('list.title')} />
+            <CardHeader
+                title={t('list.title')}
+                action={
+                    <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<PersonAdd />}
+                        onClick={() => setOpenAddDialog(true)}   // ⬅️ dialogu aç
+                    >
+                        {t('list.addUser')}
+                    </Button>
+                }
+            />
 
             <CardContent>
                 {/* Kontroller */}
@@ -387,6 +404,14 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     />
                 </Box>
             </CardContent>
+
+            {/* AddUserDialog mount noktası */}
+            <AddUserDialog
+                open={openAddDialog}
+                onClose={() => setOpenAddDialog(false)}
+                companyId={companyId}
+                onUserAdded={fetchUsers}       // ⬅️ ekleme sonrası tabloyu yenile
+            />
         </Card>
     );
 });

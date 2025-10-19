@@ -10,6 +10,7 @@
   },
   "list": {
     "title": "Users",
+    "addUser": "Add User",
     "columns": {
       "name": "First name",
       "surname": "Last name",

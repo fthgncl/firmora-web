@@ -10,6 +10,7 @@
   },
   "list": {
     "title": "Kullanıcılar",
+    "addUser": "Kullanıcı Ekle",
     "columns": {
       "name": "Ad",
       "surname": "Soyad",
