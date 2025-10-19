@@ -9,7 +9,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({children}) => {
-    const {t} = useTranslation();
+    const {t} = useTranslation(['auth']); // ✅ namespace belirtildi
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
 
@@ -29,14 +29,14 @@ export const AuthProvider = ({children}) => {
             // Token süresini kontrol et
             const currentTime = Date.now() / 1000; // Unix timestamp (saniye)
             if (decodedToken.exp && decodedToken.exp < currentTime) {
-                console.warn(t('auth.errors.tokenExpired'));
+                console.warn(t('auth:errors.tokenExpired'));
                 logout();
                 return null;
             }
 
             return decodedToken;
         } catch (error) {
-            console.error(t('auth.errors.invalidToken'), error);
+            console.error(t('auth:errors.invalidToken'), error);
             logout();
             return null;
         }
