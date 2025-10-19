@@ -1,0 +1,19 @@
+{
+  "logs": {
+    "cacheReadError": "Fehler beim Lesen des Caches:",
+    "cacheSaveError": "Fehler beim Speichern im Cache:",
+    "cacheClearError": "Fehler beim Leeren des Caches:",
+    "userOrPermissionsMissing": "Benutzer- oder Berechtigungsinformationen nicht gefunden",
+    "noCompanyPermission": "Der Benutzer hat keine Berechtigungen für die Firma {{companyId}}",
+    "invalidPermissionCode": "Kein gültiger Berechtigungscode gefunden"
+  },
+  "errors": {
+    "fetchFailed": "Berechtigungskonfiguration konnte nicht abgerufen werden",
+    "getPermissionsError": "Fehler beim Abrufen der Berechtigungskonfiguration:",
+    "getPermissionError": "Fehler beim Abrufen der Berechtigungsinformationen:",
+    "codeToKeyError": "Fehler bei der Umwandlung des Codes in den Schlüssel:",
+    "decodeError": "Fehler beim Dekodieren der Berechtigungszeichenfolge:",
+    "encodeError": "Fehler beim Kodieren der Berechtigungsschlüssel:",
+    "checkError": "Fehler bei der Berechtigungsprüfung:"
+  }
+}

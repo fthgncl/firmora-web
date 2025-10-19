@@ -1,0 +1,19 @@
+{
+  "logs": {
+    "cacheReadError": "Cache read error:",
+    "cacheSaveError": "Cache save error:",
+    "cacheClearError": "Cache clear error:",
+    "userOrPermissionsMissing": "User or permission info not found",
+    "noCompanyPermission": "The user has no permissions for company {{companyId}}",
+    "invalidPermissionCode": "No valid permission code found"
+  },
+  "errors": {
+    "fetchFailed": "Failed to fetch permission configuration",
+    "getPermissionsError": "Error while fetching permission configuration:",
+    "getPermissionError": "Error while getting permission info:",
+    "codeToKeyError": "Error converting code to key:",
+    "decodeError": "Error decoding permission string:",
+    "encodeError": "Error encoding permission keys:",
+    "checkError": "Error while checking permissions:"
+  }
+}

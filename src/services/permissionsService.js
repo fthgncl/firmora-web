@@ -5,6 +5,9 @@ import i18n from './i18n';
 const CACHE_KEY = process.env.REACT_APP_PERMISSIONS_CACHE_KEY || 'firmora-permissions-cache';
 const CACHE_DURATION = parseInt(process.env.REACT_APP_PERMISSIONS_CACHE_DURATION || '86400000', 10); // Varsayılan: 1 gün (milisaniye cinsinden)
 
+// i18n helper
+const t = (key) => i18n.t(`permissionsService:${key}`);
+
 /**
  * Cache'teki yetki verilerini kontrol eder
  * @returns {Object|null} Cache'teki veriler veya null
@@ -12,9 +15,7 @@ const CACHE_DURATION = parseInt(process.env.REACT_APP_PERMISSIONS_CACHE_DURATION
 const getCachedPermissions = () => {
     try {
         const cached = localStorage.getItem(CACHE_KEY);
-        if (!cached) {
-            return null;
-        }
+        if (!cached) return null;
 
         const { data, timestamp } = JSON.parse(cached);
         const now = Date.now();
@@ -27,7 +28,7 @@ const getCachedPermissions = () => {
 
         return data;
     } catch (error) {
-        console.error('Cache okuma hatası:', error);
+        console.error(t('logs.cacheReadError'), error);
         localStorage.removeItem(CACHE_KEY);
         return null;
     }
@@ -45,7 +46,7 @@ const setCachedPermissions = (data) => {
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
     } catch (error) {
-        console.error('Cache kaydetme hatası:', error);
+        console.error(t('logs.cacheSaveError'), error);
     }
 };
 
@@ -56,7 +57,7 @@ const clearPermissionsCache = () => {
     try {
         localStorage.removeItem(CACHE_KEY);
     } catch (error) {
-        console.error('Cache temizleme hatası:', error);
+        console.error(t('logs.cacheClearError'), error);
     }
 };
 
@@ -73,7 +74,6 @@ const getPermissions = async (token) => {
     if (cached && cached.lang && cached.lang === i18n.language) {
         return cached;
     }
-
 
     // Cache yoksa API'den çek
     try {
@@ -92,10 +92,10 @@ const getPermissions = async (token) => {
             setCachedPermissions(permissions);
             return permissions;
         } else {
-            throw new Error(response.data.message || 'Yetki yapılandırması alınamadı');
+            throw new Error(response.data.message || t('errors.fetchFailed'));
         }
     } catch (error) {
-        console.error('Yetki yapılandırması alma hatası:', error);
+        console.error(t('errors.getPermissionsError'), error);
         throw error;
     }
 };
@@ -111,7 +111,7 @@ const getPermissionByKey = async (token, permissionKey) => {
         const permissions = await getPermissions(token);
         return permissions[permissionKey] || null;
     } catch (error) {
-        console.error('Yetki bilgisi alma hatası:', error);
+        console.error(t('errors.getPermissionError'), error);
         return null;
     }
 };
@@ -128,7 +128,7 @@ const getPermissionKeyByCode = async (token, code) => {
         const entry = Object.entries(permissions).find(([_, value]) => value.code === code);
         return entry ? entry[0] : null;
     } catch (error) {
-        console.error('Yetki kodu dönüştürme hatası:', error);
+        console.error(t('errors.codeToKeyError'), error);
         return null;
     }
 };
@@ -156,7 +156,7 @@ const decodePermissionString = async (token, permissionString) => {
 
         return permissionKeys;
     } catch (error) {
-        console.error('Yetki string çözümleme hatası:', error);
+        console.error(t('errors.decodeError'), error);
         return [];
     }
 };
@@ -178,7 +178,7 @@ const encodePermissionKeys = async (token, permissionKeys) => {
             .join('');
 
     } catch (error) {
-        console.error('Yetki kodlama hatası:', error);
+        console.error(t('errors.encodeError'), error);
         return '';
     }
 };
@@ -196,7 +196,7 @@ const checkUserRoles = async (token, user, companyId, roles = ['sys_admin'], ful
     try {
         // Kullanıcı veya permissions kontrolü
         if (!user || !user.permissions || !Array.isArray(user.permissions)) {
-            console.warn('Kullanıcı veya yetki bilgisi bulunamadı');
+            console.warn(t('logs.userOrPermissionsMissing'));
             return false;
         }
 
@@ -204,7 +204,7 @@ const checkUserRoles = async (token, user, companyId, roles = ['sys_admin'], ful
         const companyPermission = user.permissions.find(p => p.companyId === companyId);
 
         if (!companyPermission || !companyPermission.permissions) {
-            console.warn(`Kullanıcının ${companyId} firmasında yetkisi bulunamadı`);
+            console.warn(t('logs.noCompanyPermission', { companyId }));
             return false;
         }
 
@@ -225,7 +225,7 @@ const checkUserRoles = async (token, user, companyId, roles = ['sys_admin'], ful
             .filter(Boolean);
 
         if (requiredCodes.length === 0) {
-            console.warn('Geçerli yetki kodu bulunamadı');
+            console.warn(t('logs.invalidPermissionCode'));
             return false;
         }
 
@@ -239,7 +239,7 @@ const checkUserRoles = async (token, user, companyId, roles = ['sys_admin'], ful
         }
 
     } catch (error) {
-        console.error('Yetki kontrolü hatası:', error);
+        console.error(t('errors.checkError'), error);
         return false;
     }
 };

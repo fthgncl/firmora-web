@@ -1,0 +1,19 @@
+{
+  "logs": {
+    "cacheReadError": "Cache okuma hatası:",
+    "cacheSaveError": "Cache kaydetme hatası:",
+    "cacheClearError": "Cache temizleme hatası:",
+    "userOrPermissionsMissing": "Kullanıcı veya yetki bilgisi bulunamadı",
+    "noCompanyPermission": "Kullanıcının {{companyId}} firmasında yetkisi bulunamadı",
+    "invalidPermissionCode": "Geçerli yetki kodu bulunamadı"
+  },
+  "errors": {
+    "fetchFailed": "Yetki yapılandırması alınamadı",
+    "getPermissionsError": "Yetki yapılandırması alma hatası:",
+    "getPermissionError": "Yetki bilgisi alma hatası:",
+    "codeToKeyError": "Yetki kodu dönüştürme hatası:",
+    "decodeError": "Yetki string çözümleme hatası:",
+    "encodeError": "Yetki kodlama hatası:",
+    "checkError": "Yetki kontrolü hatası:"
+  }
+}
