@@ -13,9 +13,16 @@ import {
 import { Popper } from '@mui/material';
 import { Search, Clear, ErrorOutline } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
-export default function UserSearchField({ companyId, minWidth = 320, onUserSelect, searchScope = 'all' }) {
+export default function UserSearchField({
+                                            companyId,
+                                            minWidth = 320,
+                                            onUserSelect,
+                                            searchScope = 'all',
+                                        }) {
     const { token } = useAuth();
+    const { t } = useTranslation(['users', 'common']);
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -88,18 +95,23 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
     };
 
     const handleUserClick = (user) => {
-        // popper açıkken mousedown ile blur engellendi, click burada çalışır
         setAnchorEl(null);
         if (onUserSelect) onUserSelect(user);
     };
 
-    const renderVerifyChip = (flag) => {
-        if ( !flag ) {
-            return <Chip size="small" color="warning" icon={<ErrorOutline />} label="Bekleniyor" />
+    const renderVerifyChip = (verified) => {
+        if (verified) {
+            return <Chip size="small" color="success" label={t('users.verify.verified')} />;
         }
-
-
-    }
+        return (
+            <Chip
+                size="small"
+                color="warning"
+                icon={<ErrorOutline />}
+                label={t('users:verify.pending')}
+            />
+        );
+    };
 
     const open = Boolean(anchorEl) && !!searchTerm && !loading && searchResults.length > 0;
 
@@ -108,7 +120,7 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
             <TextField
                 fullWidth
                 size="small"
-                placeholder="Ara (isim, email, tel, username)"
+                placeholder={t('users:search.placeholder')}
                 value={searchTerm}
                 onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -144,10 +156,10 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                 open={open}
                 anchorEl={anchorEl}
                 placement="bottom-start"
-                style={{ 
+                style={{
                     width: Math.max(anchorEl?.offsetWidth || 0, 480),
                     maxWidth: '95vw',
-                    zIndex: 1300
+                    zIndex: 1300,
                 }}
             >
                 <Paper
@@ -158,11 +170,15 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                         overflowY: 'auto',
                         mt: 0.5,
                         borderRadius: 1.5,
-                        minWidth: 320
+                        minWidth: 320,
                     }}
                 >
-                    <Typography variant="caption" color="text.secondary" sx={{ px: 1, pb: 1, display: 'block' }}>
-                        {searchResults.length} sonuç bulundu
+                    <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ px: 1, pb: 1, display: 'block' }}
+                    >
+                        {t('users:search.resultsFound', { count: searchResults.length })}
                     </Typography>
 
                     {searchResults.map((user) => (
@@ -180,16 +196,31 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                             onMouseDown={(e) => e.preventDefault()} // input blur olmasın
                             onClick={() => handleUserClick(user)}
                         >
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    gap: 2,
+                                }}
+                            >
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
                                     <Typography variant="body2" sx={{ fontWeight: 600, wordBreak: 'break-word' }}>
                                         {user.name} {user.surname}
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-word', display: 'block' }}>
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{ wordBreak: 'break-word', display: 'block' }}
+                                    >
                                         {user.email}
                                     </Typography>
                                     {user.phone && (
-                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25 }}>
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{ display: 'block', mt: 0.25 }}
+                                        >
                                             • {user.phone}
                                         </Typography>
                                     )}
@@ -201,10 +232,9 @@ export default function UserSearchField({ companyId, minWidth = 320, onUserSelec
                 </Paper>
             </Popper>
 
-            {/* Boş sonuçta popper kapalı; istersen hint gösterebilirsin */}
             {!loading && searchTerm && searchResults.length === 0 && (
                 <Typography variant="caption" color="text.secondary" sx={{ position: 'absolute', mt: 0.5 }}>
-                    Sonuç bulunamadı
+                    {t('users:search.noResults')}
                 </Typography>
             )}
         </Box>

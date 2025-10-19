@@ -1,0 +1,11 @@
+{
+  "search": {
+    "placeholder": "Suchen (Name, E-Mail, Telefon, Benutzername)",
+    "resultsFound": "{{count}} Ergebnis(se) gefunden",
+    "noResults": "Keine Ergebnisse gefunden"
+  },
+  "verify": {
+    "pending": "Ausstehend",
+    "verified": "Verifiziert"
+  }
+}

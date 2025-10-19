@@ -1,0 +1,11 @@
+{
+  "search": {
+    "placeholder": "Ara (isim, e-posta, telefon, kullanıcı adı)",
+    "resultsFound": "{{count}} sonuç bulundu",
+    "noResults": "Sonuç bulunamadı"
+  },
+  "verify": {
+    "pending": "Bekleniyor",
+    "verified": "Onaylı"
+  }
+}
