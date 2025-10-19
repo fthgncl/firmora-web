@@ -37,7 +37,7 @@ import {
     Search,
     Clear,
     PersonAdd,
-    ShieldMoon,
+    Group,
 } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
@@ -209,53 +209,118 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
             {/* Başlık Şeridi */}
             <Box
                 sx={{
-                    position: 'relative',
-                    px: 2.5, py: 2,
+                    px: 2.5,
+                    py: 2,
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1.5,
-                    background: (t) => `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.primary.light} 40%, transparent 100%)`,
-                    color: 'primary.contrastText'
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+                    borderBottom: '1px solid rgba(255,255,255,0.15)',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    position: 'relative'
                 }}
             >
-                <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.15)', width: 40, height: 40 }}>
-                    <ShieldMoon />
+                {/* Sol ikon */}
+                <Avatar
+                    sx={{
+                        color: 'white',
+                        bgcolor: 'rgba(255,255,255,0.18)',
+                        width: 42,
+                        height: 42,
+                        backdropFilter: 'blur(4px)',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+                    }}
+                >
+                    <Group />
                 </Avatar>
+
+                {/* Başlıklar */}
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="h6" noWrap>{t('list.title')}</Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                    <Typography
+                        variant="h6"
+                        noWrap
+                        sx={{
+                            fontWeight: 600,
+                            letterSpacing: 0.3,
+                            textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                        }}
+                    >
+                        {t('list.title')}
+                    </Typography>
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            opacity: 0.9,
+                            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+                        }}
+                    >
                         {t('list.total', { total })} • {t('list.rowsPerPage')} {limit}
                     </Typography>
                 </Box>
 
+                {/* Görünüm menüsü */}
                 <Tooltip title={t('list.view.tooltip')}>
                     <IconButton
                         onClick={openColsMenu}
-                        sx={{ color: 'inherit', bgcolor: 'rgba(255,255,255,0.12)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}
+                        sx={{
+                            color: '#fff',
+                            bgcolor: 'rgba(255,255,255,0.18)',
+                            border: '1px solid rgba(255,255,255,0.25)',
+                            '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                            transition: 'all 0.2s ease',
+                        }}
                     >
                         <ViewColumn />
                     </IconButton>
                 </Tooltip>
 
+                {/* Yenile düğmesi */}
                 <Tooltip title={t('list.refresh')}>
                     <IconButton
                         onClick={fetchUsers}
-                        sx={{ ml: 1, color: 'inherit', bgcolor: 'rgba(255,255,255,0.12)', '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' } }}
+                        sx={{
+                            ml: 1,
+                            color: '#fff',
+                            bgcolor: 'rgba(255,255,255,0.18)',
+                            border: '1px solid rgba(255,255,255,0.25)',
+                            '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                            transition: 'all 0.2s ease',
+                        }}
                     >
                         <Refresh />
                     </IconButton>
                 </Tooltip>
 
-                {/* Yüzen Ekle Butonu */}
-                 <Button
-                   variant="contained"
-                   startIcon={<PersonAdd />}
-                   onClick={() => setOpenAddDialog(true)}
-                   sx={{ borderRadius: 999, textTransform: 'none', px: 2, boxShadow: 2, ml: 1 }}
-                 >
-                   {t('list.addUser', 'Kullanıcı Ekle')}
-                 </Button>
+                {/* Kullanıcı Ekle butonu */}
+                <Button
+                    variant="contained"
+                    startIcon={<PersonAdd />}
+                    onClick={() => setOpenAddDialog(true)}
+                    sx={{
+                        ml: 1.5,
+                        borderRadius: 999,
+                        textTransform: 'none',
+                        px: 2.5,
+                        py: 0.75,
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        bgcolor: 'rgba(255,255,255,0.12)',
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        color: '#fff',
+                        backdropFilter: 'blur(4px)',
+                        boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+                        '&:hover': {
+                            bgcolor: 'rgba(255,255,255,0.25)',
+                            borderColor: 'rgba(255,255,255,0.45)',
+                            boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
+                        },
+                    }}
+                >
+                    {t('list.addUser', 'Kullanıcı Ekle')}
+                </Button>
             </Box>
+
 
             {/* Araç Çubuğu */}
             <Box
