@@ -1,41 +1,14 @@
-/**
- * Yaygın kullanılan para birimleri
- * ISO 4217 standartına uygun 3 harfli kodlar
- */
+import i18n from '../services/i18n';
+
 export const CURRENCY_OPTIONS = [
-    { value: 'USD', label: 'USD - Amerikan Doları' },
-    { value: 'EUR', label: 'EUR - Euro' },
-    { value: 'TRY', label: 'TRY - Türk Lirası' },
-    { value: 'GBP', label: 'GBP - İngiliz Sterlini' },
-    { value: 'JPY', label: 'JPY - Japon Yeni' },
-    { value: 'CHF', label: 'CHF - İsviçre Frangı' },
-    { value: 'CAD', label: 'CAD - Kanada Doları' },
-    { value: 'AUD', label: 'AUD - Avustralya Doları' },
-    { value: 'CNY', label: 'CNY - Çin Yuanı' },
-    { value: 'RUB', label: 'RUB - Rus Rublesi' }
+    { value: 'USD', label: `USD - ${i18n.t('currencies.usd')}` },
+    { value: 'EUR', label: `EUR - ${i18n.t('currencies.eur')}` },
+    { value: 'TRY', label: `TRY - ${i18n.t('currencies.try')}` },
+    { value: 'GBP', label: `GBP - ${i18n.t('currencies.gbp')}` },
+    { value: 'JPY', label: `JPY - ${i18n.t('currencies.jpy')}` },
+    { value: 'CHF', label: `CHF - ${i18n.t('currencies.chf')}` },
+    { value: 'CAD', label: `CAD - ${i18n.t('currencies.cad')}` },
+    { value: 'AUD', label: `AUD - ${i18n.t('currencies.aud')}` },
+    { value: 'CNY', label: `CNY - ${i18n.t('currencies.cny')}` },
+    { value: 'RUB', label: `RUB - ${i18n.t('currencies.rub')}` }
 ];
-
-/**
- * Varsayılan para birimi
- */
-export const DEFAULT_CURRENCY = 'USD';
-
-/**
- * Para birimi formatı regex pattern
- */
-export const CURRENCY_REGEX = /^[A-Z]{3}$/;
-
-/**
- * Para birimi kodlarını liste olarak döndürür
- */
-export const getCurrencyCodes = () => CURRENCY_OPTIONS.map(option => option.value);
-
-/**
- * Para birimi kodu için label döndürür
- * @param {string} code - Para birimi kodu (örn: 'USD')
- * @returns {string} - Label (örn: 'USD - Amerikan Doları')
- */
-export const getCurrencyLabel = (code) => {
-    const currency = CURRENCY_OPTIONS.find(option => option.value === code);
-    return currency ? currency.label : code;
-};
