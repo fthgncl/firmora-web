@@ -1,31 +1,25 @@
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
+import {initReactI18next} from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import axios from "axios";
 
-// 🌍 src/locales/{lng}/{namespace}.json yapısını destekler
+// 🌍 src/locales/{lng}/{namespace}.json (namespace'ler kök seviyede)
 const loadLocales = () => {
-    const context = require.context("../locales", true, /\.json$/);
+    const ctx = require.context("../locales", true, /\.json$/);
     const resources = {};
+    const namespaces = new Set();
 
-    context.keys().forEach((path) => {
-        // Örnek path: ./en/common.json → ['en', 'common']
-        const parts = path.replace("./", "").split("/");
-        const lng = parts[0];
-        const ns = parts[1].replace(".json", "");
-
-        if (!resources[lng]) {
-            resources[lng] = { flag: require(`../images/flags/${lng.toUpperCase()}.png`), };
-        }
-        if (!resources[lng].translation) resources[lng].translation = {};
-
-        resources[lng].translation[ns] = context(path);
+    ctx.keys().forEach((p) => {
+        const [lng, file] = p.replace("./", "").split("/");
+        const ns = file.replace(".json", "");
+        namespaces.add(ns);
+        if (!resources[lng]) resources[lng] = {};
+        resources[lng][ns] = ctx(p);
     });
-
-    return resources;
+    return {resources, namespaces: Array.from(namespaces)};
 };
 
-const resources = loadLocales();
+const {resources, namespaces} = loadLocales();
 
 i18n
     .use(LanguageDetector)
@@ -33,9 +27,9 @@ i18n
     .init({
         resources,
         fallbackLng: "en",
-        ns: Object.keys(resources.en?.translation || {}), // namespace’leri otomatik alır
-        defaultNS: "common",
-        interpolation: { escapeValue: false },
+        ns: namespaces,
+        defaultNS: namespaces.includes("common") ? "common" : (namespaces[0] || "translation"),
+        interpolation: {escapeValue: false},
     });
 
 // 🔁 Axios dil header’ı
