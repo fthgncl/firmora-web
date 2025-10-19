@@ -27,7 +27,6 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
 import {useAlert} from '../contexts/AlertContext';
 import UserList from '../components/UsersList';
-import AddUserToCompany from '../components/AddUserToCompany';
 import MoneyTransferDialog from '../components/MoneyTransferDialog';
 import ExternalMoneyDialog from '../components/ExternalMoneyDialog';
 import axios from 'axios';
@@ -103,10 +102,6 @@ export default function CompanyPage() {
             currency: currency,
             minimumFractionDigits: 2,
         }).format(balance);
-    };
-
-    const handleUserAdded = () => {
-        if (userListRef.current) userListRef.current.refresh();
     };
 
     if (loading) {
@@ -228,7 +223,7 @@ export default function CompanyPage() {
                                         </Stack>
 
                                         <Stack direction="row" alignItems="center" spacing={1.5} sx={{mb: 1, mt: 1}}>
-                                            <Avatar sx={{bgcolor: 'rgba(255,255,255,0.2)'}}>
+                                            <Avatar sx={{bgcolor: 'rgba(255,255,255,0.2)', color:'white'}}>
                                                 <AccountBalance/>
                                             </Avatar>
                                             <Typography variant="h6" sx={{fontWeight: 600}}>
@@ -310,13 +305,6 @@ export default function CompanyPage() {
                             </Grid>
                         </CardContent>
                     </Card>
-                </Grid>
-            </Grid>
-
-            {/* Kullanıcı Ekleme */}
-            <Grid container spacing={3} sx={{mt: 2}}>
-                <Grid item xs={12} md={4}>
-                    <AddUserToCompany companyId={companyId} onUserAdded={handleUserAdded}/>
                 </Grid>
             </Grid>
 
