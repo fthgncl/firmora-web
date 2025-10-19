@@ -25,6 +25,7 @@ import {usePermissions} from '../contexts/PermissionsContext';
 import {useAuth} from '../contexts/AuthContext';
 import {permissionsService} from '../services/permissionsService';
 import EditUserPermissionsDialog from './EditUserPermissionsDialog';
+import { useTranslation } from 'react-i18next';
 
 // Kategori -> ikon eşleşmesi
 const categoryIcon = (category) => {
@@ -41,9 +42,10 @@ const categoryIcon = (category) => {
     return <InfoOutlinedIcon fontSize="small" sx={{mr: 0.5}}/>;
 };
 
-const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Yetkiler', onEditedUser}) => {
+const PermissionsBadgePopover = ({userId, companyId, userPermissions, onEditedUser}) => {
+    const { t } = useTranslation(['permissions']);
     const {permissions} = usePermissions();
-    const {user, token} = useAuth(); // giriş yapan kullanıcı ve token
+    const {user, token} = useAuth();
     const [anchorEl, setAnchorEl] = useState(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [canEdit, setCanEdit] = useState(false);
@@ -53,9 +55,7 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
             setCanEdit(false);
             return;
         }
-
         const controller = new AbortController();
-
         const checkPermission = async () => {
             try {
                 const ok = await permissionsService.checkUserRoles(
@@ -64,46 +64,31 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
                     companyId,
                     ['personnel_manager']
                 );
-                if (!controller.signal.aborted) {
-                    setCanEdit(!!ok);
-                }
-            } catch (e) {
-                if (!controller.signal.aborted) {
-                    setCanEdit(false);
-                }
+                if (!controller.signal.aborted) setCanEdit(!!ok);
+            } catch {
+                if (!controller.signal.aborted) setCanEdit(false);
             }
         };
-
         checkPermission();
-
         return () => controller.abort();
     }, [userId, companyId, user, token]);
 
-
     const userPermObjects = useMemo(() => {
         if (!permissions || !userPermissions) return [];
-
         const codes = String(userPermissions).split('');
-
-        // Eğer kullanıcı 'a' yetkisine sahipse → Tüm permission objelerini dön
-        if (codes.includes('a')) {
-            return Object.values(permissions);
-        }
-
-        // Normal filtreleme
+        if (codes.includes('a')) return Object.values(permissions);
         return Object.values(permissions).filter((p) => codes.includes(p.code));
-
     }, [permissions, userPermissions]);
-
 
     const groupedByCategory = useMemo(() => {
         const groups = {};
         for (const p of userPermObjects) {
-            const cat = p.category || 'Genel';
+            const cat = p.category || t('general');
             (groups[cat] ||= []).push(p);
         }
         return groups;
-    }, [userPermObjects]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userPermObjects, t]);
 
     const handleOpen = useCallback((e) => setAnchorEl(e.currentTarget), []);
     const handleClose = useCallback(() => setAnchorEl(null), []);
@@ -122,7 +107,7 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
                     size="small"
                     onClick={handleOpen}
                     startIcon={<SecurityIcon fontSize="small"/>}
-                    aria-label="Kullanıcı izinleri"
+                    aria-label={t('aria.openPermissions')}
                     sx={{
                         border: 1,
                         borderColor: 'divider',
@@ -135,7 +120,7 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
                     variant="text"
                 >
                     <Typography variant="subtitle2" sx={{opacity: 0.9}}>
-                        {label}
+                        {t('badge.label')}
                     </Typography>
                 </Button>
             </Badge>
@@ -151,7 +136,7 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
                     sx: {width: 380, maxWidth: '92vw', borderRadius: 2, overflow: 'hidden'},
                 }}
             >
-                {/* Üst şerit: başlık solda, aksiyonlar sağda */}
+                {/* Üst şerit */}
                 <Box
                     sx={{
                         px: 1.25,
@@ -169,29 +154,28 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
                 >
                     <Box>
                         <Typography variant="subtitle1" sx={{fontWeight: 700, lineHeight: 1.2}}>
-                            Kullanıcı Yetkileri
+                            {t('title')}
                         </Typography>
                         <Typography variant="caption" sx={{opacity: 0.7}}>
-                            Toplam {totalCount} izin
+                            {t('badge.total', { count: totalCount })}
                         </Typography>
                     </Box>
 
                     <Stack direction="row" spacing={0.5} alignItems="center">
                         {canEdit && (
-                            <Tooltip title="Kullanıcı izinlerini düzenle" arrow enterDelay={300}>
+                            <Tooltip title={t('actions.edit')} arrow enterDelay={300}>
                                 <IconButton
                                     size="small"
                                     onClick={handleOpenEditDialog}
-                                    aria-label="Kullanıcı izinlerini dialog ile düzenle"
+                                    aria-label={t('aria.editPermissions')}
                                 >
                                     <EditOutlinedIcon fontSize="small"/>
                                 </IconButton>
                             </Tooltip>
                         )}
 
-                        {/* Kapat (SAĞ ÜST) */}
-                        <Tooltip title="Kapat" arrow enterDelay={300}>
-                            <IconButton size="small" onClick={handleClose} aria-label="Kapat">
+                        <Tooltip title={t('actions.close')} arrow enterDelay={300}>
+                            <IconButton size="small" onClick={handleClose} aria-label={t('actions.close')}>
                                 <CloseRoundedIcon fontSize="small"/>
                             </IconButton>
                         </Tooltip>
@@ -224,8 +208,7 @@ const PermissionsBadgePopover = ({userId, companyId, userPermissions, label = 'Y
                                 {items.map((p) => (
                                     <ListItem key={p.code} disableGutters sx={{px: 0.5}}>
                                         <ListItemText
-                                            primary={<Typography variant="body2"
-                                                                 sx={{fontWeight: 600}}>{p.name}</Typography>}
+                                            primary={<Typography variant="body2" sx={{fontWeight: 600}}>{p.name}</Typography>}
                                             secondary={
                                                 <Typography
                                                     variant="caption"

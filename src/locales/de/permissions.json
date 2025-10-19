@@ -1,0 +1,16 @@
+{
+  "badge": {
+    "label": "Berechtigungen",
+    "total": "Insgesamt {{count}} Berechtigungen"
+  },
+  "title": "Benutzerberechtigungen",
+  "general": "Allgemein",
+  "actions": {
+    "edit": "Benutzerberechtigungen bearbeiten",
+    "close": "Schließen"
+  },
+  "aria": {
+    "openPermissions": "Benutzerberechtigungen öffnen",
+    "editPermissions": "Benutzerberechtigungen bearbeiten"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "badge": {
+    "label": "Yetkiler",
+    "total": "Toplam {{count}} izin"
+  },
+  "title": "Kullanıcı Yetkileri",
+  "general": "Genel",
+  "actions": {
+    "edit": "Kullanıcı izinlerini düzenle",
+    "close": "Kapat"
+  },
+  "aria": {
+    "openPermissions": "Kullanıcı izinlerini aç",
+    "editPermissions": "Kullanıcı izinlerini düzenle"
+  }
+}

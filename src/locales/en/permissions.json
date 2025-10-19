@@ -1,0 +1,16 @@
+{
+  "badge": {
+    "label": "Permissions",
+    "total": "Total {{count}} permissions"
+  },
+  "title": "User Permissions",
+  "general": "General",
+  "actions": {
+    "edit": "Edit user permissions",
+    "close": "Close"
+  },
+  "aria": {
+    "openPermissions": "Open user permissions",
+    "editPermissions": "Edit user permissions"
+  }
+}
