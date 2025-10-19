@@ -1,0 +1,19 @@
+{
+  "title": "My Accounts",
+  "empty": "You do not have any accounts yet.",
+  "balance": "Balance",
+  "registeredAt": "Registered on: {{date}}",
+  "menu": {
+    "moneyTransfer": "Money Transfer",
+    "addIncome": "Add Income"
+  },
+  "aria": {
+    "more": "More options"
+  },
+  "errors": {
+    "consoleLoadError": "Error while loading account list:",
+    "loadFailed": "An error occurred while loading accounts",
+    "serverUnreachable": "Cannot reach the server",
+    "unexpected": "An unexpected error occurred"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "title": "Meine Konten",
+  "empty": "Sie haben noch keine Konten.",
+  "balance": "Kontostand",
+  "registeredAt": "Registriert am: {{date}}",
+  "menu": {
+    "moneyTransfer": "Geldüberweisung",
+    "addIncome": "Einnahme hinzufügen"
+  },
+  "aria": {
+    "more": "Weitere Optionen"
+  },
+  "errors": {
+    "consoleLoadError": "Fehler beim Laden der Kontoliste:",
+    "loadFailed": "Beim Laden der Konten ist ein Fehler aufgetreten",
+    "serverUnreachable": "Server ist nicht erreichbar",
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+  }
+}

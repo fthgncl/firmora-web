@@ -26,8 +26,10 @@ import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
 import MoneyTransferDialog from './MoneyTransferDialog';
 import ExternalMoneyDialog from './ExternalMoneyDialog';
+import { useTranslation } from 'react-i18next';
 
 export default function AccountList() {
+    const { t, i18n } = useTranslation(['accounts']);
     const {token} = useAuth();
     const [accounts, setAccounts] = useState([]);
     const [userName, setUserName] = useState('');
@@ -38,6 +40,14 @@ export default function AccountList() {
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
 
+    const mapLngToLocale = (lng) => {
+        switch (lng) {
+            case 'tr': return 'tr-TR';
+            case 'de': return 'de-DE';
+            default: return 'en-US';
+        }
+    };
+
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
@@ -47,9 +57,7 @@ export default function AccountList() {
                 const response = await axios.get(
                     `${process.env.REACT_APP_API_URL}/accounts`,
                     {
-                        headers: {
-                            'x-access-token': token
-                        }
+                        headers: { 'x-access-token': token }
                     }
                 );
 
@@ -60,13 +68,13 @@ export default function AccountList() {
                     }
                 }
             } catch (err) {
-                console.error('Hesap listesi yüklenirken hata:', err);
+                console.error(t('accounts:errors.consoleLoadError'), err);
                 if (err.response) {
-                    setError(err.response.data.message || 'Hesaplar yüklenirken bir hata oluştu');
+                    setError(err.response.data.message || t('accounts:errors.loadFailed'));
                 } else if (err.request) {
-                    setError('Sunucuya ulaşılamıyor');
+                    setError(t('accounts:errors.serverUnreachable'));
                 } else {
-                    setError('Beklenmeyen bir hata oluştu');
+                    setError(t('accounts:errors.unexpected'));
                 }
             } finally {
                 setLoading(false);
@@ -76,10 +84,11 @@ export default function AccountList() {
         if (token) {
             fetchAccounts();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('tr-TR', {
+        return new Date(dateString).toLocaleDateString(mapLngToLocale(i18n.language), {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -87,7 +96,7 @@ export default function AccountList() {
     };
 
     const formatBalance = (balance, currency) => {
-        return new Intl.NumberFormat('tr-TR', {
+        return new Intl.NumberFormat(mapLngToLocale(i18n.language), {
             style: 'currency',
             currency: currency || 'EUR',
             minimumFractionDigits: 2,
@@ -146,7 +155,7 @@ export default function AccountList() {
         return (
             <Container maxWidth="lg" sx={{mt: 4}}>
                 <Alert severity="info" sx={{borderRadius: 2}}>
-                    Henüz hesabınız bulunmamaktadır.
+                    {t('accounts:empty')}
                 </Alert>
             </Container>
         );
@@ -167,7 +176,7 @@ export default function AccountList() {
                     }}
                 >
                     <AccountBalance sx={{fontSize: 40, color: 'primary.main'}}/>
-                    Hesaplarım
+                    {t('accounts:title')}
                 </Typography>
             </Box>
 
@@ -192,7 +201,6 @@ export default function AccountList() {
                             position: 'relative',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': { transform: 'translateY(-6px)', boxShadow: 6 },
-                            // İnce üst şerit (ribbon)
                             '&::before': {
                                 content: '""',
                                 position: 'absolute',
@@ -216,6 +224,7 @@ export default function AccountList() {
                                         color: 'text.secondary',
                                         '&:hover': { color: 'primary.main', backgroundColor: 'action.hover' },
                                     }}
+                                    aria-label={t('accounts:aria.more')}
                                 >
                                     <MoreVert />
                                 </IconButton>
@@ -271,7 +280,7 @@ export default function AccountList() {
                                     color="text.secondary"
                                     sx={{ mb: 0.5, fontWeight: 500 }}
                                 >
-                                    Bakiye
+                                    {t('accounts:balance')}
                                 </Typography>
                                 <Typography
                                     variant="h4"
@@ -317,7 +326,7 @@ export default function AccountList() {
                                                 height: 24,
                                                 color: 'text.secondary',
                                                 borderColor: (t) => t.palette.divider,
-                                                opacity: 0.55, // dikkat çekmesin
+                                                opacity: 0.55,
                                             }}
                                         />
                                     )}
@@ -329,7 +338,7 @@ export default function AccountList() {
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <CalendarToday sx={{ fontSize: 16, color: 'text.secondary' }} />
                                     <Typography variant="caption" color="text.secondary">
-                                        Kayıt Tarihi: {formatDate(account.created_at)}
+                                        {t('accounts:registeredAt', { date: formatDate(account.created_at) })}
                                     </Typography>
                                 </Stack>
                             </Box>
@@ -353,10 +362,10 @@ export default function AccountList() {
                 }}
             >
                 <MenuItem onClick={handleTransferClick}>
-                    Para Transferi
+                    {t('accounts:menu.moneyTransfer')}
                 </MenuItem>
                 <MenuItem onClick={handleExternalMoneyClick}>
-                    Gelir Ekle
+                    {t('accounts:menu.addIncome')}
                 </MenuItem>
             </Menu>
 

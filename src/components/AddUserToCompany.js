@@ -1,4 +1,4 @@
-// src/components/AddUserToCompany.jsx
+// src/components/AddUserToCompany.js
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import {
