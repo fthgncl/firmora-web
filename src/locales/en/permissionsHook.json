@@ -1,0 +1,9 @@
+{
+  "logs": {
+    "loadError": "Permission load error:"
+  },
+  "errors": {
+    "fetchFailedDefault": "Permissions could not be loaded"
+  },
+  "unknownCategory": "Unknown"
+}

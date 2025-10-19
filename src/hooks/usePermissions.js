@@ -1,7 +1,9 @@
-// src/hooks/usePermissions.js
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { permissionsService } from '../services/permissionsService';
+import i18n from '../services/i18n';
+
+const t = (k) => i18n.t(`permissionsHook:${k}`);
 
 /**
  * Yetki yönetimi için custom hook
@@ -24,8 +26,8 @@ export const usePermissions = () => {
             const data = await permissionsService.getPermissions(token);
             setPermissions(data);
         } catch (err) {
-            console.error('Yetki yükleme hatası:', err);
-            setError(err.message || 'Yetkiler yüklenemedi');
+            console.error(t('logs.loadError'), err);
+            setError(err.message || t('errors.fetchFailedDefault'));
         } finally {
             setLoading(false);
         }
@@ -69,7 +71,7 @@ export const usePermissions = () => {
         const grouped = {};
 
         Object.entries(permissions).forEach(([key, value]) => {
-            const category = value.category || "Bilinmeyen";
+            const category = value.category || t('unknownCategory');
 
             if (!grouped[category]) {
                 grouped[category] = [];
@@ -86,9 +88,8 @@ export const usePermissions = () => {
         return grouped;
     }, [permissions]);
 
-
     const getCacheInfo = useCallback(() => {
-        return permissionsService.getCacheInfo();
+        return permissionsService.getCacheInfo?.(); // mevcutsa döner
     }, []);
 
     return {

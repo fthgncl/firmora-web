@@ -1,0 +1,9 @@
+{
+  "logs": {
+    "loadError": "Yetki yükleme hatası:"
+  },
+  "errors": {
+    "fetchFailedDefault": "Yetkiler yüklenemedi"
+  },
+  "unknownCategory": "Bilinmeyen"
+}

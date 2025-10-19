@@ -1,0 +1,9 @@
+{
+  "logs": {
+    "loadError": "Fehler beim Laden der Berechtigungen:"
+  },
+  "errors": {
+    "fetchFailedDefault": "Berechtigungen konnten nicht geladen werden"
+  },
+  "unknownCategory": "Unbekannt"
+}
