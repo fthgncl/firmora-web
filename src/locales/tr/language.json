@@ -1,0 +1,10 @@
+{
+  "openMenu": "Dil menüsünü aç",
+  "currentLanguage": "Geçerli dil: {{name}}",
+  "selectLanguage": "Dili seç: {{name}}",
+  "languages": {
+    "tr": "Türkçe",
+    "en": "İngilizce",
+    "de": "Almanca"
+  }
+}

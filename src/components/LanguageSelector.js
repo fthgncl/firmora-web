@@ -5,8 +5,10 @@ import MenuItem from '@mui/material/MenuItem';
 import i18n from '../services/i18n';
 import {useAuth} from "../contexts/AuthContext";
 import {usePermissions} from "../contexts/PermissionsContext";
+import { useTranslation } from 'react-i18next';
 
 export default function LanguageSelector() {
+    const { t } = useTranslation(['language']);
     const { token } = useAuth();
     const { refreshPermissions } = usePermissions();
     const [menuOpen, setMenuOpen] = useState(null);
@@ -28,7 +30,6 @@ export default function LanguageSelector() {
         i18n.on('languageChanged', handleLanguageChanged);
         i18n.on('initialized', handleInitialized);
 
-        // Component mount olduğunda da kontrol et
         if (i18n.isInitialized) {
             forceUpdate({});
         }
@@ -76,29 +77,34 @@ export default function LanguageSelector() {
         }
 
         const languageData = i18n.store.data[currentLanguage];
-
         if (!languageData) {
             return { code: i18n.language, flag: null };
         }
 
-        // Flag'i hem translation namespace dışında hem de içinde aramayı dene
+        // Flag'i hem namespace dışında hem de içinde aramayı dene (i18n kaynak yapına göre)
         const flag = languageData.flag || languageData.translation?.flag || null;
 
         return {
-            code: i18n.language,
+            code: currentLanguage,
             flag: flag
         };
     };
 
     const currentLanguageData = getCurrentLanguageData();
 
+    const getLanguageName = (code) => t(`language:languages.${code}`, { defaultValue: code.toUpperCase() });
+
     return (
         <div>
-            <Button onClick={handleOpenMenu}>
+            <Button
+                onClick={handleOpenMenu}
+                aria-label={t('language:openMenu')}
+                title={t('language:currentLanguage', { name: getLanguageName(currentLanguageData.code) })}
+            >
                 {currentLanguageData.flag && (
                     <img
                         src={currentLanguageData.flag}
-                        alt={currentLanguageData.code}
+                        alt={getLanguageName(currentLanguageData.code)}
                         style={{ width:'40px', height: 'auto' }}
                     />
                 )}
@@ -121,14 +127,15 @@ export default function LanguageSelector() {
                     const flag = languageData?.flag || languageData?.translation?.flag || null;
 
                     return (
-                        <MenuItem 
-                            key={languageCode} 
+                        <MenuItem
+                            key={languageCode}
                             onClick={() => handleSelectFlag(languageCode)}
+                            aria-label={t('language:selectLanguage', { name: getLanguageName(languageCode) })}
                         >
                             {flag && (
                                 <img
                                     src={flag}
-                                    alt={languageCode}
+                                    alt={getLanguageName(languageCode)}
                                     style={{width: '40px', height: 'auto'}}
                                 />
                             )}

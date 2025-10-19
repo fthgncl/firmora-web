@@ -1,0 +1,10 @@
+{
+  "openMenu": "Open language menu",
+  "currentLanguage": "Current language: {{name}}",
+  "selectLanguage": "Select language: {{name}}",
+  "languages": {
+    "tr": "Turkish",
+    "en": "English",
+    "de": "German"
+  }
+}
