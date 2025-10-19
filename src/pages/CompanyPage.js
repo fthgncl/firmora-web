@@ -32,12 +32,14 @@ import AddUserToCompany from '../components/AddUserToCompany';
 import MoneyTransferDialog from '../components/MoneyTransferDialog';
 import ExternalMoneyDialog from '../components/ExternalMoneyDialog';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 export default function CompanyPage() {
     const {companyId} = useParams();
     const {token} = useAuth();
     const navigate = useNavigate();
     const {showAlert} = useAlert();
+    const { t, i18n } = useTranslation(['company']);
 
     const userListRef = useRef();
     const [loading, setLoading] = useState(true);
@@ -50,6 +52,14 @@ export default function CompanyPage() {
         fetchCompanyDetails();
         // eslint-disable-next-line
     }, [companyId, token]);
+
+    const mapLngToLocale = (lng) => {
+        switch (lng) {
+            case 'tr': return 'tr-TR';
+            case 'de': return 'de-DE';
+            default: return 'en-US';
+        }
+    };
 
     const fetchCompanyDetails = async () => {
         try {
@@ -68,17 +78,17 @@ export default function CompanyPage() {
             if (response.data.success) {
                 setCompany(response.data.data);
             } else {
-                showAlert(response.data.message || 'Firma bilgileri alınamadı', 'error');
+                showAlert(response.data.message || t('company:errors.loadFailed'), 'error');
                 navigate('/');
             }
         } catch (err) {
-            console.error('Firma bilgileri yüklenirken hata:', err);
+            console.error(t('company:errors.consoleLoadError'), err);
             if (err.response && err.response.data) {
-                showAlert(err.response.data.message || 'Firma bilgileri yüklenirken bir hata oluştu', 'error');
+                showAlert(err.response.data.message || t('company:errors.loadErrorGeneric'), 'error');
             } else if (err.request) {
-                showAlert('Sunucuya ulaşılamıyor', 'error');
+                showAlert(t('company:errors.serverUnreachable'), 'error');
             } else {
-                showAlert('Beklenmeyen bir hata oluştu', 'error');
+                showAlert(t('company:errors.unexpected'), 'error');
             }
             navigate('/');
         } finally {
@@ -88,7 +98,7 @@ export default function CompanyPage() {
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('tr-TR', {
+        return date.toLocaleDateString(mapLngToLocale(i18n.language), {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -96,7 +106,7 @@ export default function CompanyPage() {
     };
 
     const formatBalance = (balance, currency) => {
-        return new Intl.NumberFormat('tr-TR', {
+        return new Intl.NumberFormat(mapLngToLocale(i18n.language), {
             style: 'currency',
             currency: currency,
             minimumFractionDigits: 2,
@@ -149,7 +159,7 @@ export default function CompanyPage() {
         return (
             <Container maxWidth="xl" sx={{mt: 4, mb: 4}}>
                 <Alert severity="error" sx={{borderRadius: 2}}>
-                    Firma bulunamadı
+                    {t('company:errors.notFound')}
                 </Alert>
             </Container>
         );
@@ -167,6 +177,7 @@ export default function CompanyPage() {
                             boxShadow: 1,
                             '&:hover': {bgcolor: 'action.hover'}
                         }}
+                        aria-label={t('company:aria.back')}
                     >
                         <ArrowBack/>
                     </IconButton>
@@ -192,6 +203,7 @@ export default function CompanyPage() {
                         boxShadow: 1,
                         '&:hover': {bgcolor: 'action.hover'}
                     }}
+                    aria-label={t('company:aria.settings')}
                 >
                     <Settings/>
                 </IconButton>
@@ -221,6 +233,7 @@ export default function CompanyPage() {
                                         backgroundColor: 'rgba(255,255,255,0.1)'
                                     }
                                 }}
+                                aria-label={t('company:aria.more')}
                             >
                                 <MoreVert />
                             </IconButton>
@@ -231,14 +244,14 @@ export default function CompanyPage() {
                                     <AccountBalance/>
                                 </Avatar>
                                 <Typography variant="h6" sx={{fontWeight: 600}}>
-                                    Mevcut Bakiye
+                                    {t('company:currentBalance')}
                                 </Typography>
                             </Box>
                             <Typography variant="h3" sx={{fontWeight: 700, mb: 1}}>
                                 {formatBalance(company.balance, company.currency)}
                             </Typography>
                             <Typography variant="body2" sx={{opacity: 0.9}}>
-                                {company.currency} • Güncel Durum
+                                {t('company:currencyStatus', { currency: company.currency })}
                             </Typography>
                         </CardContent>
                     </Card>
@@ -253,12 +266,12 @@ export default function CompanyPage() {
                                     <Business/>
                                 </Avatar>
                                 <Typography variant="h6" sx={{fontWeight: 600}}>
-                                    Firma Bilgileri
+                                    {t('company:companyInfo')}
                                 </Typography>
                             </Box>
                             <Box sx={{mb: 2}}>
                                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                                    Firma Adı
+                                    {t('company:companyName')}
                                 </Typography>
                                 <Typography variant="body1" sx={{fontWeight: 600, mb: 2}}>
                                     {company.company_name}
@@ -266,7 +279,7 @@ export default function CompanyPage() {
                             </Box>
                             <Box>
                                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                                    Sektör
+                                    {t('company:sector')}
                                 </Typography>
                                 <Typography variant="body1" sx={{fontWeight: 600}}>
                                     {company.sector}
@@ -285,14 +298,14 @@ export default function CompanyPage() {
                                     <CalendarToday/>
                                 </Avatar>
                                 <Typography variant="h6" sx={{fontWeight: 600}}>
-                                    Oluşturma Tarihi
+                                    {t('company:creationDate')}
                                 </Typography>
                             </Box>
                             <Typography variant="h5" sx={{fontWeight: 700, mb: 1}}>
                                 {formatDate(company.created_at)}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Firma kayıt tarihi
+                                {t('company:registeredAt')}
                             </Typography>
                         </CardContent>
                     </Card>
@@ -304,14 +317,14 @@ export default function CompanyPage() {
                 <Box sx={{display: 'flex', alignItems: 'center', mb: 3}}>
                     <TrendingUp sx={{fontSize: 28, color: 'primary.main', mr: 1.5}}/>
                     <Typography variant="h5" sx={{fontWeight: 600}}>
-                        Özet Bilgiler
+                        {t('company:summary')}
                     </Typography>
                 </Box>
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} md={3}>
                         <Box>
                             <Typography variant="body2" color="text.secondary" gutterBottom>
-                                Firma ID
+                                {t('company:companyId')}
                             </Typography>
                             <Typography variant="body1" sx={{fontWeight: 600, fontFamily: 'monospace'}}>
                                 {company.id}
@@ -321,7 +334,7 @@ export default function CompanyPage() {
                     <Grid item xs={12} sm={6} md={3}>
                         <Box>
                             <Typography variant="body2" color="text.secondary" gutterBottom>
-                                Para Birimi
+                                {t('company:currency')}
                             </Typography>
                             <Typography variant="body1" sx={{fontWeight: 600}}>
                                 {company.currency}
@@ -331,10 +344,10 @@ export default function CompanyPage() {
                     <Grid item xs={12} sm={6} md={3}>
                         <Box>
                             <Typography variant="body2" color="text.secondary" gutterBottom>
-                                Bakiye Durumu
+                                {t('company:balanceStatus')}
                             </Typography>
                             <Chip
-                                label={company.balance >= 0 ? 'Pozitif' : 'Negatif'}
+                                label={company.balance >= 0 ? t('company:positive') : t('company:negative')}
                                 color={company.balance >= 0 ? 'success' : 'error'}
                                 size="small"
                             />
@@ -343,7 +356,7 @@ export default function CompanyPage() {
                     <Grid item xs={12} sm={6} md={3}>
                         <Box>
                             <Typography variant="body2" color="text.secondary" gutterBottom>
-                                Sektör
+                                {t('company:sector')}
                             </Typography>
                             <Typography variant="body1" sx={{fontWeight: 600}}>
                                 {company.sector}
@@ -379,10 +392,10 @@ export default function CompanyPage() {
                 }}
             >
                 <MenuItem onClick={handleTransferClick}>
-                    Para Transferi
+                    {t('company:menu.moneyTransfer')}
                 </MenuItem>
                 <MenuItem onClick={handleExternalMoneyClick}>
-                    Gelir Ekle
+                    {t('company:menu.addIncome')}
                 </MenuItem>
             </Menu>
 

@@ -1,0 +1,32 @@
+{
+  "errors": {
+    "loadFailed": "Firma bilgileri alınamadı",
+    "consoleLoadError": "Firma bilgileri yüklenirken hata:",
+    "loadErrorGeneric": "Firma bilgileri yüklenirken bir hata oluştu",
+    "serverUnreachable": "Sunucuya ulaşılamıyor",
+    "unexpected": "Beklenmeyen bir hata oluştu",
+    "notFound": "Firma bulunamadı"
+  },
+  "aria": {
+    "back": "Geri dön",
+    "settings": "Ayarlar",
+    "more": "Daha fazla seçenek"
+  },
+  "currentBalance": "Mevcut Bakiye",
+  "currencyStatus": "{{currency}} • Güncel Durum",
+  "companyInfo": "Firma Bilgileri",
+  "companyName": "Firma Adı",
+  "sector": "Sektör",
+  "creationDate": "Oluşturma Tarihi",
+  "registeredAt": "Firma kayıt tarihi",
+  "summary": "Özet Bilgiler",
+  "companyId": "Firma ID",
+  "currency": "Para Birimi",
+  "balanceStatus": "Bakiye Durumu",
+  "positive": "Pozitif",
+  "negative": "Negatif",
+  "menu": {
+    "moneyTransfer": "Para Transferi",
+    "addIncome": "Gelir Ekle"
+  }
+}

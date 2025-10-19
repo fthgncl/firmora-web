@@ -1,0 +1,32 @@
+{
+  "errors": {
+    "loadFailed": "Failed to fetch company details",
+    "consoleLoadError": "Error while loading company details:",
+    "loadErrorGeneric": "An error occurred while loading company details",
+    "serverUnreachable": "Cannot reach the server",
+    "unexpected": "An unexpected error occurred",
+    "notFound": "Company not found"
+  },
+  "aria": {
+    "back": "Go back",
+    "settings": "Settings",
+    "more": "More options"
+  },
+  "currentBalance": "Current Balance",
+  "currencyStatus": "{{currency}} • Current Status",
+  "companyInfo": "Company Information",
+  "companyName": "Company Name",
+  "sector": "Sector",
+  "creationDate": "Creation Date",
+  "registeredAt": "Company registration date",
+  "summary": "Summary",
+  "companyId": "Company ID",
+  "currency": "Currency",
+  "balanceStatus": "Balance Status",
+  "positive": "Positive",
+  "negative": "Negative",
+  "menu": {
+    "moneyTransfer": "Money Transfer",
+    "addIncome": "Add Income"
+  }
+}

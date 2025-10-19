@@ -1,0 +1,32 @@
+{
+  "errors": {
+    "loadFailed": "Firmendaten konnten nicht abgerufen werden",
+    "consoleLoadError": "Fehler beim Laden der Firmendaten:",
+    "loadErrorGeneric": "Beim Laden der Firmendaten ist ein Fehler aufgetreten",
+    "serverUnreachable": "Server ist nicht erreichbar",
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten",
+    "notFound": "Firma nicht gefunden"
+  },
+  "aria": {
+    "back": "Zurück",
+    "settings": "Einstellungen",
+    "more": "Weitere Optionen"
+  },
+  "currentBalance": "Aktueller Kontostand",
+  "currencyStatus": "{{currency}} • Aktueller Status",
+  "companyInfo": "Firmendaten",
+  "companyName": "Firmenname",
+  "sector": "Branche",
+  "creationDate": "Erstellungsdatum",
+  "registeredAt": "Registrierungsdatum der Firma",
+  "summary": "Zusammenfassung",
+  "companyId": "Firmen-ID",
+  "currency": "Währung",
+  "balanceStatus": "Kontostatus",
+  "positive": "Positiv",
+  "negative": "Negativ",
+  "menu": {
+    "moneyTransfer": "Geldüberweisung",
+    "addIncome": "Einnahme hinzufügen"
+  }
+}
