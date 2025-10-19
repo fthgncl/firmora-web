@@ -1,0 +1,52 @@
+{
+  "titles": {
+    "addToUser": "Einnahme zum Benutzer hinzufügen",
+    "addToCompany": "Einnahme zum Unternehmen hinzufügen"
+  },
+  "info": {
+    "userTitle": "Einnahme zu Ihrem Konto hinzufügen",
+    "companyTitle": "Einnahme zum Unternehmen hinzufügen",
+    "description": "Sie können externe Zahlungen, Kundenzahlungen oder Banküberweisungen hier erfassen."
+  },
+  "fields": {
+    "fromExternalName": {
+      "label": "Quelle / Absendername",
+      "placeholder": "z. B. Kundenzahlung – Max Mustermann, XYZ Bank – Kredit"
+    },
+    "amount": {
+      "label": "Betrag"
+    },
+    "description": {
+      "label": "Beschreibung (Optional)",
+      "placeholder": "Zusätzliche Details zur Einnahme..."
+    }
+  },
+  "actions": {
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "add": "Einnahme hinzufügen",
+    "adding": "Wird hinzugefügt..."
+  },
+  "messages": {
+    "addSuccess": "Einnahme wurde erfolgreich hinzugefügt"
+  },
+  "errors": {
+    "noPermission": "Sie haben keine Berechtigung für diese Aktion.",
+    "addFailed": "Einnahme konnte nicht hinzugefügt werden",
+    "generic": "Beim Hinzufügen der Einnahme ist ein Fehler aufgetreten"
+  },
+  "validation": {
+    "amount": {
+      "required": "Bitte einen Betrag eingeben",
+      "positive": "Der Betrag muss positiv sein",
+      "maxDecimals": "Es sind höchstens 2 Dezimalstellen erlaubt"
+    },
+    "fromExternalName": {
+      "required": "Bitte einen Quellnamen eingeben",
+      "max": "Der Quellname darf maximal 255 Zeichen lang sein"
+    },
+    "description": {
+      "max": "Die Beschreibung darf maximal 255 Zeichen lang sein"
+    }
+  }
+}

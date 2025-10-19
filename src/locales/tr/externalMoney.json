@@ -1,0 +1,52 @@
+{
+  "titles": {
+    "addToUser": "Kullanıcıya Gelir Ekle",
+    "addToCompany": "Firmaya Gelir Ekle"
+  },
+  "info": {
+    "userTitle": "Kendi Hesabınıza Gelir Ekleme",
+    "companyTitle": "Firmaya Gelir Ekleme",
+    "description": "Sistem dışından gelen ödemeleri, müşteri ödemelerini veya banka transferlerini buradan kayıt altına alabilirsiniz."
+  },
+  "fields": {
+    "fromExternalName": {
+      "label": "Kaynak / Gönderen Adı",
+      "placeholder": "Örn: Müşteri Ödemesi - Ali Veli, XYZ Bank - Kredi"
+    },
+    "amount": {
+      "label": "Tutar"
+    },
+    "description": {
+      "label": "Açıklama (Opsiyonel)",
+      "placeholder": "Gelir ile ilgili ek bilgiler..."
+    }
+  },
+  "actions": {
+    "close": "Kapat",
+    "cancel": "İptal",
+    "add": "Gelir Ekle",
+    "adding": "Ekleniyor..."
+  },
+  "messages": {
+    "addSuccess": "Gelir başarıyla eklendi"
+  },
+  "errors": {
+    "noPermission": "Bu işlem için yetkiniz bulunmamaktadır.",
+    "addFailed": "Gelir eklenemedi",
+    "generic": "Gelir eklerken bir hata oluştu"
+  },
+  "validation": {
+    "amount": {
+      "required": "Tutar giriniz",
+      "positive": "Tutar pozitif olmalıdır",
+      "maxDecimals": "En fazla 2 ondalık basamak olabilir"
+    },
+    "fromExternalName": {
+      "required": "Kaynak adı giriniz",
+      "max": "Kaynak adı en fazla 255 karakter olabilir"
+    },
+    "description": {
+      "max": "Açıklama en fazla 255 karakter olabilir"
+    }
+  }
+}

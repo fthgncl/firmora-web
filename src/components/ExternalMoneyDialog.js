@@ -24,8 +24,10 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import { permissionsService } from '../services/permissionsService';
+import { useTranslation } from 'react-i18next';
 
 export default function ExternalMoneyDialog({ open, onClose, targetAccount = null, targetScope = 'user' }) {
+    const { t } = useTranslation(['externalMoney']);
     const { token, user } = useAuth();
     const { showAlert } = useAlert();
     const [loading, setLoading] = useState(false);
@@ -35,14 +37,11 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
     const transferType = targetScope === 'user' ? 'external_to_user' : 'external_to_company';
     const requiredPermission = targetScope === 'user' ? 'can_receive_external_to_user' : 'can_receive_external_to_company';
 
-
     // Yetki kontrolü
     useEffect(() => {
         const checkPermissions = async () => {
             if (!targetAccount || !user || !token) return;
-
             const companyId = targetAccount.company?.id || targetAccount.id;
-
             try {
                 const permission = await permissionsService.checkUserRoles(
                     token,
@@ -50,35 +49,33 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                     companyId,
                     [requiredPermission]
                 );
-
                 setHasPermission(permission);
             } catch (error) {
                 console.error('Yetki kontrolü hatası:', error);
                 setHasPermission(false);
             }
         };
-
         if (open) {
             checkPermissions();
         }
     }, [open, targetAccount, user, token, requiredPermission]);
 
-    // Form validasyon şeması
-    const validationSchema = Yup.object({
-        amount: Yup.number()
-            .required('Tutar giriniz')
-            .positive('Tutar pozitif olmalıdır')
-            .test('max-decimals', 'En fazla 2 ondalık basamak olabilir', function(value) {
-                if (!value) return true;
-                const decimals = (value.toString().split('.')[1] || '').length;
-                return decimals <= 2;
-            }),
-        fromExternalName: Yup.string()
-            .required('Kaynak adı giriniz')
-            .max(255, 'Kaynak adı en fazla 255 karakter olabilir'),
-        description: Yup.string()
-            .max(255, 'Açıklama en fazla 255 karakter olabilir'),
-    });
+    // Yup şeması (çeviri ile)
+    const buildValidationSchema = () =>
+        Yup.object({
+            amount: Yup.number()
+                .required(t('validation.amount.required'))
+                .positive(t('validation.amount.positive'))
+                .test('max-decimals', t('validation.amount.maxDecimals'), function (value) {
+                    if (!value && value !== 0) return true;
+                    const decimals = (value.toString().split('.')[1] || '').length;
+                    return decimals <= 2;
+                }),
+            fromExternalName: Yup.string()
+                .required(t('validation.fromExternalName.required'))
+                .max(255, t('validation.fromExternalName.max')),
+            description: Yup.string().max(255, t('validation.description.max')),
+        });
 
     const formik = useFormik({
         initialValues: {
@@ -86,12 +83,18 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             fromExternalName: '',
             description: '',
         },
-        validationSchema,
+        validationSchema: buildValidationSchema(),
         enableReinitialize: true,
         onSubmit: async (values) => {
             await handleExternalTransfer(values);
         },
     });
+
+    // Dil değiştiğinde Yup mesajlarını güncelle (opsiyonel ama faydalı)
+    useEffect(() => {
+        formik.setErrors({});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [t]);
 
     const handleExternalTransfer = async (values) => {
         try {
@@ -107,12 +110,10 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                 currency: targetAccount?.currency || 'EUR',
             };
 
-            // Kullanıcıya gidiyorsa, giriş yapan kullanıcının ID'sini kullan
             if (targetScope === 'user') {
                 requestData.to_user_id = user.id;
             }
 
-            // Opsiyonel açıklama
             if (values.description) {
                 requestData.description = values.description;
             }
@@ -129,11 +130,11 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             );
 
             if (response.data.status === 'success') {
-                showAlert('Gelir başarıyla eklendi', 'success');
+                showAlert(t('messages.addSuccess'), 'success');
                 formik.resetForm();
                 onClose();
             } else {
-                showAlert(response.data.message || 'Gelir eklenemedi', 'error');
+                showAlert(response.data.message || t('errors.addFailed'), 'error');
             }
         } catch (error) {
             console.error('Gelir ekleme hatası:', error);
@@ -142,7 +143,7 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             } else if (error.message) {
                 showAlert(error.message, 'error');
             } else {
-                showAlert('Gelir eklerken bir hata oluştu', 'error');
+                showAlert(t('errors.generic'), 'error');
             }
         } finally {
             setLoading(false);
@@ -155,36 +156,32 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             onClose={onClose}
             maxWidth="md"
             fullWidth
-            PaperProps={{
-                sx: {
-                    borderRadius: 3,
-                }
-            }}
+            PaperProps={{ sx: { borderRadius: 3 } }}
         >
-            <DialogTitle sx={{ 
-                fontWeight: 700,
-                fontSize: '1.5rem',
-                borderBottom: 1,
-                borderColor: 'divider',
-                pb: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-            }}>
+            <DialogTitle
+                sx={{
+                    fontWeight: 700,
+                    fontSize: '1.5rem',
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    pb: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                }}
+            >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <TrendingUp color="success" />
-                    {targetScope === 'user' ? 'Kullanıcıya Gelir Ekle' : 'Firmaya Gelir Ekle'}
+                    {targetScope === 'user' ? t('titles.addToUser') : t('titles.addToCompany')}
                 </Box>
                 <IconButton
                     onClick={onClose}
                     size="small"
                     sx={{
                         color: 'text.secondary',
-                        '&:hover': {
-                            color: 'text.primary',
-                            backgroundColor: 'action.hover',
-                        }
+                        '&:hover': { color: 'text.primary', backgroundColor: 'action.hover' }
                     }}
+                    aria-label={t('actions.close')}
                 >
                     <Close />
                 </IconButton>
@@ -192,38 +189,35 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
 
             <form onSubmit={formik.handleSubmit}>
                 <DialogContent sx={{ mt: 2 }}>
-                    {/* Yetki kontrolü */}
                     {!hasPermission && (
                         <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
                             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                Bu işlem için yetkiniz bulunmamaktadır.
+                                {t('errors.noPermission')}
                             </Typography>
                         </Alert>
                     )}
 
-                    {/* Bilgilendirme */}
                     {hasPermission && (
                         <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
                             <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                {targetScope === 'user' ? 'Kendi Hesabınıza Gelir Ekleme' : 'Firmaya Gelir Ekleme'}
+                                {targetScope === 'user' ? t('info.userTitle') : t('info.companyTitle')}
                             </Typography>
                             <Typography variant="body2">
-                                Sistem dışından gelen ödemeleri, müşteri ödemelerini veya banka transferlerini buradan kayıt altına alabilirsiniz.
+                                {t('info.description')}
                             </Typography>
                         </Alert>
                     )}
 
-                    {/* Kaynak adı */}
                     <TextField
                         fullWidth
-                        label="Kaynak / Gönderen Adı"
+                        label={t('fields.fromExternalName.label')}
                         name="fromExternalName"
                         value={formik.values.fromExternalName}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         error={formik.touched.fromExternalName && Boolean(formik.errors.fromExternalName)}
                         helperText={formik.touched.fromExternalName && formik.errors.fromExternalName}
-                        placeholder="Örn: Müşteri Ödemesi - Ali Veli, XYZ Bank - Kredi"
+                        placeholder={t('fields.fromExternalName.placeholder')}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -234,10 +228,9 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                         sx={{ mb: 3 }}
                     />
 
-                    {/* Tutar */}
                     <TextField
                         fullWidth
-                        label="Tutar"
+                        label={t('fields.amount.label')}
                         name="amount"
                         type="number"
                         inputProps={{ step: '0.01', min: '0' }}
@@ -256,10 +249,9 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                         sx={{ mb: 3 }}
                     />
 
-                    {/* Açıklama */}
                     <TextField
                         fullWidth
-                        label="Açıklama (Opsiyonel)"
+                        label={t('fields.description.label')}
                         name="description"
                         multiline
                         rows={3}
@@ -268,45 +260,38 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                         onBlur={formik.handleBlur}
                         error={formik.touched.description && Boolean(formik.errors.description)}
                         helperText={formik.touched.description && formik.errors.description}
-                        placeholder="Gelir ile ilgili ek bilgiler..."
+                        placeholder={t('fields.description.placeholder')}
                         inputProps={{ maxLength: 255 }}
                     />
                 </DialogContent>
 
-                <DialogActions sx={{ 
-                    px: 3, 
-                    pb: 3,
-                    gap: 1,
-                    borderTop: 1,
-                    borderColor: 'divider',
-                    pt: 2,
-                }}>
-                    <Button 
+                <DialogActions
+                    sx={{
+                        px: 3,
+                        pb: 3,
+                        gap: 1,
+                        borderTop: 1,
+                        borderColor: 'divider',
+                        pt: 2,
+                    }}
+                >
+                    <Button
                         onClick={onClose}
                         variant="outlined"
                         disabled={loading}
-                        sx={{ 
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            fontWeight: 600,
-                        }}
+                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
                     >
-                        İptal
+                        {t('actions.cancel')}
                     </Button>
-                    <Button 
+                    <Button
                         type="submit"
                         variant="contained"
                         color="success"
                         disabled={loading || !formik.isValid || !hasPermission}
                         startIcon={loading ? <CircularProgress size={20} /> : <TrendingUp />}
-                        sx={{ 
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            px: 3,
-                        }}
+                        sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600, px: 3 }}
                     >
-                        {loading ? 'Ekleniyor...' : 'Gelir Ekle'}
+                        {loading ? t('actions.adding') : t('actions.add')}
                     </Button>
                 </DialogActions>
             </form>

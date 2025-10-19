@@ -1,0 +1,52 @@
+{
+  "titles": {
+    "addToUser": "Add Income to User",
+    "addToCompany": "Add Income to Company"
+  },
+  "info": {
+    "userTitle": "Add Income to Your Account",
+    "companyTitle": "Add Income to Company",
+    "description": "You can record external payments, customer payments, or bank transfers here."
+  },
+  "fields": {
+    "fromExternalName": {
+      "label": "Source / Sender Name",
+      "placeholder": "e.g. Customer Payment - John Doe, XYZ Bank - Credit"
+    },
+    "amount": {
+      "label": "Amount"
+    },
+    "description": {
+      "label": "Description (Optional)",
+      "placeholder": "Additional details about the income..."
+    }
+  },
+  "actions": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "add": "Add Income",
+    "adding": "Adding..."
+  },
+  "messages": {
+    "addSuccess": "Income has been added successfully"
+  },
+  "errors": {
+    "noPermission": "You do not have permission for this action.",
+    "addFailed": "Failed to add income",
+    "generic": "An error occurred while adding income"
+  },
+  "validation": {
+    "amount": {
+      "required": "Please enter an amount",
+      "positive": "Amount must be positive",
+      "maxDecimals": "At most 2 decimal places are allowed"
+    },
+    "fromExternalName": {
+      "required": "Please enter a source name",
+      "max": "Source name can be at most 255 characters"
+    },
+    "description": {
+      "max": "Description can be at most 255 characters"
+    }
+  }
+}
