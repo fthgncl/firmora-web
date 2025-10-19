@@ -5,11 +5,47 @@
     "createNewCompany": "Neues Unternehmen erstellen"
   },
   "empty": {
-    "title": "Sie haben noch kein Unternehmen",
+    "title": "Sie haben noch keine Unternehmen",
     "description": "Erstellen Sie ein neues Unternehmen, um zu starten."
   },
   "errors": {
     "loadFailed": "Unternehmen konnten nicht geladen werden.",
     "network": "Verbindungsfehler: Server konnte nicht erreicht werden."
+  },
+
+  "createDialog": {
+    "title": "Neues Unternehmen erstellen",
+    "titles": {
+      "success": "Erfolg"
+    },
+    "fields": {
+      "companyName": "Unternehmensname",
+      "sector": "Branche",
+      "currency": "Währung"
+    },
+    "placeholders": {
+      "companyName": "z. B. Acme Corporation",
+      "sector": "z. B. Technologie, Einzelhandel, Produktion (Optional)"
+    },
+    "helpers": {
+      "currency": "3-stelliger ISO-Währungscode"
+    },
+    "actions": {
+      "close": "Schließen",
+      "cancel": "Abbrechen",
+      "create": "Erstellen",
+      "creating": "Wird erstellt..."
+    },
+    "messages": {
+      "created": "Unternehmen {{name}} wurde erfolgreich erstellt!"
+    },
+    "errors": {
+      "createFailed": "Beim Erstellen des Unternehmens ist ein Fehler aufgetreten.",
+      "badRequest": "Erforderliche Felder fehlen oder sind ungültig.",
+      "forbidden": "Keine Berechtigung (create_company erforderlich).",
+      "conflict": "Dieser Unternehmensname ist bereits vorhanden.",
+      "network": "Server kann nicht erreicht werden.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten."
+    }
   }
 }

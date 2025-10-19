@@ -20,8 +20,10 @@ import { useFormik } from 'formik';
 import { useAlert } from '../contexts/AlertContext';
 import { createCompanyValidationSchema, createCompanyInitialValues } from '../validations/companyValidation';
 import { CURRENCY_OPTIONS } from '../constants/currency';
+import { useTranslation } from 'react-i18next';
 
 export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, token }) {
+    const { t } = useTranslation(['companies']);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const { showSuccess } = useAlert();
@@ -32,7 +34,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
         validationSchema: createCompanyValidationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
             try {
-                setFormError(''); // Önceki hataları temizle
+                setFormError('');
 
                 const response = await axios.post(
                     `${process.env.REACT_APP_API_URL}/companies`,
@@ -50,48 +52,41 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                 );
 
                 if (response.data.status === "success") {
+                    // Başarı mesajı
+                    const successMsg = response.data.message
+                        || t('companies:createDialog.messages.created', { name: values.company_name });
+                    showSuccess(successMsg, t('companies:createDialog.titles.success'));
 
-                    // Önce başarı mesajını göster
-                    showSuccess(
-                        response.data.message || `${values.company_name} firması başarıyla oluşturuldu!`,
-                        'İşlem Başarılı'
-                    );
+                    if (onCompanyCreated) onCompanyCreated();
 
-                    // Parent component'e bilgi gönder (firma listesini güncellemek için)
-                    if (onCompanyCreated) {
-                        onCompanyCreated();
-                    }
-
-                    // En son dialog'u kapat
                     resetForm();
                     handleClose();
                 }
             } catch (err) {
                 console.error('Firma oluşturma hatası:', err);
 
-                let errorMessage = 'Firma oluşturulurken bir hata oluştu';
+                let errorMessage = t('companies:createDialog.errors.createFailed');
 
                 if (err.response) {
                     switch (err.response.status) {
                         case 400:
-                            errorMessage = 'Gerekli alanlar eksik veya hatalı';
+                            errorMessage = t('companies:createDialog.errors.badRequest');
                             break;
                         case 403:
-                            errorMessage = 'Yetkiniz yetersiz (create_company yetkisi gerekli)';
+                            errorMessage = t('companies:createDialog.errors.forbidden');
                             break;
                         case 409:
-                            errorMessage = 'Bu firma adı zaten mevcut';
+                            errorMessage = t('companies:createDialog.errors.conflict');
                             break;
                         default:
                             errorMessage = err.response.data.message || errorMessage;
                     }
                 } else if (err.request) {
-                    errorMessage = 'Sunucuya ulaşılamıyor';
+                    errorMessage = t('companies:createDialog.errors.network');
                 } else {
-                    errorMessage = 'Beklenmeyen bir hata oluştu';
+                    errorMessage = t('companies:createDialog.errors.unexpected');
                 }
 
-                // Hatayı form içinde göster
                 setFormError(errorMessage);
             } finally {
                 setSubmitting(false);
@@ -101,7 +96,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
 
     const handleClose = () => {
         formik.resetForm();
-        setFormError(''); // Hata mesajını temizle
+        setFormError('');
         onClose();
     };
 
@@ -127,13 +122,13 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                 borderBottom: `1px solid ${theme.palette.divider}`
             }}>
                 <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                    Yeni Firma Oluştur
+                    {t('companies:createDialog.title')}
                 </Typography>
                 <IconButton
                     edge="end"
                     color="inherit"
                     onClick={handleClose}
-                    aria-label="close"
+                    aria-label={t('companies:createDialog.actions.close')}
                     size="small"
                 >
                     <Close />
@@ -150,7 +145,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
 
                     <TextField
                         fullWidth
-                        label="Firma Adı"
+                        label={t('companies:createDialog.fields.companyName')}
                         name="company_name"
                         value={formik.values.company_name}
                         onChange={formik.handleChange}
@@ -160,14 +155,14 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                         disabled={formik.isSubmitting}
                         margin="normal"
                         variant="outlined"
-                        placeholder="Örn: Acme Corporation"
+                        placeholder={t('companies:createDialog.placeholders.companyName')}
                         inputProps={{ maxLength: 50 }}
                         sx={{ mb: 2 }}
                     />
 
                     <TextField
                         fullWidth
-                        label="Sektör"
+                        label={t('companies:createDialog.fields.sector')}
                         name="sector"
                         value={formik.values.sector}
                         onChange={formik.handleChange}
@@ -177,7 +172,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                         disabled={formik.isSubmitting}
                         margin="normal"
                         variant="outlined"
-                        placeholder="Örn: Teknoloji, Perakende, İmalat (Opsiyonel)"
+                        placeholder={t('companies:createDialog.placeholders.sector')}
                         inputProps={{ maxLength: 50 }}
                         sx={{ mb: 2 }}
                     />
@@ -185,13 +180,13 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                     <TextField
                         fullWidth
                         select
-                        label="Para Birimi"
+                        label={t('companies:createDialog.fields.currency')}
                         name="currency"
                         value={formik.values.currency}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         error={formik.touched.currency && Boolean(formik.errors.currency)}
-                        helperText={(formik.touched.currency && formik.errors.currency) || '3 harfli ISO para birimi kodu'}
+                        helperText={(formik.touched.currency && formik.errors.currency) || t('companies:createDialog.helpers.currency')}
                         disabled={formik.isSubmitting}
                         margin="normal"
                         variant="outlined"
@@ -216,7 +211,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                         disabled={formik.isSubmitting}
                         color="inherit"
                     >
-                        İptal
+                        {t('companies:createDialog.actions.cancel')}
                     </Button>
                     <Button
                         type="submit"
@@ -224,7 +219,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                         disabled={formik.isSubmitting}
                         startIcon={formik.isSubmitting ? <CircularProgress size={20} /> : null}
                     >
-                        {formik.isSubmitting ? 'Oluşturuluyor...' : 'Oluştur'}
+                        {formik.isSubmitting ? t('companies:createDialog.actions.creating') : t('companies:createDialog.actions.create')}
                     </Button>
                 </DialogActions>
             </form>

@@ -11,5 +11,41 @@
   "errors": {
     "loadFailed": "Firmalar yüklenemedi.",
     "network": "Bağlantı hatası: Sunucuya ulaşılamadı."
+  },
+
+  "createDialog": {
+    "title": "Yeni Firma Oluştur",
+    "titles": {
+      "success": "İşlem Başarılı"
+    },
+    "fields": {
+      "companyName": "Firma Adı",
+      "sector": "Sektör",
+      "currency": "Para Birimi"
+    },
+    "placeholders": {
+      "companyName": "Örn: Acme Corporation",
+      "sector": "Örn: Teknoloji, Perakende, İmalat (Opsiyonel)"
+    },
+    "helpers": {
+      "currency": "3 harfli ISO para birimi kodu"
+    },
+    "actions": {
+      "close": "Kapat",
+      "cancel": "İptal",
+      "create": "Oluştur",
+      "creating": "Oluşturuluyor..."
+    },
+    "messages": {
+      "created": "{{name}} firması başarıyla oluşturuldu!"
+    },
+    "errors": {
+      "createFailed": "Firma oluşturulurken bir hata oluştu.",
+      "badRequest": "Gerekli alanlar eksik veya hatalı.",
+      "forbidden": "Yetkiniz yetersiz (create_company yetkisi gerekli).",
+      "conflict": "Bu firma adı zaten mevcut.",
+      "network": "Sunucuya ulaşılamıyor.",
+      "unexpected": "Beklenmeyen bir hata oluştu."
+    }
   }
 }

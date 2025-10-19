@@ -5,11 +5,47 @@
     "createNewCompany": "Create New Company"
   },
   "empty": {
-    "title": "You have no companies yet",
+    "title": "You don't have any companies yet",
     "description": "Create a new company to get started."
   },
   "errors": {
     "loadFailed": "Failed to load companies.",
     "network": "Connection error: Could not reach the server."
+  },
+
+  "createDialog": {
+    "title": "Create New Company",
+    "titles": {
+      "success": "Success"
+    },
+    "fields": {
+      "companyName": "Company Name",
+      "sector": "Sector",
+      "currency": "Currency"
+    },
+    "placeholders": {
+      "companyName": "e.g., Acme Corporation",
+      "sector": "e.g., Technology, Retail, Manufacturing (Optional)"
+    },
+    "helpers": {
+      "currency": "3-letter ISO currency code"
+    },
+    "actions": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "create": "Create",
+      "creating": "Creating..."
+    },
+    "messages": {
+      "created": "Company {{name}} has been created successfully!"
+    },
+    "errors": {
+      "createFailed": "An error occurred while creating the company.",
+      "badRequest": "Required fields are missing or invalid.",
+      "forbidden": "You do not have permission (create_company required).",
+      "conflict": "This company name already exists.",
+      "network": "Cannot reach the server.",
+      "unexpected": "An unexpected error occurred."
+    }
   }
 }
