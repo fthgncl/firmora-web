@@ -1,0 +1,32 @@
+{
+  "title": "Kayıt Ol",
+  "labels": {
+    "name": "Ad",
+    "surname": "Soyad",
+    "username": "Kullanıcı Adı",
+    "email": "E-posta",
+    "phone": "Telefon Numarası",
+    "password": "Şifre",
+    "confirmPassword": "Şifre Tekrarı"
+  },
+  "placeholders": {
+    "email": "adres@email.com",
+    "phone": "Telefon numarası girin"
+  },
+  "submit": "Kaydol",
+  "submitting": "Kayıt Yapılıyor...",
+  "haveAccount": "Hesabınız var mı?",
+  "signInLink": "Giriş yapın",
+  "successTitle": "Başarılı",
+  "errorTitle": "Hata",
+  "connectionErrorTitle": "Bağlantı Hatası",
+  "errors": {
+    "validation": "Kayıt işlemi sırasında bir hata oluştu. Lütfen form bilgilerinizi kontrol edin.",
+    "generic": "Kayıt işlemi başarısız oldu.",
+    "network": "Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.",
+    "unexpected": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
+  },
+  "aria": {
+    "submit": "Kayıt ol düğmesi"
+  }
+}

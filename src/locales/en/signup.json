@@ -1,0 +1,32 @@
+{
+  "title": "Sign Up",
+  "labels": {
+    "name": "First Name",
+    "surname": "Last Name",
+    "username": "Username",
+    "email": "Email",
+    "phone": "Phone Number",
+    "password": "Password",
+    "confirmPassword": "Confirm Password"
+  },
+  "placeholders": {
+    "email": "name@example.com",
+    "phone": "Enter phone number"
+  },
+  "submit": "Create Account",
+  "submitting": "Creating Account...",
+  "haveAccount": "Already have an account?",
+  "signInLink": "Sign in",
+  "successTitle": "Success",
+  "errorTitle": "Error",
+  "connectionErrorTitle": "Connection Error",
+  "errors": {
+    "validation": "There was an error during sign up. Please check your form details.",
+    "generic": "Registration failed.",
+    "network": "Could not connect to the server. Please check your internet connection.",
+    "unexpected": "An unexpected error occurred. Please try again."
+  },
+  "aria": {
+    "submit": "Sign up button"
+  }
+}

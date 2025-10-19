@@ -17,6 +17,7 @@ import Link from '@mui/material/Link';
 import Copyright from '../components/Copyright';
 import PhoneInputField from '../components/PhoneInputField';
 import { useAlert } from '../contexts/AlertContext';
+import { useTranslation } from 'react-i18next';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -47,18 +48,19 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp() {
+    const { t } = useTranslation(['signup']);
     const [apiErrors, setApiErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const { showSuccess, showError } = useAlert();
-
 
     const onSubmit = async (values, actions) => {
         setIsLoading(true);
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/sign-up`, values);
             if (response.data.status === 'success') {
-                showSuccess(response.data.message, 'Başarılı', 3000);
+                // İçerik mesajını API'den alıyoruz, başlık i18n
+                showSuccess(response.data.message, t('signup:successTitle'), 3000);
                 actions.resetForm();
                 setTimeout(() => {
                     navigate('/sign-in');
@@ -68,14 +70,14 @@ export default function SignUp() {
             if (error.response) {
                 if (error.response.data.errors) {
                     setApiErrors(error.response.data.errors);
-                    showError('Kayıt işlemi sırasında bir hata oluştu. Lütfen form bilgilerinizi kontrol edin.', 'Hata');
+                    showError(t('signup:errors.validation'), t('signup:errorTitle'));
                 } else {
-                    showError(error.response.data.message || 'Kayıt işlemi başarısız oldu.', 'Hata');
+                    showError(error.response.data.message || t('signup:errors.generic'), t('signup:errorTitle'));
                 }
             } else if (error.request) {
-                showError('Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.', 'Bağlantı Hatası');
+                showError(t('signup:errors.network'), t('signup:connectionErrorTitle'));
             } else {
-                showError('Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.', 'Hata');
+                showError(t('signup:errors.unexpected'), t('signup:errorTitle'));
             }
         } finally {
             setIsLoading(false);
@@ -110,7 +112,7 @@ export default function SignUp() {
                         variant="h4"
                         sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
                     >
-                        Kayıt Ol
+                        {t('signup:title')}
                     </Typography>
                     <Box
                         component="form"
@@ -118,7 +120,7 @@ export default function SignUp() {
                         sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="name">Ad</FormLabel>
+                            <FormLabel htmlFor="name">{t('signup:labels.name')}</FormLabel>
                             <TextField
                                 autoComplete="name"
                                 name="name"
@@ -133,8 +135,9 @@ export default function SignUp() {
                                 disabled={isLoading}
                             />
                         </FormControl>
+
                         <FormControl>
-                            <FormLabel htmlFor="name">Soyad</FormLabel>
+                            <FormLabel htmlFor="surname">{t('signup:labels.surname')}</FormLabel>
                             <TextField
                                 autoComplete="surname"
                                 name="surname"
@@ -149,8 +152,9 @@ export default function SignUp() {
                                 disabled={isLoading}
                             />
                         </FormControl>
+
                         <FormControl>
-                            <FormLabel htmlFor="name">Kullanıcı Adı</FormLabel>
+                            <FormLabel htmlFor="username">{t('signup:labels.username')}</FormLabel>
                             <TextField
                                 autoComplete="username"
                                 name="username"
@@ -165,13 +169,14 @@ export default function SignUp() {
                                 disabled={isLoading}
                             />
                         </FormControl>
+
                         <FormControl>
-                            <FormLabel htmlFor="email">E-posta</FormLabel>
+                            <FormLabel htmlFor="email">{t('signup:labels.email')}</FormLabel>
                             <TextField
                                 required
                                 fullWidth
                                 id="email"
-                                placeholder="adres@email.com"
+                                placeholder={t('signup:placeholders.email')}
                                 value={values.email}
                                 name="email"
                                 autoComplete="email"
@@ -183,14 +188,15 @@ export default function SignUp() {
                                 disabled={isLoading}
                             />
                         </FormControl>
+
                         <FormControl error={!!errors.phone}>
-                            <FormLabel htmlFor="phone">Telefon Numarası</FormLabel>
+                            <FormLabel htmlFor="phone">{t('signup:labels.phone')}</FormLabel>
                             <PhoneInputField
                                 defaultCountry="DE"
                                 value={values.phone}
                                 onChange={(value) => setFieldValue('phone', value)}
                                 disabled={isLoading}
-                                placeholder="Telefon numarası girin"
+                                placeholder={t('signup:placeholders.phone')}
                                 error={!!errors.phone}
                                 touched={touched.phone}
                             />
@@ -200,8 +206,9 @@ export default function SignUp() {
                                 </Typography>
                             )}
                         </FormControl>
+
                         <FormControl>
-                            <FormLabel htmlFor="password">Şifre</FormLabel>
+                            <FormLabel htmlFor="password">{t('signup:labels.password')}</FormLabel>
                             <TextField
                                 required
                                 fullWidth
@@ -219,8 +226,9 @@ export default function SignUp() {
                                 disabled={isLoading}
                             />
                         </FormControl>
+
                         <FormControl>
-                            <FormLabel htmlFor="confirmpassword">Şifre Tekrarı</FormLabel>
+                            <FormLabel htmlFor="confirmpassword">{t('signup:labels.confirmPassword')}</FormLabel>
                             <TextField
                                 required
                                 fullWidth
@@ -238,6 +246,7 @@ export default function SignUp() {
                                 disabled={isLoading}
                             />
                         </FormControl>
+
                         <Button
                             type="submit"
                             fullWidth
@@ -245,18 +254,21 @@ export default function SignUp() {
                             onClick={validateForm}
                             disabled={isLoading}
                             startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+                            aria-label={t('signup:aria.submit')}
                         >
-                            {isLoading ? 'Kayıt Yapılıyor...' : 'Kaydol'}
+                            {isLoading ? t('signup:submitting') : t('signup:submit')}
                         </Button>
+
                         <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
-                            Hesabınız var mı?{' '}
+                            {t('signup:haveAccount')}{' '}
                             <Link
                                 component="button"
+                                type="button" // 🔒 form submit tetiklemesin
                                 variant="body2"
                                 onClick={() => navigate('/sign-in')}
                                 sx={{ cursor: 'pointer' }}
                             >
-                                Giriş yapın
+                                {t('signup:signInLink')}
                             </Link>
                         </Typography>
                     </Box>

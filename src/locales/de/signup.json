@@ -1,0 +1,32 @@
+{
+  "title": "Registrieren",
+  "labels": {
+    "name": "Vorname",
+    "surname": "Nachname",
+    "username": "Benutzername",
+    "email": "E-Mail",
+    "phone": "Telefonnummer",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen"
+  },
+  "placeholders": {
+    "email": "name@beispiel.de",
+    "phone": "Telefonnummer eingeben"
+  },
+  "submit": "Konto erstellen",
+  "submitting": "Konto wird erstellt...",
+  "haveAccount": "Bereits ein Konto?",
+  "signInLink": "Anmelden",
+  "successTitle": "Erfolg",
+  "errorTitle": "Fehler",
+  "connectionErrorTitle": "Verbindungsfehler",
+  "errors": {
+    "validation": "Bei der Registrierung ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Eingaben.",
+    "generic": "Registrierung fehlgeschlagen.",
+    "network": "Verbindung zum Server fehlgeschlagen. Bitte prüfen Sie Ihre Internetverbindung.",
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+  },
+  "aria": {
+    "submit": "Registrieren-Schaltfläche"
+  }
+}
