@@ -13,8 +13,10 @@ import {
 import { Popper } from '@mui/material';
 import { Search, Clear, Business } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function CompanySearchField({ minWidth = 320, onCompanySelect, excludeCompanyId = null }) {
+    const { t } = useTranslation(['companySearch']);
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/companies/search`;
 
@@ -103,7 +105,7 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
             <TextField
                 fullWidth
                 size="small"
-                placeholder="Firma ara (ad veya sektör)"
+                placeholder={t('placeholder')}
                 value={searchTerm}
                 onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -126,7 +128,7 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
                             {loading ? (
                                 <CircularProgress size={16} />
                             ) : searchTerm ? (
-                                <IconButton size="small" onClick={handleClear}>
+                                <IconButton size="small" onClick={handleClear} aria-label={t('actions.clear')}>
                                     <Clear fontSize="small" />
                                 </IconButton>
                             ) : null}
@@ -139,7 +141,7 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
                 open={open}
                 anchorEl={anchorEl}
                 placement="bottom-start"
-                style={{ 
+                style={{
                     width: Math.max(anchorEl?.offsetWidth || 0, 480),
                     maxWidth: '95vw',
                     zIndex: 1300
@@ -157,7 +159,7 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
                     }}
                 >
                     <Typography variant="caption" color="text.secondary" sx={{ px: 1, pb: 1, display: 'block' }}>
-                        {searchResults.length} sonuç bulundu
+                        {t('resultsFound', { count: searchResults.length })}
                     </Typography>
 
                     {searchResults.map((company) => (
@@ -182,21 +184,21 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
                                 </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', mb: 0.5 }}>
-                                <Chip 
-                                    label={company.sector} 
-                                    size="small" 
+                                <Chip
+                                    label={company.sector}
+                                    size="small"
                                     variant="outlined"
                                     sx={{ height: 20, fontSize: '0.7rem' }}
                                 />
-                                <Chip 
-                                    label={company.currency} 
-                                    size="small" 
+                                <Chip
+                                    label={company.currency}
+                                    size="small"
                                     color="primary"
                                     sx={{ height: 20, fontSize: '0.7rem' }}
                                 />
                             </Box>
                             <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-                                ID: {company.id}
+                                {t('labels.id')}: {company.id}
                             </Typography>
                         </Box>
                     ))}
@@ -206,7 +208,7 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
             {/* Boş sonuç */}
             {!loading && searchTerm && searchResults.length === 0 && (
                 <Typography variant="caption" color="text.secondary" sx={{ position: 'absolute', mt: 0.5 }}>
-                    Sonuç bulunamadı
+                    {t('noResults')}
                 </Typography>
             )}
         </Box>

@@ -1,0 +1,11 @@
+{
+  "placeholder": "Firma suchen (Name oder Branche)",
+  "resultsFound": "{{count}} Ergebnis(se) gefunden",
+  "noResults": "Keine Ergebnisse gefunden",
+  "actions": {
+    "clear": "Löschen"
+  },
+  "labels": {
+    "id": "ID"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "placeholder": "Firma ara (ad veya sektör)",
+  "resultsFound": "{{count}} sonuç bulundu",
+  "noResults": "Sonuç bulunamadı",
+  "actions": {
+    "clear": "Temizle"
+  },
+  "labels": {
+    "id": "ID"
+  }
+}

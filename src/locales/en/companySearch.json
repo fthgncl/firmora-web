@@ -1,0 +1,11 @@
+{
+  "placeholder": "Search company (name or sector)",
+  "resultsFound": "{{count}} result(s) found",
+  "noResults": "No results found",
+  "actions": {
+    "clear": "Clear"
+  },
+  "labels": {
+    "id": "ID"
+  }
+}
