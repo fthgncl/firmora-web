@@ -206,19 +206,21 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                 ...sx
             }}
         >
-            {/* Başlık Şeridi */}
+            {/* Başlık Şeridi (Tam Responsive + İkonlu Mobil Buton) */}
             <Box
                 sx={{
-                    px: 2.5,
-                    py: 2,
+                    px: { xs: 1.5, sm: 2.5 },
+                    py: { xs: 1.25, sm: 2 },
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1.5,
+                    flexWrap: 'wrap',
+                    rowGap: { xs: 1, sm: 1.5 },
+                    columnGap: { xs: 1, sm: 1.5 },
                     boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
                     borderBottom: '1px solid rgba(255,255,255,0.15)',
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
-                    position: 'relative'
+                    position: 'relative',
                 }}
             >
                 {/* Sol ikon */}
@@ -226,17 +228,19 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     sx={{
                         color: 'white',
                         bgcolor: 'rgba(255,255,255,0.18)',
-                        width: 42,
-                        height: 42,
+                        width: { xs: 36, sm: 42 },
+                        height: { xs: 36, sm: 42 },
                         backdropFilter: 'blur(4px)',
                         boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+                        flexShrink: 0,
+                        order: 0,
                     }}
                 >
                     <Group />
                 </Avatar>
 
-                {/* Başlıklar */}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
+                {/* Başlık */}
+                <Box sx={{ flex: 1, minWidth: 0, order: 1 }}>
                     <Typography
                         variant="h6"
                         noWrap
@@ -253,73 +257,112 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         sx={{
                             opacity: 0.9,
                             textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+                            display: 'block',
+                            whiteSpace: { xs: 'normal', sm: 'nowrap' },
                         }}
                     >
                         {t('list.total', { total })} • {t('list.rowsPerPage')} {limit}
                     </Typography>
                 </Box>
 
-                {/* Görünüm menüsü */}
-                <Tooltip title={t('list.view.tooltip')}>
-                    <IconButton
-                        onClick={openColsMenu}
-                        sx={{
-                            color: '#fff',
-                            bgcolor: 'rgba(255,255,255,0.18)',
-                            border: '1px solid rgba(255,255,255,0.25)',
-                            '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
-                            transition: 'all 0.2s ease',
-                        }}
-                    >
-                        <ViewColumn />
-                    </IconButton>
-                </Tooltip>
-
-                {/* Yenile düğmesi */}
-                <Tooltip title={t('list.refresh')}>
-                    <IconButton
-                        onClick={fetchUsers}
-                        sx={{
-                            ml: 1,
-                            color: '#fff',
-                            bgcolor: 'rgba(255,255,255,0.18)',
-                            border: '1px solid rgba(255,255,255,0.25)',
-                            '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
-                            transition: 'all 0.2s ease',
-                        }}
-                    >
-                        <Refresh />
-                    </IconButton>
-                </Tooltip>
-
-                {/* Kullanıcı Ekle butonu */}
-                <Button
-                    variant="contained"
-                    startIcon={<PersonAdd />}
-                    onClick={() => setOpenAddDialog(true)}
+                {/* Sağ aksiyonlar */}
+                <Box
                     sx={{
-                        ml: 1.5,
-                        borderRadius: 999,
-                        textTransform: 'none',
-                        px: 2.5,
-                        py: 0.75,
-                        fontWeight: 600,
-                        fontSize: '0.9rem',
-                        bgcolor: 'rgba(255,255,255,0.12)',
-                        border: '1px solid rgba(255,255,255,0.25)',
-                        color: '#fff',
-                        backdropFilter: 'blur(4px)',
-                        boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-                        '&:hover': {
-                            bgcolor: 'rgba(255,255,255,0.25)',
-                            borderColor: 'rgba(255,255,255,0.45)',
-                            boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
-                        },
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        flexWrap: 'wrap',
+                        justifyContent: { xs: 'flex-end', sm: 'flex-end' },
+                        width: { xs: 'auto', sm: 'auto' },
+                        order: 2,
                     }}
                 >
-                    {t('list.addUser', 'Kullanıcı Ekle')}
-                </Button>
+                    {/* Görünüm menüsü */}
+                    <Tooltip title={t('list.view.tooltip')}>
+                        <IconButton
+                            onClick={openColsMenu}
+                            size="small"
+                            sx={{
+                                color: '#fff',
+                                bgcolor: 'rgba(255,255,255,0.18)',
+                                border: '1px solid rgba(255,255,255,0.25)',
+                                '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                                transition: 'all 0.2s ease',
+                            }}
+                        >
+                            <ViewColumn />
+                        </IconButton>
+                    </Tooltip>
+
+                    {/* Yenile düğmesi */}
+                    <Tooltip title={t('list.refresh')}>
+                        <IconButton
+                            onClick={fetchUsers}
+                            size="small"
+                            sx={{
+                                color: '#fff',
+                                bgcolor: 'rgba(255,255,255,0.18)',
+                                border: '1px solid rgba(255,255,255,0.25)',
+                                '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                                transition: 'all 0.2s ease',
+                            }}
+                        >
+                            <Refresh />
+                        </IconButton>
+                    </Tooltip>
+
+                    {/* Kullanıcı Ekle (Responsive) */}
+                    {/* 📱 Mobilde sadece ikon, 💻 Desktop'ta metinli */}
+                    <Tooltip title={t('list.addUser', 'Kullanıcı Ekle')}>
+                        <Box>
+                            {/* Mobil görünüm (sadece ikon) */}
+                            <IconButton
+                                onClick={() => setOpenAddDialog(true)}
+                                size="small"
+                                sx={{
+                                    display: { xs: 'inline-flex', sm: 'none' },
+                                    color: '#fff',
+                                    bgcolor: 'rgba(255,255,255,0.18)',
+                                    border: '1px solid rgba(255,255,255,0.25)',
+                                    '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                                    transition: 'all 0.2s ease',
+                                }}
+                            >
+                                <PersonAdd />
+                            </IconButton>
+
+                            {/* Desktop görünüm (metinli) */}
+                            <Button
+                                variant="contained"
+                                startIcon={<PersonAdd />}
+                                onClick={() => setOpenAddDialog(true)}
+                                sx={{
+                                    display: { xs: 'none', sm: 'inline-flex' },
+                                    borderRadius: 999,
+                                    textTransform: 'none',
+                                    px: 2.5,
+                                    py: 0.75,
+                                    fontWeight: 600,
+                                    fontSize: '0.9rem',
+                                    bgcolor: 'rgba(255,255,255,0.12)',
+                                    border: '1px solid rgba(255,255,255,0.25)',
+                                    color: '#fff',
+                                    backdropFilter: 'blur(4px)',
+                                    boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+                                    '&:hover': {
+                                        bgcolor: 'rgba(255,255,255,0.25)',
+                                        borderColor: 'rgba(255,255,255,0.45)',
+                                        boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
+                                    },
+                                }}
+                            >
+                                {t('list.addUser', 'Kullanıcı Ekle')}
+                            </Button>
+                        </Box>
+                    </Tooltip>
+                </Box>
             </Box>
+
 
 
             {/* Araç Çubuğu */}
