@@ -1,45 +1,53 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import LanguageDetector from 'i18next-browser-languagedetector';
-import axios from 'axios';
+import LanguageDetector from "i18next-browser-languagedetector";
+import axios from "axios";
 
-// Locales klasöründeki tüm JSON dosyalarını dinamik olarak yükle
+// 🌍 src/locales/{lng}/{namespace}.json yapısını destekler
 const loadLocales = () => {
-    const localeModules = require.context('../locales', false, /\.json$/);
+    const context = require.context("../locales", true, /\.json$/);
     const resources = {};
 
-    localeModules.keys().forEach((fileName) => {
-        const languageCode = fileName.replace('./', '').replace('.json', '');
-        resources[languageCode] = {
-            translation: localeModules(fileName),
-            flag: require(`../images/flags/${languageCode.toUpperCase()}.png`)
-        };
+    context.keys().forEach((path) => {
+        // Örnek path: ./en/common.json → ['en', 'common']
+        const parts = path.replace("./", "").split("/");
+        const lng = parts[0];
+        const ns = parts[1].replace(".json", "");
+
+        if (!resources[lng]) {
+            resources[lng] = { flag: require(`../images/flags/${lng.toUpperCase()}.png`), };
+        }
+        if (!resources[lng].translation) resources[lng].translation = {};
+
+        resources[lng].translation[ns] = context(path);
     });
 
     return resources;
 };
 
+const resources = loadLocales();
+
 i18n
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
-        resources: loadLocales(),
+        resources,
         fallbackLng: "en",
+        ns: Object.keys(resources.en?.translation || {}), // namespace’leri otomatik alır
+        defaultNS: "common",
         interpolation: { escapeValue: false },
     });
 
-// Axios interceptor ile tüm isteklere dil header'ını ekle
-axios.interceptors.request.use((config) => {
-    config.headers['x-language'] = i18n.language;
+// 🔁 Axios dil header’ı
+let interceptorId = axios.interceptors.request.use((config) => {
+    config.headers["x-language"] = i18n.language;
     return config;
 });
 
-// Dil değiştiğinde interceptor'ı güncelle
-i18n.on('languageChanged', (lng) => {
-    // Mevcut interceptor'ları temizle ve yeniden ekle
-    axios.interceptors.request.clear();
-    axios.interceptors.request.use((config) => {
-        config.headers['x-language'] = lng;
+i18n.on("languageChanged", (lng) => {
+    axios.interceptors.request.eject(interceptorId);
+    interceptorId = axios.interceptors.request.use((config) => {
+        config.headers["x-language"] = lng;
         return config;
     });
 });
