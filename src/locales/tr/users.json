@@ -7,5 +7,41 @@
   "verify": {
     "pending": "Bekleniyor",
     "verified": "Onaylı"
+  },
+  "list": {
+    "title": "Kullanıcılar",
+    "columns": {
+      "name": "Ad",
+      "surname": "Soyad",
+      "username": "Kullanıcı adı",
+      "permissions": "Yetkiler",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "emailverified": "E-posta Onayı",
+      "created_at": "Kayıt tarihi"
+    },
+    "sort": {
+      "asc": "Artan",
+      "desc": "Azalan"
+    },
+    "view": {
+      "tooltip": "Görünüm",
+      "columnsTitle": "Görünecek Sütunlar"
+    },
+    "search": {
+      "placeholder": "Tabloda ara (isim, email, tel, username)"
+    },
+    "refresh": "Yenile",
+    "loading": "Yükleniyor…",
+    "noResultsForSearch": "Arama sonucu bulunamadı.",
+    "noRecords": "Kayıt bulunamadı.",
+    "verify": {
+      "verified": "Onaylandı",
+      "pending": "Bekleniyor"
+    },
+    "total": "Toplam: {{total}}",
+    "totalFiltered": "Toplam: {{filtered}} ({{total}} içinden)",
+    "rowsPerPage": "Sayfa başına",
+    "displayedRows": "{{from}}-{{to}} / {{count}}"
   }
 }

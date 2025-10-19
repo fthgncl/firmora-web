@@ -7,5 +7,41 @@
   "verify": {
     "pending": "Ausstehend",
     "verified": "Verifiziert"
+  },
+  "list": {
+    "title": "Benutzer",
+    "columns": {
+      "name": "Vorname",
+      "surname": "Nachname",
+      "username": "Benutzername",
+      "permissions": "Berechtigungen",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "emailverified": "E-Mail-Bestätigung",
+      "created_at": "Erstellt am"
+    },
+    "sort": {
+      "asc": "Aufsteigend",
+      "desc": "Absteigend"
+    },
+    "view": {
+      "tooltip": "Ansicht",
+      "columnsTitle": "Anzuzeigende Spalten"
+    },
+    "search": {
+      "placeholder": "In Tabelle suchen (Name, E-Mail, Telefon, Benutzername)"
+    },
+    "refresh": "Aktualisieren",
+    "loading": "Wird geladen…",
+    "noResultsForSearch": "Keine Suchergebnisse gefunden.",
+    "noRecords": "Keine Einträge vorhanden.",
+    "verify": {
+      "verified": "Bestätigt",
+      "pending": "Ausstehend"
+    },
+    "total": "Gesamt: {{total}}",
+    "totalFiltered": "Gesamt: {{filtered}} (von {{total}})",
+    "rowsPerPage": "Zeilen pro Seite",
+    "displayedRows": "{{from}}-{{to}} / {{count}}"
   }
 }

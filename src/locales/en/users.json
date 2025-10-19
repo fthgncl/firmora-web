@@ -7,5 +7,41 @@
   "verify": {
     "pending": "Pending",
     "verified": "Verified"
+  },
+  "list": {
+    "title": "Users",
+    "columns": {
+      "name": "First name",
+      "surname": "Last name",
+      "username": "Username",
+      "permissions": "Permissions",
+      "phone": "Phone",
+      "email": "Email",
+      "emailverified": "Email Verified",
+      "created_at": "Created at"
+    },
+    "sort": {
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "view": {
+      "tooltip": "View",
+      "columnsTitle": "Visible Columns"
+    },
+    "search": {
+      "placeholder": "Search table (name, email, phone, username)"
+    },
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "noResultsForSearch": "No results found.",
+    "noRecords": "No records.",
+    "verify": {
+      "verified": "Verified",
+      "pending": "Pending"
+    },
+    "total": "Total: {{total}}",
+    "totalFiltered": "Total: {{filtered}} (of {{total}})",
+    "rowsPerPage": "Rows per page",
+    "displayedRows": "{{from}}-{{to}} / {{count}}"
   }
 }

@@ -29,33 +29,36 @@ import {
     ListItemText,
 } from '@mui/material';
 import { Refresh, ViewColumn, CheckCircleOutline, ErrorOutline, Search, Clear } from '@mui/icons-material';
-import { useAuth } from '../contexts/AuthContext';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
+import { useTranslation } from 'react-i18next';
+
+import { useAuth } from '../contexts/AuthContext';
 import PermissionsDisplay from './PermissionsDisplay';
 
-// Kolon tanımları
+// Kolon tanımları (i18n key’leriyle)
 const COLUMN_DEFS = [
-    { key: 'name', label: 'Ad' },
-    { key: 'surname', label: 'Soyad' },
-    { key: 'username', label: 'Kullanıcı adı' },
-    { key: 'permissions', label: 'Yetkiler' },
-    { key: 'phone', label: 'Telefon' },
-    { key: 'email', label: 'E-posta' },
-    { key: 'emailverified', label: 'E-posta Onayı' },
-    { key: 'created_at', label: 'Kayıt tarihi' }
+    { key: 'name',          labelKey: 'list.columns.name' },
+    { key: 'surname',       labelKey: 'list.columns.surname' },
+    { key: 'username',      labelKey: 'list.columns.username' },
+    { key: 'permissions',   labelKey: 'list.columns.permissions' },
+    { key: 'phone',         labelKey: 'list.columns.phone' },
+    { key: 'email',         labelKey: 'list.columns.email' },
+    { key: 'emailverified', labelKey: 'list.columns.emailverified' },
+    { key: 'created_at',    labelKey: 'list.columns.created_at' },
 ];
 
 const SORT_FIELDS = COLUMN_DEFS
     .filter(c => ['name', 'surname', 'email', 'phone', 'username', 'created_at'].includes(c.key))
-    .map(c => ({ value: c.key, label: c.label }));
+    .map(c => ({ value: c.key, labelKey: c.labelKey }));
 
 const SORT_ORDERS = [
-    { value: 'ASC', label: 'Artan' },
-    { value: 'DESC', label: 'Azalan' },
+    { value: 'ASC',  labelKey: 'list.sort.asc'  },
+    { value: 'DESC', labelKey: 'list.sort.desc' },
 ];
 
 const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) => {
+    const { t } = useTranslation(['users']); // users namespace
     const { token } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
@@ -81,28 +84,22 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
 
     const offset = useMemo(() => page * limit, [page, limit]);
 
-    // Arama terimine göre filtrelenmiş satırlar
+    // Arama terimine göre filtrelenmiş satırlar (client-side)
     const filteredRows = useMemo(() => {
-        if (!searchTerm.trim()) {
-            return rows;
-        }
+        if (!searchTerm.trim()) return rows;
 
         const lowerSearch = searchTerm.toLowerCase().trim();
-        return rows.filter(user => {
-            return (
-                user.name?.toLowerCase().includes(lowerSearch) ||
-                user.surname?.toLowerCase().includes(lowerSearch) ||
-                user.email?.toLowerCase().includes(lowerSearch) ||
-                user.phone?.toLowerCase().includes(lowerSearch) ||
-                user.username?.toLowerCase().includes(lowerSearch)
-            );
-        });
+        return rows.filter(user =>
+            (user.name || '').toLowerCase().includes(lowerSearch) ||
+            (user.surname || '').toLowerCase().includes(lowerSearch) ||
+            (user.email || '').toLowerCase().includes(lowerSearch) ||
+            (user.phone || '').toLowerCase().includes(lowerSearch) ||
+            (user.username || '').toLowerCase().includes(lowerSearch)
+        );
     }, [rows, searchTerm]);
 
-    // Filtrelenmiş satırların toplam sayısı
     const filteredTotal = filteredRows.length;
 
-    // Sayfalanmış satırlar
     const paginatedRows = useMemo(() => {
         const start = page * limit;
         const end = start + limit;
@@ -112,13 +109,12 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     const authHeaders = useMemo(
         () => ({
             headers: {
-                'x-access-token': token, // senin istediğin header
+                'x-access-token': token,
                 'Content-Type': 'application/json',
             },
         }),
         [token]
     );
-
 
     const fetchUsers = useCallback(async () => {
         if (!companyId) {
@@ -132,7 +128,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
             const body = {
                 companyId,
                 searchTerm: '',
-                searchScope: "company",
+                searchScope: 'company',
                 limit,
                 offset,
                 sortBy,
@@ -164,10 +160,10 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
 
     // Ref ile fetchUsers metodunu dışarı aç
     React.useImperativeHandle(ref, () => ({
-        refresh: fetchUsers
+        refresh: fetchUsers,
     }));
 
-    // Arama terimi değiştiğinde sayfayı sıfırla
+    // Arama terimi değişince sayfayı sıfırla
     useEffect(() => {
         setPage(0);
     }, [searchTerm]);
@@ -177,11 +173,9 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     const closeColsMenu = () => setAnchorEl(null);
     const toggleCol = (key) => setVisibleCols(prev => ({ ...prev, [key]: !prev[key] }));
 
-    // Yetkileri companyId'ye göre filtrele ve birleştir
+    // Yetkileri companyId'ye göre filtreleyip birleştir
     const getUserPermissions = (userPermissions) => {
-        if (!userPermissions || !Array.isArray(userPermissions) || userPermissions.length === 0) {
-            return '-';
-        }
+        if (!userPermissions || !Array.isArray(userPermissions) || userPermissions.length === 0) return '-';
 
         const filtered = userPermissions
             .filter(item => item.companyId === companyId)
@@ -193,9 +187,9 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     // Chip + Tarih
     const renderVerifyChip = (flag) =>
         flag ? (
-            <Chip size="small" color="success" icon={<CheckCircleOutline />} label="Onaylandı" />
+            <Chip size="small" color="success" icon={<CheckCircleOutline />} label={t('list.verify.verified')} />
         ) : (
-            <Chip size="small" color="warning" icon={<ErrorOutline />} label="Bekleniyor" />
+            <Chip size="small" color="warning" icon={<ErrorOutline />} label={t('list.verify.pending')} />
         );
 
     const formatDate = (d) =>
@@ -205,10 +199,10 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
 
     return (
         <Card sx={{ ...sx }}>
-            <CardHeader title="Kullanıcılar" />
+            <CardHeader title={t('list.title')} />
 
             <CardContent>
-                {/* Kontroller - Responsive */}
+                {/* Kontroller */}
                 <Box
                     sx={{
                         display: 'flex',
@@ -218,12 +212,12 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         alignItems: { xs: 'stretch', md: 'center' },
                     }}
                 >
-                    {/* Sol grup: Sıralama kontrolleri */}
+                    {/* Sol: Sıralama */}
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                         <FormControl size="small" sx={{ minWidth: 120 }}>
                             <Select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(0); }}>
                                 {SORT_FIELDS.map(f => (
-                                    <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>
+                                    <MenuItem key={f.value} value={f.value}>{t(`users:${f.labelKey}`)}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
@@ -231,12 +225,12 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         <FormControl size="small" sx={{ minWidth: 100 }}>
                             <Select value={sortOrder} onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}>
                                 {SORT_ORDERS.map(o => (
-                                    <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
+                                    <MenuItem key={o.value} value={o.value}>{t(`users:${o.labelKey}`)}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
 
-                        <Tooltip title="Görünüm">
+                        <Tooltip title={t('list.view.tooltip')}>
                             <IconButton onClick={openColsMenu} size="small">
                                 <ViewColumn />
                             </IconButton>
@@ -249,26 +243,28 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                             PaperProps={{ sx: { width: 240, p: 1 } }}
                         >
-                            <Typography variant="subtitle2" sx={{ px: 1, pb: 0.5 }}>Görünecek Sütunlar</Typography>
+                            <Typography variant="subtitle2" sx={{ px: 1, pb: 0.5 }}>
+                                {t('list.view.columnsTitle')}
+                            </Typography>
                             <Divider sx={{ mb: 0.5 }} />
                             {COLUMN_DEFS.map(c => (
                                 <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
                                     <ListItemIcon>
                                         <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1} disableRipple />
                                     </ListItemIcon>
-                                    <ListItemText primary={c.label} />
+                                    <ListItemText primary={t(`users:${c.labelKey}`)} />
                                 </ListItemButton>
                             ))}
                         </Popover>
                     </Box>
 
-                    {/* Sağ grup: Arama */}
+                    {/* Sağ: Arama + Yenile */}
                     <Box sx={{ display: 'flex', gap: 1, flex: { xs: '1', md: '0 1 auto' }, alignItems: 'center' }}>
                         <Box sx={{ flex: 1, minWidth: { xs: '100%', md: 320 }, maxWidth: { md: 480 } }}>
                             <TextField
                                 fullWidth
                                 size="small"
-                                placeholder="Tabloda ara (isim, email, tel, username)"
+                                placeholder={t('list.search.placeholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 InputProps={{
@@ -288,7 +284,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                             />
                         </Box>
 
-                        <Tooltip title="Yenile">
+                        <Tooltip title={t('list.refresh')}>
                             <IconButton onClick={fetchUsers} size="small">
                                 <Refresh />
                             </IconButton>
@@ -304,7 +300,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         <TableHead>
                             <TableRow>
                                 {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
-                                    <TableCell key={c.key}>{c.label}</TableCell>
+                                    <TableCell key={c.key}>{t(`users:${c.labelKey}`)}</TableCell>
                                 ))}
                             </TableRow>
                         </TableHead>
@@ -315,7 +311,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     <TableCell colSpan={COLUMN_DEFS.length}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <CircularProgress size={18} />
-                                            <Typography variant="body2" color="text.secondary">Yükleniyor…</Typography>
+                                            <Typography variant="body2" color="text.secondary">{t('list.loading')}</Typography>
                                         </Box>
                                     </TableCell>
                                 </TableRow>
@@ -323,7 +319,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                 <TableRow>
                                     <TableCell colSpan={COLUMN_DEFS.length}>
                                         <Typography variant="body2" color="text.secondary">
-                                            {searchTerm ? 'Arama sonucu bulunamadı.' : 'Kayıt bulunamadı.'}
+                                            {searchTerm ? t('list.noResultsForSearch') : t('list.noRecords')}
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -335,7 +331,12 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                         {visibleCols.username && <TableCell>{u.username}</TableCell>}
                                         {visibleCols.permissions && (
                                             <TableCell>
-                                                <PermissionsDisplay onEditedUser={fetchUsers} userId={u.id} companyId={companyId} userPermissions={getUserPermissions(u.permissions)} />
+                                                <PermissionsDisplay
+                                                    onEditedUser={fetchUsers}
+                                                    userId={u.id}
+                                                    companyId={companyId}
+                                                    userPermissions={getUserPermissions(u.permissions)}
+                                                />
                                             </TableCell>
                                         )}
                                         {visibleCols.phone && <TableCell>{u.phone || '-'}</TableCell>}
@@ -349,22 +350,22 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     </Table>
                 </TableContainer>
 
-                <Box 
-                    sx={{ 
-                        display: 'flex', 
+                <Box
+                    sx={{
+                        display: 'flex',
                         flexDirection: { xs: 'column', sm: 'row' },
-                        alignItems: { xs: 'flex-start', sm: 'center' }, 
-                        justifyContent: 'space-between', 
+                        alignItems: { xs: 'flex-start', sm: 'center' },
+                        justifyContent: 'space-between',
                         mt: 2,
-                        gap: 1
+                        gap: 1,
                     }}
                 >
                     <Typography variant="body2" color="text.secondary">
-                        {searchTerm 
-                            ? `Toplam: ${filteredTotal} (${total} içinden)` 
-                            : `Toplam: ${total}`
-                        }
+                        {searchTerm
+                            ? t('list.totalFiltered', { filtered: filteredTotal, total })
+                            : t('list.total', { total })}
                     </Typography>
+
                     <TablePagination
                         component="div"
                         count={filteredTotal}
@@ -373,13 +374,15 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         rowsPerPage={limit}
                         onRowsPerPageChange={(e) => { setLimit(parseInt(e.target.value, 10)); setPage(0); }}
                         rowsPerPageOptions={[10, 20, 50, 100]}
-                        labelRowsPerPage="Sayfa başına"
-                        labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
+                        labelRowsPerPage={t('list.rowsPerPage')}
+                        labelDisplayedRows={({ from, to, count }) =>
+                            t('list.displayedRows', { from, to, count })
+                        }
                         sx={{
                             '.MuiTablePagination-toolbar': {
                                 flexWrap: 'wrap',
-                                minHeight: { xs: 'auto', sm: 52 }
-                            }
+                                minHeight: { xs: 'auto', sm: 52 },
+                            },
                         }}
                     />
                 </Box>
