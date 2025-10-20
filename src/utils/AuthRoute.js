@@ -1,17 +1,62 @@
-import {Navigate, useLocation} from 'react-router-dom';
+import {Navigate, useLocation, useParams} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
+import {useEffect, useState} from "react";
+import {permissionsService} from "../services/permissionsService";
+import Unauthorized from '../pages/Unauthorized';
 
 const AuthRoute = ({
                        children,
                        guest,
                        requireAuth = false,
                        requireGuest = false,
-                       redirectTo = "/"
+                       redirectTo = "/",
+                       requireRoles = []
                    }) => {
 
-    const {user} = useAuth(); // Auth durumunuzu buradan alın
+    const {user, token} = useAuth();
+    const {companyId} = useParams();
     const isAuthenticated = Boolean(user);
     const location = useLocation();
+    const [hasPermission, setHasPermission] = useState(null);
+
+    useEffect(() => {
+
+        if (requireRoles.length === 0) {
+            setHasPermission(true);
+            return;
+        }
+
+        if (!companyId || !user || !token) {
+            setHasPermission(false);
+            return;
+        }
+
+        const checkPermission = async () => {
+            try {
+                const permissionResult = await permissionsService.checkUserRoles(
+                    token,
+                    user,
+                    companyId,
+                    requireRoles
+                );
+                console.log('permissionResult',permissionResult);
+                setHasPermission(permissionResult);
+            } catch {
+                setHasPermission(false);
+            }
+        };
+        checkPermission();
+
+        // eslint-disable-next-line
+    }, [user, token, companyId]);
+
+    if (hasPermission === false) {
+        return <Unauthorized />;
+    }
+
+    if (hasPermission === null) {
+        return null;
+    }
 
     // Giriş yapmış kullanıcıların girmemesi gereken sayfalar (guest sayfalar)
     if (requireGuest && isAuthenticated) {

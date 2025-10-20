@@ -52,7 +52,10 @@ function App() {
                 }/>
 
                 <Route path="/company/:companyId" element={
-                    <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                    <AuthRoute
+                        requireAuth={true}
+                        redirectTo="/sign-in"
+                        requireRoles={['sys_admin','personnel_manager','can_view_company_transfer_history','can_view_other_users_transfer_history']}>
                         <CompanyPage/>
                     </AuthRoute>
                 }/>
