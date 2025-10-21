@@ -171,6 +171,10 @@ export default function CompanyPage() {
                                                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                                 color: 'white',
                                                 position: 'relative',
+
+                                                /* 🔸 Container Query için gerekli */
+                                                containerType: 'inline-size',
+                                                containerName: 'balanceCard',
                                             }}
                                         >
                                             {/* Sağ üstte üç profesyonel buton */}
@@ -191,7 +195,14 @@ export default function CompanyPage() {
                                                         transition: 'all 0.2s ease',
                                                     },
                                                     '& .MuiSvgIcon-root': { fontSize: 20 },
-                                                    '@media (max-width:600px)': { right: 8 },
+
+                                                    /* 🔸 Kartın kendi genişliği daraldığında butonları akışa al */
+                                                    '@container balanceCard (max-width: 420px)': {
+                                                        position: 'static',
+                                                        flexDirection: 'row',
+                                                        justifyContent: 'flex-end',
+                                                        mb: 1,
+                                                    },
                                                 }}
                                             >
                                                 <Tooltip title={t('company:menu.moneyTransfer')}>
@@ -228,11 +239,35 @@ export default function CompanyPage() {
                                                 const inField = (typeof total === 'number') ? (total - balance) : undefined;
 
                                                 return (
-                                                    <Stack direction="row" alignItems="baseline" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                                                    <Stack
+                                                        direction="row"
+                                                        alignItems="flex-start"
+                                                        justifyContent="space-between"
+                                                        sx={{
+                                                            mb: 0.5,
+                                                            gap: 1.5,
+                                                            flexWrap: 'wrap',
+
+                                                            /* 🔸 Kart genişliği daralınca otomatik kolon yerleşimi */
+                                                            '@container balanceCard (max-width: 560px)': {
+                                                                flexDirection: 'column',
+                                                                alignItems: 'flex-start',
+                                                            },
+                                                        }}
+                                                    >
                                                         {/* Mevcut Bakiye (sol, büyük) */}
                                                         <Typography
                                                             variant="h3"
-                                                            sx={{ fontWeight: 800, lineHeight: 1.1, whiteSpace: 'nowrap' }}
+                                                            sx={{
+                                                                fontWeight: 800,
+                                                                lineHeight: 1.1,
+                                                                fontVariantNumeric: 'tabular-nums',
+                                                                fontSize: { xs: 'clamp(24px, 7vw, 34px)', sm: 'clamp(28px, 4vw, 42px)' },
+                                                                whiteSpace: 'nowrap',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                flexShrink: 0,
+                                                            }}
                                                         >
                                                             {formatBalance(balance, company.currency)}
                                                         </Typography>
@@ -246,35 +281,55 @@ export default function CompanyPage() {
                                                                     color: 'rgba(255,255,255,0.9)',
                                                                     borderLeft: '1px solid rgba(255,255,255,0.2)',
                                                                     pl: 1.5,
-                                                                    minWidth: 160,
+                                                                    minWidth: 0,
+                                                                    flex: '0 1 46%',
+
+                                                                    /* 🔸 Dar alanda sağ blok alta insin ve sola hizalansın */
+                                                                    '@container balanceCard (max-width: 560px)': {
+                                                                        ml: 0,
+                                                                        pl: 0,
+                                                                        borderLeft: 'none',
+                                                                        textAlign: 'left',
+                                                                        flex: '1 1 100%',
+                                                                    },
                                                                 }}
                                                             >
-                                                                <Typography
-                                                                    variant="body2"
-                                                                    sx={{ fontWeight: 600, lineHeight: 1.1 }}
-                                                                >
+                                                                <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
                                                                     {t('company:totalBalance')}
                                                                 </Typography>
                                                                 <Typography
                                                                     variant="subtitle2"
-                                                                    sx={{ fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap' }}
+                                                                    sx={{
+                                                                        opacity: 0.9,
+                                                                        fontWeight: 600,
+                                                                        fontVariantNumeric: 'tabular-nums',
+                                                                        whiteSpace: 'nowrap',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                    }}
                                                                 >
                                                                     {formatBalance(total, company.currency)}
                                                                 </Typography>
 
                                                                 {typeof inField === 'number' && (
-                                                                    <Typography
-                                                                        variant="caption"
-                                                                        sx={{
-                                                                            display: 'inline-block',
-                                                                            mt: 0.5,
-                                                                            opacity: 0.9,
-                                                                            whiteSpace: 'nowrap',
-                                                                        }}
-                                                                    >
-                                                                        {/* Sahadaki Bakiye */}
-                                                                        {t('company:inFieldBalance')}: {formatBalance(inField, company.currency)}
-                                                                    </Typography>
+                                                                    <Box sx={{ mt: 1 }}>
+                                                                        <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
+                                                                            {t('company:inFieldBalance')}
+                                                                        </Typography>
+                                                                        <Typography
+                                                                            variant="subtitle2"
+                                                                            sx={{
+                                                                                opacity: 0.9,
+                                                                                fontWeight: 600,
+                                                                                fontVariantNumeric: 'tabular-nums',
+                                                                                whiteSpace: 'nowrap',
+                                                                                overflow: 'hidden',
+                                                                                textOverflow: 'ellipsis',
+                                                                            }}
+                                                                        >
+                                                                            {formatBalance(inField, company.currency)}
+                                                                        </Typography>
+                                                                    </Box>
                                                                 )}
                                                             </Box>
                                                         )}
@@ -304,6 +359,7 @@ export default function CompanyPage() {
                                             </Stack>
                                         </Box>
                                     </Grid>
+
                                 )}
 
 
