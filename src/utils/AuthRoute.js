@@ -1,7 +1,6 @@
 import {Navigate, useLocation, useParams} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
-import {useEffect, useState} from "react";
-import {permissionsService} from "../services/permissionsService";
+import PermissionGuard from './PermissionGuard';
 import Unauthorized from '../pages/Unauthorized';
 
 const AuthRoute = ({
@@ -13,49 +12,10 @@ const AuthRoute = ({
                        requireRoles = []
                    }) => {
 
-    const {user, token} = useAuth();
+    const {user} = useAuth();
     const {companyId} = useParams();
     const isAuthenticated = Boolean(user);
     const location = useLocation();
-    const [hasPermission, setHasPermission] = useState(null);
-
-    useEffect(() => {
-
-        if (requireRoles.length === 0) {
-            setHasPermission(true);
-            return;
-        }
-
-        if (!companyId || !user || !token) {
-            setHasPermission(false);
-            return;
-        }
-
-        const checkPermission = async () => {
-            try {
-                const permissionResult = await permissionsService.checkUserRoles(
-                    token,
-                    user,
-                    companyId,
-                    requireRoles
-                );
-                setHasPermission(permissionResult);
-            } catch {
-                setHasPermission(false);
-            }
-        };
-        checkPermission();
-
-        // eslint-disable-next-line
-    }, [user, token, companyId]);
-
-    if (hasPermission === false) {
-        return <Unauthorized />;
-    }
-
-    if (hasPermission === null) {
-        return null;
-    }
 
     // Giriş yapmış kullanıcıların girmemesi gereken sayfalar (guest sayfalar)
     if (requireGuest && isAuthenticated) {
@@ -79,6 +39,15 @@ const AuthRoute = ({
     // Eski API desteği için (mevcut kodunuzla uyumlu olması için)
     if (guest && isAuthenticated) {
         return <Navigate to={redirectTo} replace/>;
+    }
+
+    // Eğer rol kontrolü gerekiyorsa PermissionGuard kullan
+    if (requireRoles.length > 0) {
+        return (
+            <PermissionGuard requireRoles={requireRoles} companyId={companyId} fallback={<Unauthorized />}>
+                {children || guest}
+            </PermissionGuard>
+        );
     }
 
     return children || guest;
