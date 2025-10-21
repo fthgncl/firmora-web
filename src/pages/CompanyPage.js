@@ -179,10 +179,10 @@ export default function CompanyPage() {
                                         >
                                             {/* Sağ üstte üç profesyonel buton */}
                                             <Stack
-                                                direction={{ xs: 'column-reverse', sm: 'row' }}
+                                                direction={{ xs: 'column', sm: 'row' }} // xs’te dikey, sm+ yatay
                                                 spacing={1}
                                                 sx={{
-                                                    position: 'absolute',
+                                                    position: 'absolute',           // ⬅️ her zaman absolute (boşluk bırakmaz)
                                                     top: 12,
                                                     right: 12,
                                                     alignItems: 'flex-end',
@@ -196,12 +196,16 @@ export default function CompanyPage() {
                                                     },
                                                     '& .MuiSvgIcon-root': { fontSize: 20 },
 
-                                                    /* 🔸 Kartın kendi genişliği daraldığında butonları akışa al */
+                                                    /* Kartın kendi genişliği daraldığında: dikey kalsın, absolute kalsın, butonları ufalt */
                                                     '@container balanceCard (max-width: 420px)': {
-                                                        position: 'static',
-                                                        flexDirection: 'row',
-                                                        justifyContent: 'flex-end',
-                                                        mb: 1,
+                                                        flexDirection: 'column',
+                                                        alignItems: 'flex-end',
+                                                        right: 8,
+                                                        top: 8,
+                                                        '& .MuiIconButton-root': {
+                                                            width: 36,
+                                                            height: 36,
+                                                        },
                                                     },
                                                 }}
                                             >
@@ -221,6 +225,7 @@ export default function CompanyPage() {
                                                     </IconButton>
                                                 </Tooltip>
                                             </Stack>
+
 
                                             {/* Başlık */}
                                             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1, mt: 1 }}>
@@ -359,6 +364,7 @@ export default function CompanyPage() {
                                             </Stack>
                                         </Box>
                                     </Grid>
+
 
                                 )}
 
