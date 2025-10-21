@@ -39,7 +39,6 @@ const AuthRoute = ({
                     companyId,
                     requireRoles
                 );
-                console.log('permissionResult',permissionResult);
                 setHasPermission(permissionResult);
             } catch {
                 setHasPermission(false);
