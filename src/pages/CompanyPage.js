@@ -79,8 +79,9 @@ export default function CompanyPage() {
                 navigate('/');
             }
         } catch (err) {
-            console.error(t('company:errors.consoleLoadError'), err);
-            showAlert(t('company:errors.loadErrorGeneric'), 'error');
+
+            console.error(err.response.data.message || t('company:errors.consoleLoadError'), err);
+            showAlert(err.response.data.message || t('company:errors.loadErrorGeneric'), 'error');
             navigate('/');
         } finally {
             setLoading(false);
