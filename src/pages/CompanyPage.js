@@ -162,116 +162,150 @@ export default function CompanyPage() {
                         <CardContent>
                             <Grid container spacing={3}>
                                 {/* Sol: Bakiye ve butonlar */}
-                                <Grid item xs={12} md={5}>
-                                    <Box
-                                        sx={{
-                                            p: 3,
-                                            borderRadius: 2,
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            color: 'white',
-                                            position: 'relative',
-                                        }}
-                                    >
-                                        {/* Sağ üstte üç profesyonel buton */}
-                                        <Stack
-                                            direction={{ xs: 'column-reverse', sm: 'row' }}
-                                            spacing={1}
+                                {company?.balance !== undefined && company?.balance !== null && (
+                                    <Grid item xs={12} md={5}>
+                                        <Box
                                             sx={{
-                                                position: 'absolute',
-                                                top: 12,
-                                                right: 12,
-                                                alignItems: 'flex-end',
-                                                '& .MuiIconButton-root': {
-                                                    width: 40,
-                                                    height: 40,
-                                                    color: 'white',
-                                                    backgroundColor: 'rgba(255,255,255,0.15)',
-                                                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.25)' },
-                                                    transition: 'all 0.2s ease',
-                                                },
-                                                '& .MuiSvgIcon-root': {
-                                                    fontSize: 20,
-                                                },
-                                                '@media (max-width:600px)': {
-                                                    right: 8,
-                                                },
+                                                p: 3,
+                                                borderRadius: 2,
+                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                color: 'white',
+                                                position: 'relative',
                                             }}
                                         >
+                                            {/* Sağ üstte üç profesyonel buton */}
+                                            <Stack
+                                                direction={{ xs: 'column-reverse', sm: 'row' }}
+                                                spacing={1}
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 12,
+                                                    right: 12,
+                                                    alignItems: 'flex-end',
+                                                    '& .MuiIconButton-root': {
+                                                        width: 40,
+                                                        height: 40,
+                                                        color: 'white',
+                                                        backgroundColor: 'rgba(255,255,255,0.15)',
+                                                        '&:hover': { backgroundColor: 'rgba(255,255,255,0.25)' },
+                                                        transition: 'all 0.2s ease',
+                                                    },
+                                                    '& .MuiSvgIcon-root': { fontSize: 20 },
+                                                    '@media (max-width:600px)': { right: 8 },
+                                                }}
+                                            >
+                                                <Tooltip title={t('company:menu.moneyTransfer')}>
+                                                    <IconButton onClick={() => setTransferDialogOpen(true)}>
+                                                        <SwapHoriz />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title={t('company:menu.addIncome')}>
+                                                    <IconButton onClick={() => setExternalMoneyDialogOpen(true)}>
+                                                        <AddCircleOutline />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title={t('company:goToSettings')}>
+                                                    <IconButton onClick={() => navigate(`/company/${companyId}/settings`)}>
+                                                        <Settings />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Stack>
 
-                                        <Tooltip title={t('company:menu.moneyTransfer')}>
-                                                <IconButton
-                                                    sx={{
-                                                        color: 'white',
-                                                        backgroundColor: 'rgba(255,255,255,0.15)',
-                                                        '&:hover': {backgroundColor: 'rgba(255,255,255,0.25)'},
-                                                    }}
-                                                    onClick={() => setTransferDialogOpen(true)}
-                                                >
-                                                    <SwapHoriz/>
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title={t('company:menu.addIncome')}>
-                                                <IconButton
-                                                    size="small"
-                                                    sx={{
-                                                        color: 'white',
-                                                        backgroundColor: 'rgba(255,255,255,0.15)',
-                                                        '&:hover': {backgroundColor: 'rgba(255,255,255,0.25)'},
-                                                    }}
-                                                    onClick={() => setExternalMoneyDialogOpen(true)}
-                                                >
-                                                    <AddCircleOutline />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title={t('company:goToSettings')}>
-                                                <IconButton
-                                                    size="small"
-                                                    sx={{
-                                                        color: 'white',
-                                                        backgroundColor: 'rgba(255,255,255,0.15)',
-                                                        '&:hover': {backgroundColor: 'rgba(255,255,255,0.25)'},
-                                                    }}
-                                                    onClick={() => navigate(`/company/${companyId}/settings`)}
-                                                >
-                                                    <Settings />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </Stack>
+                                            {/* Başlık */}
+                                            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1, mt: 1 }}>
+                                                <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}>
+                                                    <AccountBalance />
+                                                </Avatar>
+                                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                                    {t('company:currentBalance')}
+                                                </Typography>
+                                            </Stack>
 
-                                        <Stack direction="row" alignItems="center" spacing={1.5} sx={{mb: 1, mt: 1}}>
-                                            <Avatar sx={{bgcolor: 'rgba(255,255,255,0.2)', color:'white'}}>
-                                                <AccountBalance/>
-                                            </Avatar>
-                                            <Typography variant="h6" sx={{fontWeight: 600}}>
-                                                {t('company:currentBalance')}
+                                            {/* Bakiye + Sağ tarafta Toplam & Sahadaki */}
+                                            {(() => {
+                                                const total = company?.totalBalance;
+                                                const balance = company.balance ?? 0;
+                                                const inField = (typeof total === 'number') ? (total - balance) : undefined;
+
+                                                return (
+                                                    <Stack direction="row" alignItems="baseline" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                                                        {/* Mevcut Bakiye (sol, büyük) */}
+                                                        <Typography
+                                                            variant="h3"
+                                                            sx={{ fontWeight: 800, lineHeight: 1.1, whiteSpace: 'nowrap' }}
+                                                        >
+                                                            {formatBalance(balance, company.currency)}
+                                                        </Typography>
+
+                                                        {/* Sağ sütun: Toplam Bakiye + Sahadaki Bakiye */}
+                                                        {typeof total === 'number' && (
+                                                            <Box
+                                                                sx={{
+                                                                    ml: 2,
+                                                                    textAlign: 'right',
+                                                                    color: 'rgba(255,255,255,0.9)',
+                                                                    borderLeft: '1px solid rgba(255,255,255,0.2)',
+                                                                    pl: 1.5,
+                                                                    minWidth: 160,
+                                                                }}
+                                                            >
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    sx={{ fontWeight: 600, lineHeight: 1.1 }}
+                                                                >
+                                                                    {t('company:totalBalance')}
+                                                                </Typography>
+                                                                <Typography
+                                                                    variant="subtitle2"
+                                                                    sx={{ fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap' }}
+                                                                >
+                                                                    {formatBalance(total, company.currency)}
+                                                                </Typography>
+
+                                                                {typeof inField === 'number' && (
+                                                                    <Typography
+                                                                        variant="caption"
+                                                                        sx={{
+                                                                            display: 'inline-block',
+                                                                            mt: 0.5,
+                                                                            opacity: 0.9,
+                                                                            whiteSpace: 'nowrap',
+                                                                        }}
+                                                                    >
+                                                                        {/* Sahadaki Bakiye */}
+                                                                        {t('company:inFieldBalance')}: {formatBalance(inField, company.currency)}
+                                                                    </Typography>
+                                                                )}
+                                                            </Box>
+                                                        )}
+                                                    </Stack>
+                                                );
+                                            })()}
+
+                                            <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                                                {t('company:currencyStatus', { currency: company.currency })}
                                             </Typography>
-                                        </Stack>
 
-                                        <Typography variant="h3" sx={{fontWeight: 800, lineHeight: 1.1}}>
-                                            {formatBalance(company.balance, company.currency)}
-                                        </Typography>
+                                            {/* Chipler */}
+                                            <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap' }}>
+                                                <Chip
+                                                    size="small"
+                                                    color={company.balance >= 0 ? 'success' : 'error'}
+                                                    label={company.balance >= 0 ? t('company:positive') : t('company:negative')}
+                                                    variant="filled"
+                                                    sx={{ color: 'white' }}
+                                                />
+                                                <Chip
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{ borderColor: 'rgba(255,255,255,0.5)', color: 'white' }}
+                                                    label={company.currency}
+                                                />
+                                            </Stack>
+                                        </Box>
+                                    </Grid>
+                                )}
 
-                                        <Typography variant="body2" sx={{opacity: 0.9, mt: 0.5}}>
-                                            {t('company:currencyStatus', { currency: company.currency })}
-                                        </Typography>
-
-                                        <Stack direction="row" spacing={1} sx={{mt: 2, flexWrap: 'wrap'}}>
-                                            <Chip
-                                                size="small"
-                                                color={company.balance >= 0 ? 'success' : 'error'}
-                                                label={company.balance >= 0 ? t('company:positive') : t('company:negative')}
-                                                variant="filled"
-                                                sx={{color: 'white'}}
-                                            />
-                                            <Chip
-                                                size="small"
-                                                variant="outlined"
-                                                sx={{borderColor: 'rgba(255,255,255,0.5)', color: 'white'}}
-                                                label={company.currency}
-                                            />
-                                        </Stack>
-                                    </Box>
-                                </Grid>
 
                                 {/* Sağ: Firma Bilgileri */}
                                 <Grid item xs={12} md={7}>

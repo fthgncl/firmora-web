@@ -13,6 +13,8 @@
     "more": "More options"
   },
   "currentBalance": "Current Balance",
+  "totalBalance": "Total Balance",
+  "inFieldBalance": "Cash Held by Staff",
   "currencyStatus": "{{currency}} • Current Status",
   "companyInfo": "Company Information",
   "companyName": "Company Name",

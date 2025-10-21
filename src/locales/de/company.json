@@ -13,6 +13,8 @@
     "more": "Weitere Optionen"
   },
   "currentBalance": "Aktueller Kontostand",
+  "totalBalance": "Gesamtsaldo",
+  "inFieldBalance": "Bargeld bei Mitarbeitern",
   "currencyStatus": "{{currency}} • Aktueller Status",
   "companyInfo": "Firmendaten",
   "companyName": "Firmenname",

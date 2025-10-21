@@ -13,6 +13,8 @@
     "more": "Daha fazla seçenek"
   },
   "currentBalance": "Mevcut Bakiye",
+  "inFieldBalance": "Sahadaki Bakiye",
+  "totalBalance": "Toplam Bakiye",
   "currencyStatus": "{{currency}} • Güncel Durum",
   "companyInfo": "Firma Bilgileri",
   "companyName": "Firma Adı",
