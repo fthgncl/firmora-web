@@ -57,5 +57,6 @@
   "permissions": "Yetkiler",
   "role": "Rol",
   "success_message": "İşlem başarıyla tamamlandı.",
-  "error_message": "Bir hata oluştu, lütfen tekrar deneyin."
+  "error_message": "Bir hata oluştu, lütfen tekrar deneyin.",
+  "balance": "Bakiye"
 }

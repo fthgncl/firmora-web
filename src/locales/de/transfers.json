@@ -50,9 +50,9 @@
     "submit": "Senden",
     "submit_tip": "Überweisung absenden",
     "loading_permissions": "Berechtigungen werden überprüft…",
-    "source_company": "Quellunternehmen",
     "source_user": "Quellbenutzerkonto",
-    "user_account": "Benutzerkonto"
+    "source_company": "Absendendes Unternehmen",
+    "sender_account": "Benutzerkonto für Zahlungsausgang"
   },
   "fields": {
     "transfer_type": "Überweisungsart",

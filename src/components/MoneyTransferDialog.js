@@ -4,7 +4,7 @@ import axios from 'axios';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
     useMediaQuery, useTheme, Box, Stack, Typography,
-    TextField, InputAdornment, MenuItem, Button, Chip,
+    TextField, InputAdornment, MenuItem, Button,
     IconButton, Tooltip, Divider, CircularProgress
 } from '@mui/material';
 
@@ -385,41 +385,136 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
             fullScreen={fullScreen}
             PaperProps={{ sx: { borderRadius: fullScreen ? 0 : 2 } }}
         >
-            <DialogTitle sx={{ pr: 6 }}>
+            <DialogTitle
+                sx={{
+                    pr: 6,
+                    color: 'white',
+                    background: 'linear-gradient(90deg, rgba(99,102,241,0.7), rgba(236,72,153,0.7))',
+                    fontWeight: 600,
+                    letterSpacing: 0.3,
+                    position: 'relative',
+                }}
+            >
                 {t('transfers:dialog.title')}
+
                 <IconButton
                     aria-label={t('common:close')}
                     onClick={handleClose}
                     edge="end"
-                    sx={{ position: 'absolute', right: 8, top: 8 }}
+                    sx={{
+                        position: 'absolute',
+                        right: 16,
+                        top: 8,
+                        color: 'white',
+                        transition: 'opacity 0.2s ease',
+                        '&:hover': { opacity: 0.8 },
+                    }}
                 >
                     <CloseRounded />
                 </IconButton>
             </DialogTitle>
 
+
             <DialogContent dividers sx={{ pt: 2 }}>
-                {/* Kaynak hesap özeti */}
-                <Box sx={{ mb: 2, p: 2, borderRadius: 2, bgcolor: 'action.hover' }}>
-                    <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
-                        <Stack>
-                            <Typography variant="caption" color="text.secondary">
+                {/* Kaynak Hesap Özeti */}
+                <Box
+                    sx={{
+                        mb: 3,
+                        p: 2.5,
+                        borderRadius: 2,
+                        bgcolor: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                    }}
+                >
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        {/* Sol ikon */}
+                        <Box
+                            sx={{
+                                width: 44,
+                                height: 44,
+                                borderRadius: '12px',
+                                background: 'rgba(255,255,255,0.04)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                backdropFilter: 'blur(6px)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'rgba(255,255,255,0.7)',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: 'rgba(255,255,255,0.07)',
+                                    color: '#fff',
+                                },
+                            }}
+                        >
+                            {fromScope === 'company' && <Business />}
+                            {fromScope === 'user' && <Person />}
+                            {fromScope === 'external' && <AccountBalance />}
+                        </Box>
+
+
+
+                        {/* Bilgi Alanı */}
+                        <Box>
+                            <Typography
+                                variant="overline"
+                                sx={{
+                                    color: 'text.secondary',
+                                    fontSize: '0.8rem',
+                                    letterSpacing: 0.5,
+                                    textTransform: 'uppercase',
+                                }}
+                            >
                                 {fromScope === 'company'
                                     ? t('transfers:dialog.source_company')
-                                    : t('transfers:dialog.source_user')}
+                                    : t('transfers:dialog.sender_account')}
                             </Typography>
-                            <Typography variant="subtitle2">
-                                {fromScope === 'company'
-                                    ? (sourceAccount?.company?.company_name || '—')
-                                    : t('transfers:dialog.user_account')}
-                            </Typography>
-                        </Stack>
-                        <Chip
-                            size="small"
-                            variant="outlined"
-                            label={`${currency} • ${formatAmount(sourceAccount?.balance)}`}
-                        />
+
+                            {fromScope === 'company' ? (
+                                <>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                        {sourceAccount?.company_name}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                        {t('transfers:labels.companyId')}: {sourceAccount?.id}
+                                    </Typography>
+                                </>
+                            ) : (
+                                <>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                        {sourceAccount?.name || '-'}
+                                    </Typography>
+                                    {sourceAccount?.company?.company_name && (
+                                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                            {sourceAccount.company.company_name}
+                                        </Typography>
+                                    )}
+                                </>
+                            )}
+                        </Box>
                     </Stack>
+
+                    {/* Sağ taraf: Bakiye */}
+                    <Box sx={{ textAlign: 'right', mt: { xs: 2, sm: 0 } }}>
+                        <Typography
+                            variant="caption"
+                            sx={{ color: 'text.secondary', display: 'block', textTransform: 'uppercase' }}
+                        >
+                            {t('common:balance')}
+                        </Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                            {formatAmount(sourceAccount?.balance ?? 0)}{' '}
+                            <Typography component="span" variant="subtitle2" sx={{ ml: 0.5 }}>
+                                {sourceAccount?.currency}
+                            </Typography>
+                        </Typography>
+                    </Box>
                 </Box>
+
 
                 {/* Transfer tipi */}
                 <TextField

@@ -57,5 +57,6 @@
   "permissions": "Permissions",
   "role": "Role",
   "success_message": "Operation completed successfully.",
-  "error_message": "An error occurred. Please try again."
+  "error_message": "An error occurred. Please try again.",
+  "balance": "Balance"
 }

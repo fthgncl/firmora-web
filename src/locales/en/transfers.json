@@ -50,9 +50,9 @@
     "submit": "Send",
     "submit_tip": "Submit transfer",
     "loading_permissions": "Checking permissions…",
-    "source_company": "Source Company",
     "source_user": "Source User Account",
-    "user_account": "User Account"
+    "source_company": "Sender Company",
+    "sender_account": "User account for outgoing payment"
   },
   "fields": {
     "transfer_type": "Transfer Type",

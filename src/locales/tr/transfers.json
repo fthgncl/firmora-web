@@ -50,9 +50,9 @@
     "submit": "Gönder",
     "submit_tip": "Transferi gönder",
     "loading_permissions": "İzinler kontrol ediliyor…",
-    "source_company": "Kaynak Firma",
     "source_user": "Kaynak Kullanıcı Hesabı",
-    "user_account": "Kullanıcı Hesabı"
+    "source_company": "Gönderen Firma",
+    "sender_account": "Para çıkışı yapılacak kullanıcı hesabı"
   },
   "fields": {
     "transfer_type": "Transfer Tipi",

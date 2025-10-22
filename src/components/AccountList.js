@@ -32,7 +32,7 @@ export default function AccountList() {
     const { t, i18n } = useTranslation(['accounts']);
     const {token} = useAuth();
     const [accounts, setAccounts] = useState([]);
-    const [userName, setUserName] = useState('');
+    const [accountName, setAccountName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [anchorEl, setAnchorEl] = useState(null);
@@ -64,7 +64,7 @@ export default function AccountList() {
                 if (response.data.status === 'success') {
                     setAccounts(response.data.accounts);
                     if (response.data.user?.name && response.data.user?.surname) {
-                        setUserName(`${response.data.user.name} ${response.data.user.surname}`);
+                        setAccountName(`${response.data.user.name} ${response.data.user.surname}`);
                     }
                 }
             } catch (err) {
@@ -106,6 +106,7 @@ export default function AccountList() {
 
     const handleMenuOpen = (event, account) => {
         setAnchorEl(event.currentTarget);
+        account.name = accountName;
         setSelectedAccount(account);
     };
 
@@ -234,16 +235,16 @@ export default function AccountList() {
 
                                     <Box>
                                         {/* Kullanıcı adı */}
-                                        {userName && (
+                                        {accountName && (
                                             <Typography
                                                 variant="subtitle1"
                                                 sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.1 }}
                                             >
-                                                {userName}
+                                                {accountName}
                                             </Typography>
                                         )}
 
-                                        {/* Firma adı (userName altı) */}
+                                        {/* Firma adı (accountName altı) */}
                                         <Typography
                                             variant="body2"
                                             sx={{ color: 'text.secondary', mt: 0.35 }}
