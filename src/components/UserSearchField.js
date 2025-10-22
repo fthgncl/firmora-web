@@ -113,7 +113,7 @@ export default function UserSearchField({
         );
     };
 
-    const open = Boolean(anchorEl) && !!searchTerm && !loading && searchResults.length > 0;
+    const open = Boolean(anchorEl) && !!searchTerm && !loading;
 
     return (
         <Box sx={{ position: 'relative', minWidth }}>
@@ -128,7 +128,7 @@ export default function UserSearchField({
                     if (!e.target.value) setAnchorEl(null);
                 }}
                 onFocus={(e) => {
-                    if (searchTerm && searchResults.length > 0 && !anchorEl) {
+                    if (searchTerm && !anchorEl) {
                         setAnchorEl(e.currentTarget);
                     }
                 }}
@@ -178,7 +178,10 @@ export default function UserSearchField({
                         color="text.secondary"
                         sx={{ px: 1, pb: 1, display: 'block' }}
                     >
-                        {t('users:search.resultsFound', { count: searchResults.length })}
+                        {searchResults.length > 0 
+                            ? t('users:search.resultsFound', { count: searchResults.length })
+                            : t('users:search.noResults')
+                        }
                     </Typography>
 
                     {searchResults.map((user) => (
@@ -231,12 +234,6 @@ export default function UserSearchField({
                     ))}
                 </Paper>
             </Popper>
-
-            {!loading && searchTerm && searchResults.length === 0 && (
-                <Typography variant="caption" color="text.secondary" sx={{ position: 'absolute', mt: 0.5 }}>
-                    {t('users:search.noResults')}
-                </Typography>
-            )}
         </Box>
     );
 }

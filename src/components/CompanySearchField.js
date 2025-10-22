@@ -98,7 +98,7 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
         if (onCompanySelect) onCompanySelect(company);
     };
 
-    const open = Boolean(anchorEl) && !!searchTerm && !loading && searchResults.length > 0;
+    const open = Boolean(anchorEl) && !!searchTerm && !loading;
 
     return (
         <Box sx={{ position: 'relative', minWidth }}>
@@ -113,7 +113,7 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
                     if (!e.target.value) setAnchorEl(null);
                 }}
                 onFocus={(e) => {
-                    if (searchTerm && searchResults.length > 0 && !anchorEl) {
+                    if (searchTerm && !anchorEl) {
                         setAnchorEl(e.currentTarget);
                     }
                 }}
@@ -159,7 +159,10 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
                     }}
                 >
                     <Typography variant="caption" color="text.secondary" sx={{ px: 1, pb: 1, display: 'block' }}>
-                        {t('resultsFound', { count: searchResults.length })}
+                        {searchResults.length > 0 
+                            ? t('resultsFound', { count: searchResults.length })
+                            : t('noResults')
+                        }
                     </Typography>
 
                     {searchResults.map((company) => (
@@ -204,13 +207,6 @@ export default function CompanySearchField({ minWidth = 320, onCompanySelect, ex
                     ))}
                 </Paper>
             </Popper>
-
-            {/* Boş sonuç */}
-            {!loading && searchTerm && searchResults.length === 0 && (
-                <Typography variant="caption" color="text.secondary" sx={{ position: 'absolute', mt: 0.5 }}>
-                    {t('noResults')}
-                </Typography>
-            )}
         </Box>
     );
 }
