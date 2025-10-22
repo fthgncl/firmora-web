@@ -179,7 +179,7 @@ export default function CompanyPage() {
                                         >
                                             {/* Sağ üstte üç profesyonel buton */}
                                             <Stack
-                                                direction={{ xs: 'column', sm: 'row' }} // xs’te dikey, sm+ yatay
+                                                direction={{ xs: 'column', sm: 'row', md:'column' }} // xs’te dikey, sm+ yatay
                                                 spacing={1}
                                                 sx={{
                                                     position: 'absolute',           // ⬅️ her zaman absolute (boşluk bırakmaz)
