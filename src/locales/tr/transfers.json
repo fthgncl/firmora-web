@@ -1,90 +1,87 @@
 {
-  "title": "Para Transferi",
-  "fields": {
-    "transferType": "Transfer Tipi",
-    "amount": "Tutar",
-    "receiverUser": "Alıcı Kullanıcı",
-    "targetCompany": "Hedef Firma",
-    "externalName": "Alıcı Adı / Firma Adı",
-    "description": "Açıklama (Opsiyonel)"
-  },
-  "placeholders": {
-    "externalName": "Tedarikçi A.Ş.",
-    "description": "Transfer açıklaması..."
-  },
-  "labels": {
-    "noPermission": "Yetki Yok",
-    "selectedUser": "Seçilen Kullanıcı",
-    "selectedCompany": "Seçilen Firma",
-    "companyId": "Firma ID"
-  },
-  "steps": {
-    "selectTargetCompany": "1. Hedef Firmayı Seçin",
-    "selectUserFromCompany": "2. Bu Firmadan Kullanıcı Seçin"
-  },
-  "info": {
-    "sender": "Gönderen",
-    "personalAccount": "Kişisel Hesap",
-    "companyAccount": "Firma Hesabı",
-    "currentBalance": "Mevcut Bakiye"
-  },
-  "actions": {
-    "cancel": "İptal",
-    "send": "Gönder",
-    "sending": "Gönderiliyor..."
-  },
-  "messages": {
-    "success": "Transfer başarıyla oluşturuldu.",
-    "createFailed": "Transfer oluşturulamadı.",
-    "genericError": "Transfer sırasında bir hata oluştu."
-  },
-  "validations": {
-    "transferTypeRequired": "Transfer tipi seçiniz",
-    "amountRequired": "Tutar giriniz",
-    "amountPositive": "Tutar pozitif olmalıdır",
-    "maxDecimals": "En fazla 2 ondalık basamak olabilir",
-    "insufficientBalance": "Yetersiz bakiye",
-    "descriptionMax": "Açıklama en fazla 255 karakter olabilir",
-    "selectUser": "Kullanıcı seçiniz",
-    "companyIdRequired": "Firma ID gerekli",
-    "externalNameRequired": "Alıcı adı giriniz"
-  },
   "types": {
     "company_to_user_same": {
-      "label": "Aynı Firmadaki Kullanıcıya",
-      "description": "Firma hesabından aynı firmadaki kullanıcıya transfer"
+      "label": "Aynı firmadaki kullanıcıya transfer",
+      "description": "Firma hesabından aynı firmadaki bir kullanıcıya para gönderir."
     },
     "company_to_user_other": {
-      "label": "Başka Firmadaki Kullanıcıya",
-      "description": "Firma hesabından başka firmadaki kullanıcıya transfer"
+      "label": "Farklı firmadaki kullanıcıya transfer",
+      "description": "Firma hesabından başka bir firmadaki kullanıcıya para gönderir."
     },
     "company_to_company_other": {
-      "label": "Başka Firmaya",
-      "description": "Firma hesabından başka bir firmaya transfer"
+      "label": "Farklı firmaya transfer",
+      "description": "Firma hesabından başka bir firmaya para gönderir."
     },
     "company_to_external": {
-      "label": "Harici Alıcıya",
-      "description": "Firma hesabından sistem dışı alıcıya transfer"
+      "label": "Sistem dışına transfer",
+      "description": "Firma hesabından sistem dışı bir alıcıya para gönderir."
     },
     "user_to_user_same": {
-      "label": "Aynı Firmadaki Kullanıcıya",
-      "description": "Kullanıcı hesabından aynı firmadaki kullanıcıya transfer"
+      "label": "Aynı firmadaki kullanıcıya transfer",
+      "description": "Kullanıcı hesabından aynı firmadaki başka bir kullanıcıya para gönderir."
     },
     "user_to_user_other": {
-      "label": "Başka Firmadaki Kullanıcıya",
-      "description": "Kullanıcı hesabından başka firmadaki kullanıcıya transfer"
+      "label": "Farklı firmadaki kullanıcıya transfer",
+      "description": "Kullanıcı hesabından başka firmadaki bir kullanıcıya para gönderir."
     },
     "user_to_company_same": {
-      "label": "Kendi Firmasına",
-      "description": "Kullanıcı hesabından kendi firmasına transfer"
+      "label": "Kendi firmasına transfer",
+      "description": "Kullanıcı hesabından kendi firmasına para gönderir."
     },
     "user_to_company_other": {
-      "label": "Başka Firmaya",
-      "description": "Kullanıcı hesabından başka firmaya transfer"
+      "label": "Farklı firmaya transfer",
+      "description": "Kullanıcı hesabından başka bir firmaya para gönderir."
     },
     "user_to_external": {
-      "label": "Harici Alıcıya",
-      "description": "Kullanıcı hesabından sistem dışı alıcıya transfer"
+      "label": "Sistem dışına transfer",
+      "description": "Kullanıcı hesabından sistem dışı bir alıcıya para gönderir."
+    },
+    "external_to_user": {
+      "label": "Sistem dışından kullanıcıya transfer",
+      "description": "Sistem dışı bir kaynaktan kullanıcı hesabına para girişi yapılır."
+    },
+    "external_to_company": {
+      "label": "Sistem dışından firmaya transfer",
+      "description": "Sistem dışı bir kaynaktan firma hesabına para girişi yapılır."
     }
+  },
+  "dialog": {
+    "title": "Para Transferi",
+    "submit": "Gönder",
+    "submit_tip": "Transferi gönder",
+    "loading_permissions": "İzinler kontrol ediliyor…",
+    "source_company": "Kaynak Firma",
+    "source_user": "Kaynak Kullanıcı Hesabı",
+    "user_account": "Kullanıcı Hesabı"
+  },
+  "fields": {
+    "transfer_type": "Transfer Tipi",
+    "amount": "Tutar",
+    "description": "Açıklama (opsiyonel)",
+    "to_company": "Hedef Firma",
+    "to_user": "Hedef Kullanıcı",
+    "to_external_name": "Alıcı Adı (Sistem Dışı)"
+  },
+  "validations": {
+    "amount_positive": "Lütfen pozitif bir tutar girin.",
+    "company_required": "Lütfen hedef firmayı seçin.",
+    "user_required": "Lütfen hedef kullanıcıyı seçin.",
+    "to_external_name_required": "Lütfen alıcı adını girin.",
+    "select_company_first": "Önce hedef firmayı seçin."
+  },
+  "create": {
+    "success": "Transfer başarıyla tamamlandı.",
+    "failed": "Transfer işlemi başarısız."
+  },
+  "labels": {
+    "companyId": "Firma ID",
+    "selected_target": "Seçilen Hedef",
+    "scopeInfo": "Kaynak: {{from}} → Hedef: {{to}}",
+    "currency": "Para Birimi"
+  },
+  "scopes": {
+    "user": "Kullanıcı",
+    "company": "Firma",
+    "external": "Sistem Dışı"
   }
 }

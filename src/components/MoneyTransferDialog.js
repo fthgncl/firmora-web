@@ -1,359 +1,343 @@
-import React, {useState, useEffect, useMemo} from 'react';
-import {useTranslation} from 'react-i18next';
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    Box,
-    Typography,
-    TextField,
-    FormControl,
-    FormLabel,
-    RadioGroup,
-    FormControlLabel,
-    Radio,
-    Alert,
-    CircularProgress,
-    InputAdornment,
-    Chip,
-    IconButton,
-} from '@mui/material';
-import {
-    Send,
-    AccountBalance,
-    Person,
-    Business,
-    Close,
-    SwapHoriz,
-    TrendingUp,
-} from '@mui/icons-material';
-import {useFormik} from 'formik';
-import * as Yup from 'yup';
+// src/components/MoneyTransferDialog.js
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import axios from 'axios';
-import {useAuth} from '../contexts/AuthContext';
-import {useAlert} from '../contexts/AlertContext';
-import {permissionsService} from '../services/permissionsService';
+import {
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    useMediaQuery, useTheme, Box, Stack, Typography,
+    TextField, InputAdornment, MenuItem, Button, Chip,
+    IconButton, Tooltip, Divider, CircularProgress
+} from '@mui/material';
+
+import CloseRounded from '@mui/icons-material/CloseRounded';
+import Person from '@mui/icons-material/Person';
+import Business from '@mui/icons-material/Business';
+import AccountBalance from '@mui/icons-material/AccountBalance';
+import TrendingUp from '@mui/icons-material/TrendingUp';
+import SwapHoriz from '@mui/icons-material/SwapHoriz';
+import Send from '@mui/icons-material/Send';
+import Clear from '@mui/icons-material/Clear';
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
+
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
+import { useAlert } from '../contexts/AlertContext';
+import { permissionsService } from '../services/permissionsService';
 import UserSearchField from './UserSearchField';
 import CompanySearchField from './CompanySearchField';
 
-export default function MoneyTransferDialog({open, onClose, sourceAccount = null, fromScope = 'user'}) {
-    const {t, i18n} = useTranslation(['transfers']);
-    const {token, user} = useAuth();
-    const {showAlert} = useAlert();
-    const [loading, setLoading] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedCompany, setSelectedCompany] = useState(null);
-    const [permissions, setPermissions] = useState({});
+// -----------------------------
+// helpers
+// -----------------------------
+const currencySymbol = (code) => {
+    switch (code) {
+        case 'USD': return '$';
+        case 'EUR': return '€';
+        case 'GBP': return '£';
+        case 'TRY': return '₺';
+        case 'JPY': return '¥';
+        case 'CHF': return 'CHF';
+        default: return code || '';
+    }
+};
 
-    // Tüm transfer senaryoları - API'ye göre
-    const allTransferTypes = [
-        // COMPANY kaynaklı transferler
-        {
-            value: 'company_to_user_same',
-            label: t('transfers:types.company_to_user_same.label'),
-            icon: <Person/>,
-            fromScope: 'company',
-            toScope: 'user',
-            permission: 'can_transfer_company_to_same_company_user',
-            description: t('transfers:types.company_to_user_same.description'),
-            requiresUser: true,
-            requiresOtherCompany: false,
-        },
-        {
-            value: 'company_to_user_other',
-            label: t('transfers:types.company_to_user_other.label'),
-            icon: <Business/>,
-            fromScope: 'company',
-            toScope: 'user',
-            permission: 'can_transfer_company_to_other_company_user',
-            description: t('transfers:types.company_to_user_other.description'),
-            requiresUser: true,
-            requiresOtherCompany: true,
-        },
-        {
-            value: 'company_to_company_other',
-            label: t('transfers:types.company_to_company_other.label'),
-            icon: <Business/>,
-            fromScope: 'company',
-            toScope: 'company',
-            permission: 'can_transfer_company_to_other_company',
-            description: t('transfers:types.company_to_company_other.description'),
-            requiresUser: false,
-            requiresOtherCompany: true,
-        },
-        {
-            value: 'company_to_external',
-            label: t('transfers:types.company_to_external.label'),
-            icon: <AccountBalance/>,
-            fromScope: 'company',
-            toScope: 'external',
-            permission: 'can_transfer_company_to_other_company',
-            description: t('transfers:types.company_to_external.description'),
-            requiresUser: false,
-            requiresOtherCompany: false,
-            requiresExternal: true,
-        },
-        // USER kaynaklı transferler
-        {
-            value: 'user_to_user_same',
-            label: t('transfers:types.user_to_user_same.label'),
-            icon: <Person/>,
-            fromScope: 'user',
-            toScope: 'user',
-            permission: 'can_transfer_user_to_same_company_user',
-            description: t('transfers:types.user_to_user_same.description'),
-            requiresUser: true,
-            requiresOtherCompany: false,
-        },
-        {
-            value: 'user_to_user_other',
-            label: t('transfers:types.user_to_user_other.label'),
-            icon: <Business/>,
-            fromScope: 'user',
-            toScope: 'user',
-            permission: 'can_transfer_user_to_other_company_user',
-            description: t('transfers:types.user_to_user_other.description'),
-            requiresUser: true,
-            requiresOtherCompany: true,
-        },
-        {
-            value: 'user_to_company_same',
-            label: t('transfers:types.user_to_company_same.label'),
-            icon: <TrendingUp/>,
-            fromScope: 'user',
-            toScope: 'company',
-            permission: 'can_transfer_user_to_own_company',
-            description: t('transfers:types.user_to_company_same.description'),
-            requiresUser: false,
-            requiresOtherCompany: false,
-        },
-        {
-            value: 'user_to_company_other',
-            label: t('transfers:types.user_to_company_other.label'),
-            icon: <SwapHoriz/>,
-            fromScope: 'user',
-            toScope: 'company',
-            permission: 'can_transfer_user_to_other_company',
-            description: t('transfers:types.user_to_company_other.description'),
-            requiresUser: false,
-            requiresOtherCompany: true,
-        },
-        {
-            value: 'user_to_external',
-            label: t('transfers:types.user_to_external.label'),
-            icon: <AccountBalance/>,
-            fromScope: 'user',
-            toScope: 'external',
-            permission: 'can_transfer_user_to_other_company',
-            description: t('transfers:types.user_to_external.description'),
-            requiresUser: false,
-            requiresOtherCompany: false,
-            requiresExternal: true,
-        },
-    ];
+const formatAmount = (n) => {
+    try {
+        return new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n ?? 0);
+    } catch {
+        return String(n ?? 0);
+    }
+};
 
-    // fromScope'a göre transfer tiplerini filtrele
-    const transferTypes = useMemo(() => {
-        return allTransferTypes.filter(type => type.fromScope === fromScope);
-        // eslint-disable-next-line
-    }, [fromScope]);
+// UI meta (backend ile birebir)
+const ALL_TYPES = [
+    // COMPANY kaynaklı
+    {
+        value: 'company_to_user_same',
+        labelKey: 'transfers:types.company_to_user_same.label',
+        descKey: 'transfers:types.company_to_user_same.description',
+        icon: <Person />,
+        fromScope: 'company',
+        toScope: 'user',
+        permission: 'can_transfer_company_to_same_company_user',
+        requiresUser: true,
+        requiresOtherCompany: false,
+        requiresToExternalName: false,
+        requiresFromExternalName: false,
+    },
+    {
+        value: 'company_to_user_other',
+        labelKey: 'transfers:types.company_to_user_other.label',
+        descKey: 'transfers:types.company_to_user_other.description',
+        icon: <Business />,
+        fromScope: 'company',
+        toScope: 'user',
+        permission: 'can_transfer_company_to_other_company_user',
+        requiresUser: true,
+        requiresOtherCompany: true,
+        requiresToExternalName: false,
+        requiresFromExternalName: false,
+    },
+    {
+        value: 'company_to_company_other',
+        labelKey: 'transfers:types.company_to_company_other.label',
+        descKey: 'transfers:types.company_to_company_other.description',
+        icon: <Business />,
+        fromScope: 'company',
+        toScope: 'company',
+        permission: 'can_transfer_company_to_other_company',
+        requiresUser: false,
+        requiresOtherCompany: true,
+        requiresToExternalName: false,
+        requiresFromExternalName: false,
+    },
+    {
+        value: 'company_to_external',
+        labelKey: 'transfers:types.company_to_external.label',
+        descKey: 'transfers:types.company_to_external.description',
+        icon: <AccountBalance />,
+        fromScope: 'company',
+        toScope: 'external',
+        permission: 'can_transfer_company_to_external',
+        requiresUser: false,
+        requiresOtherCompany: false,
+        requiresToExternalName: true,
+        requiresFromExternalName: false,
+    },
 
-    // İlk geçerli transfer tipini bul
-    const getInitialTransferType = () => {
-        const enabledType = transferTypes.find(type => permissions[type.permission]);
-        return enabledType ? enabledType.value : (transferTypes[0]?.value || '');
+    // USER kaynaklı
+    {
+        value: 'user_to_user_same',
+        labelKey: 'transfers:types.user_to_user_same.label',
+        descKey: 'transfers:types.user_to_user_same.description',
+        icon: <Person />,
+        fromScope: 'user',
+        toScope: 'user',
+        permission: 'can_transfer_user_to_same_company_user',
+        requiresUser: true,
+        requiresOtherCompany: false,
+        requiresToExternalName: false,
+        requiresFromExternalName: false,
+    },
+    {
+        value: 'user_to_user_other',
+        labelKey: 'transfers:types.user_to_user_other.label',
+        descKey: 'transfers:types.user_to_user_other.description',
+        icon: <Business />,
+        fromScope: 'user',
+        toScope: 'user',
+        permission: 'can_transfer_user_to_other_company_user',
+        requiresUser: true,
+        requiresOtherCompany: true,
+        requiresToExternalName: false,
+        requiresFromExternalName: false,
+    },
+    {
+        value: 'user_to_company_same',
+        labelKey: 'transfers:types.user_to_company_same.label',
+        descKey: 'transfers:types.user_to_company_same.description',
+        icon: <TrendingUp />,
+        fromScope: 'user',
+        toScope: 'company',
+        permission: 'can_transfer_user_to_own_company',
+        requiresUser: false,
+        requiresOtherCompany: false,
+        requiresToExternalName: false,
+        requiresFromExternalName: false,
+    },
+    {
+        value: 'user_to_company_other',
+        labelKey: 'transfers:types.user_to_company_other.label',
+        descKey: 'transfers:types.user_to_company_other.description',
+        icon: <SwapHoriz />,
+        fromScope: 'user',
+        toScope: 'company',
+        permission: 'can_transfer_user_to_other_company',
+        requiresUser: false,
+        requiresOtherCompany: true,
+        requiresToExternalName: false,
+        requiresFromExternalName: false,
+    },
+    {
+        value: 'user_to_external',
+        labelKey: 'transfers:types.user_to_external.label',
+        descKey: 'transfers:types.user_to_external.description',
+        icon: <AccountBalance />,
+        fromScope: 'user',
+        toScope: 'external',
+        permission: 'can_transfer_user_to_external',
+        requiresUser: false,
+        requiresOtherCompany: false,
+        requiresToExternalName: true,
+        requiresFromExternalName: false,
+    },
+];
+
+// -----------------------------
+// component
+// -----------------------------
+export default function MoneyTransferDialog({ open, onClose, sourceAccount = null, fromScope }) {
+    const { t } = useTranslation(['transfers', 'common']);
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const { token, user } = useAuth();
+    const { showError, showSuccess } = useAlert();
+
+    // derived
+    const companyId = sourceAccount?.company?.id || sourceAccount?.id || null;
+    const currency = sourceAccount?.currency || sourceAccount?.company?.currency || 'EUR';
+    const symbol = currencySymbol(currency);
+
+    // state
+    const [loadingPerms, setLoadingPerms] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+
+    const [availableTypes, setAvailableTypes] = useState([]);
+    const [typeValue, setTypeValue] = useState('');
+
+    const [toCompany, setToCompany] = useState(null);      // CompanySearchField → object
+    const [toUser, setToUser] = useState(null);            // UserSearchField → object
+    const [toExternalName, setToExternalName] = useState('');
+
+    const [amount, setAmount] = useState('');
+    const [description, setDescription] = useState('');
+
+    // filtre: bu dialog sadece verilen fromScope için tipleri gösterir
+    const scopedTypes = useMemo(
+        () => ALL_TYPES.filter((x) => x.fromScope === fromScope),
+        [fromScope]
+    );
+
+    // izinleri preload et ve uygun tipleri listele
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            if (!open || !token || !user?.id || !companyId) {
+                setAvailableTypes([]);
+                setTypeValue('');
+                return;
+            }
+            setLoadingPerms(true);
+            try {
+                const checks = await Promise.all(
+                    scopedTypes.map(async (def) => {
+                        const ok = await permissionsService.checkUserRoles(token, user, companyId, [def.permission]);
+                        return ok ? def : null;
+                    })
+                );
+                const allowed = checks.filter(Boolean);
+                if (!cancelled) {
+                    setAvailableTypes(allowed);
+                    // önceki seçim geçerliyse koru; değilse ilk uygunu seç
+                    setTypeValue((prev) => (allowed.some((x) => x.value === prev) ? prev : allowed[0]?.value || ''));
+                }
+            } catch {
+                if (!cancelled) {
+                    setAvailableTypes([]);
+                    setTypeValue('');
+                }
+            } finally {
+                if (!cancelled) setLoadingPerms(false);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [open, token, user, companyId, scopedTypes]);
+
+    // tip değişince bağımlı alanları sıfırla
+    useEffect(() => {
+        setToCompany(null);
+        setToUser(null);
+        setToExternalName('');
+    }, [typeValue]);
+
+    const selectedType = useMemo(
+        () => availableTypes.find((x) => x.value === typeValue) || null,
+        [availableTypes, typeValue]
+    );
+
+    const handleClose = useCallback(() => {
+        if (submitting) return;
+        onClose?.();
+    }, [onClose, submitting]);
+
+    // seçim handler’ları
+    const handleCompanySelect = useCallback((company) => {
+        setToCompany(company); // object
+        setToUser(null);       // firma değişince kullanıcıyı sıfırla
+    }, []);
+
+    const handleUserSelect = useCallback((userObj) => setToUser(userObj), []);
+
+    // doğrulama
+    const validate = () => {
+        if (!selectedType) {
+            showError(t('transfers:validations.select_type'));
+            return false;
+        }
+        const amt = Number(String(amount).replace(',', '.'));
+        if (!amount || Number.isNaN(amt) || amt <= 0) {
+            showError(t('transfers:validations.amount_positive'));
+            return false;
+        }
+        if (selectedType.requiresOtherCompany && !toCompany?.id) {
+            showError(t('transfers:validations.company_required'));
+            return false;
+        }
+        if (selectedType.requiresUser) {
+            // other-company ise firma seçmeden user aramasını engelle
+            if (selectedType.requiresOtherCompany && !toCompany?.id) {
+                showError(t('transfers:validations.select_company_first'));
+                return false;
+            }
+            if (!toUser?.id) {
+                showError(t('transfers:validations.user_required'));
+                return false;
+            }
+        }
+        if (selectedType.requiresToExternalName && !toExternalName.trim()) {
+            showError(t('transfers:validations.to_external_name_required'));
+            return false;
+        }
+        return true;
     };
 
-    // Yetki kontrolü
-    useEffect(() => {
-        const checkPermissions = async () => {
-            if (!sourceAccount || !user || !token) return;
-
-            const companyId = sourceAccount.company?.id || sourceAccount.id;
-
-            try {
-                const permissionCodes = [
-                    'can_transfer_company_to_same_company_user',
-                    'can_transfer_company_to_other_company_user',
-                    'can_transfer_company_to_other_company',
-                    'can_transfer_user_to_same_company_user',
-                    'can_transfer_user_to_other_company_user',
-                    'can_transfer_user_to_own_company',
-                    'can_transfer_user_to_other_company',
-                ];
-
-                const permissionResults = {};
-                for (const code of permissionCodes) {
-                    permissionResults[code] = await permissionsService.checkUserRoles(
-                        token,
-                        user,
-                        companyId,
-                        [code]
-                    );
-                }
-
-                setPermissions(permissionResults);
-            } catch (error) {
-                console.error('Yetki kontrolü hatası:', error);
-            }
+    // payload oluştur
+    const buildRequest = () => {
+        const amt = Number(String(amount).replace(',', '.'));
+        const base = {
+            transfer_type: selectedType.value,
+            currency,
+            amount: amt,
+            description: description?.trim() || undefined,
+            from_scope: selectedType.fromScope,
+            to_scope: selectedType.toScope,
+            company_id: companyId,
         };
 
-        if (open) {
-            checkPermissions();
+        if (selectedType.requiresUser && toUser?.id) {
+            base.to_user_id = toUser.id;
+            base.to_user_company_id = selectedType.requiresOtherCompany
+                ? toCompany?.id
+                : companyId; // same-company senaryosu
+        } else if (selectedType.requiresOtherCompany && toCompany?.id) {
+            base.to_user_company_id = toCompany.id;
         }
-    }, [open, sourceAccount, user, token]);
 
-    // Form validasyon şeması
-    const validationSchema = Yup.object({
-        transferType: Yup.string().required(t('transfers:validations.transferTypeRequired')),
-        amount: Yup.number()
-            .required(t('transfers:validations.amountRequired'))
-            .positive(t('transfers:validations.amountPositive'))
-            .test('max-decimals', t('transfers:validations.maxDecimals'), function (value) {
-                if (!value) return true;
-                const decimals = (value.toString().split('.')[1] || '').length;
-                return decimals <= 2;
-            })
-            .test('max-balance', t('transfers:validations.insufficientBalance'), function(value) {
-                if (!sourceAccount) return true;
-                return value <= sourceAccount.balance;
-            }),
-        description: Yup.string()
-            .max(255, t('transfers:validations.descriptionMax')),
-        toUserId: Yup.string().when('transferType', {
-            is: (val) => {
-                const type = allTransferTypes.find(t => t.value === val);
-                return type?.requiresUser;
-            },
-            then: (schema) => schema.required(t('transfers:validations.selectUser')),
-        }),
-        toUserCompanyId: Yup.string().when('transferType', {
-            is: (val) => {
-                const type = allTransferTypes.find(t => t.value === val);
-                return type?.requiresOtherCompany;
-            },
-            then: (schema) => schema.required(t('transfers:validations.companyIdRequired')),
-        }),
-        toExternalName: Yup.string().when('transferType', {
-            is: (val) => {
-                const type = allTransferTypes.find(t => t.value === val);
-                return type?.requiresExternal;
-            },
-            then: (schema) => schema.required(t('transfers:validations.externalNameRequired')),
-        }),
-    });
-
-    const formik = useFormik({
-        initialValues: {
-            transferType: '',
-            amount: '',
-            description: '',
-            toUserId: '',
-            toUserCompanyId: '',
-            toExternalName: '',
-        },
-        validationSchema,
-        enableReinitialize: true,
-        onSubmit: async (values) => {
-            await handleTransfer(values);
-        },
-    });
-
-    // İlk transfer tipini ayarla
-    useEffect(() => {
-        if (open && transferTypes.length > 0 && !formik.values.transferType) {
-            formik.setFieldValue('transferType', getInitialTransferType());
+        if (selectedType.value === 'user_to_company_same') {
+            base.to_user_company_id = companyId;
         }
-        // eslint-disable-next-line
-    }, [open, transferTypes, permissions]);
-
-    // Kullanıcı seçildiğinde
-    const handleUserSelect = (user) => {
-        setSelectedUser(user);
-        formik.setFieldValue('toUserId', user.id);
-
-        // Eğer başka firma transferi ise ve firma seçiliyse, o firmanın ID'sini kullan
-        const currentType = allTransferTypes.find(t => t.value === formik.values.transferType);
-        if (currentType?.requiresOtherCompany) {
-            if (selectedCompany) {
-                // Firma CompanySearchField ile seçildiyse onun ID'sini kullan
-                formik.setFieldValue('toUserCompanyId', selectedCompany.id);
-            } else if (user.companyId) {
-                // Fallback: Kullanıcıdan gelen companyId'yi kullan
-                formik.setFieldValue('toUserCompanyId', user.companyId);
-            }
+        if (selectedType.requiresToExternalName) {
+            base.to_external_name = toExternalName.trim();
         }
+        return base;
     };
 
-    // Firma seçildiğinde
-    const handleCompanySelect = (company) => {
-        setSelectedCompany(company);
-        formik.setFieldValue('toUserCompanyId', company.id);
-    };
-
-    // Transfer tipi değiştiğinde seçilen kullanıcıyı ve firmayı temizle
-    useEffect(() => {
-        setSelectedUser(null);
-        setSelectedCompany(null);
-        formik.setFieldValue('toUserId', '');
-        formik.setFieldValue('toUserCompanyId', '');
-        formik.setFieldValue('toExternalName', '');
-        // eslint-disable-next-line
-    }, [formik.values.transferType]);
-
-    // Firma seçimi temizlendiğinde kullanıcı seçimini de temizle
-    useEffect(() => {
-        const currentType = allTransferTypes.find(t => t.value === formik.values.transferType);
-        if (currentType?.requiresOtherCompany && currentType?.requiresUser && !selectedCompany) {
-            setSelectedUser(null);
-            formik.setFieldValue('toUserId', '');
-        }
-        // eslint-disable-next-line
-    }, [selectedCompany]);
-
-    const handleTransfer = async (values) => {
+    // submit
+    const handleSubmit = async () => {
+        if (!validate()) return;
+        setSubmitting(true);
         try {
-            setLoading(true);
-
-            const transferType = allTransferTypes.find(t => t.value === values.transferType);
-            if (!transferType) {
-                throw new Error('Unkown transfer type');
-            }
-
-            const requestData = {
-                company_id: user.companyId || (sourceAccount?.company?.id || sourceAccount?.id),
-                transfer_type: values.transferType,
-                from_scope: transferType.fromScope,
-                to_scope: transferType.toScope,
-                amount: parseFloat(values.amount),
-                currency: sourceAccount?.currency || 'EUR',
-            };
-
-            // Opsiyonel açıklama
-            if (values.description) {
-                requestData.description = values.description;
-            }
-
-            // Transfer tipine göre ek alanlar
-            if (transferType.requiresUser) {
-                requestData.to_user_id = values.toUserId;
-            }
-
-            if (transferType.requiresOtherCompany) {
-                if (transferType.toScope === 'company') {
-                    requestData.to_user_company_id = values.toUserCompanyId;
-                } else if (transferType.toScope === 'user' && values.toUserCompanyId) {
-                    requestData.to_user_company_id = values.toUserCompanyId;
-                }
-            }
-
-            if (transferType.requiresExternal) {
-                requestData.to_external_name = values.toExternalName;
-            }
-
-            const response = await axios.post(
+            const requestData = buildRequest();
+            const res = await axios.post(
                 `${process.env.REACT_APP_API_URL}/transfers`,
                 requestData,
                 {
@@ -364,382 +348,302 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                 }
             );
 
-            if (response.data.status === 'success') {
-                showAlert(response.data.message || t('transfers:messages.success'), 'success');
-                formik.resetForm();
-                setSelectedUser(null);
-                onClose();
+            if (res?.data?.success) {
+                showSuccess(res?.data?.message || t('transfers:create.success'));
+                // reset
+                setAmount('');
+                setDescription('');
+                setToCompany(null);
+                setToUser(null);
+                setToExternalName('');
+                onClose?.(res.data);
             } else {
-                showAlert(response.data.message || t('transfers:messages.createFailed'), 'error');
+                showError(res?.data?.message || t('transfers:create.failed'));
             }
-        } catch (error) {
-            console.error('Transfer hatası:', error);
-            if (error.response?.data?.message) {
-                showAlert(error.response.data.message, 'error');
-            } else if (error.message) {
-                showAlert(error.message, 'error');
-            } else {
-                showAlert(t('transfers:messages.genericError'), 'error');
-            }
+        } catch (e) {
+            const apiMsg = e?.response?.data?.message || e?.message || t('transfers:create.failed');
+            showError(apiMsg);
         } finally {
-            setLoading(false);
+            setSubmitting(false);
         }
     };
 
-    const isTransferTypeDisabled = (type) => {
-        const transferType = allTransferTypes.find(t => t.value === type);
-        if (!transferType) return true;
-        return !permissions[transferType.permission];
-    };
+    // dinamik alan bayrakları
+    const showCompanyField = !!selectedType?.requiresOtherCompany;
+    const showUserField = !!selectedType?.requiresUser;
+    const showToExternal = !!selectedType?.requiresToExternalName;
 
-    const currentTransferType = allTransferTypes.find(t => t.value === formik.values.transferType);
-
+    // -----------------------------
+    // render
+    // -----------------------------
     return (
         <Dialog
             open={open}
-            onClose={onClose}
-            maxWidth="md"
+            onClose={handleClose}
+            maxWidth="sm"
             fullWidth
-            PaperProps={{
-                sx: {
-                    borderRadius: 3,
-                }
-            }}
+            fullScreen={fullScreen}
+            PaperProps={{ sx: { borderRadius: fullScreen ? 0 : 2 } }}
         >
-            <DialogTitle sx={{
-                fontWeight: 700,
-                fontSize: '1.5rem',
-                borderBottom: 1,
-                borderColor: 'divider',
-                pb: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-            }}>
-                <Box sx={{display: 'flex', alignItems: 'center', gap: 1.5}}>
-                    <Send color="primary"/>
-                    {t('transfers:title')}
-                </Box>
+            <DialogTitle sx={{ pr: 6 }}>
+                {t('transfers:dialog.title')}
                 <IconButton
-                    onClick={onClose}
-                    size="small"
-                    sx={{
-                        color: 'text.secondary',
-                        '&:hover': {
-                            color: 'text.primary',
-                            backgroundColor: 'action.hover',
-                        }
-                    }}
+                    aria-label={t('common:close')}
+                    onClick={handleClose}
+                    edge="end"
+                    sx={{ position: 'absolute', right: 8, top: 8 }}
                 >
-                    <Close/>
+                    <CloseRounded />
                 </IconButton>
             </DialogTitle>
 
-            <form onSubmit={formik.handleSubmit}>
-                <DialogContent sx={{mt: 2}}>
-                    {/* Kaynak hesap bilgisi */}
-                    {sourceAccount && (
-                        <Alert severity="info" sx={{mb: 3, borderRadius: 2}}>
-                            <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
-                                {t('transfers:info.sender')}: {fromScope === 'user' ? t('transfers:info.personalAccount') : t('transfers:info.companyAccount')}
+            <DialogContent dividers sx={{ pt: 2 }}>
+                {/* Kaynak hesap özeti */}
+                <Box sx={{ mb: 2, p: 2, borderRadius: 2, bgcolor: 'action.hover' }}>
+                    <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                        <Stack>
+                            <Typography variant="caption" color="text.secondary">
+                                {fromScope === 'company'
+                                    ? t('transfers:dialog.source_company')
+                                    : t('transfers:dialog.source_user')}
                             </Typography>
-                            <Typography variant="body2">
-                                {t('transfers:info.currentBalance')}: {new Intl.NumberFormat(i18n.language === 'tr' ? 'tr-TR' : i18n.language === 'de' ? 'de-DE' : 'en-US', {
-                                style: 'currency',
-                                currency: sourceAccount.currency || 'EUR',
-                            }).format(sourceAccount.balance)}
+                            <Typography variant="subtitle2">
+                                {fromScope === 'company'
+                                    ? (sourceAccount?.company?.company_name || '—')
+                                    : t('transfers:dialog.user_account')}
                             </Typography>
-                        </Alert>
-                    )}
+                        </Stack>
+                        <Chip
+                            size="small"
+                            variant="outlined"
+                            label={`${currency} • ${formatAmount(sourceAccount?.balance)}`}
+                        />
+                    </Stack>
+                </Box>
 
-                    {/* Transfer tipi seçimi */}
-                    <FormControl component="fieldset" fullWidth sx={{mb: 3}}>
-                        <FormLabel component="legend" sx={{mb: 2, fontWeight: 600}}>
-                            {t('transfers:fields.transferType')}
-                        </FormLabel>
-                        <RadioGroup
-                            name="transferType"
-                            value={formik.values.transferType}
-                            onChange={formik.handleChange}
-                        >
-                            {transferTypes.map((type) => (
-                                <Box key={type.value} sx={{mb: 1}}>
-                                    <FormControlLabel
-                                        value={type.value}
-                                        disabled={isTransferTypeDisabled(type.value)}
-                                        control={<Radio/>}
-                                        label={
-                                            <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
-                                                {type.icon}
-                                                <Box>
-                                                    <Typography variant="body1" sx={{fontWeight: 500}}>
-                                                        {type.label}
-                                                        {isTransferTypeDisabled(type.value) && (
-                                                            <Chip
-                                                                label={t('transfers:labels.noPermission')}
-                                                                size="small"
-                                                                color="error"
-                                                                sx={{ml: 1, height: 20}}
-                                                            />
-                                                        )}
-                                                    </Typography>
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        {type.description}
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-                                        }
-                                    />
-                                </Box>
-                            ))}
-                        </RadioGroup>
-                        {formik.touched.transferType && formik.errors.transferType && (
-                            <Typography color="error" variant="caption" sx={{mt: 1}}>
-                                {formik.errors.transferType}
-                            </Typography>
+                {/* Transfer tipi */}
+                <TextField
+                    select
+                    fullWidth
+                    label={t('transfers:fields.transfer_type')}
+                    value={typeValue}
+                    onChange={(e) => setTypeValue(e.target.value)}
+                    disabled={loadingPerms || availableTypes.length === 0}
+                    helperText={
+                        selectedType
+                            ? t(selectedType.descKey)
+                            : loadingPerms
+                                ? t('transfers:dialog.loading_permissions')
+                                : ''
+                    }
+                    sx={{ mb: 2 }}
+                >
+                    {availableTypes.map((opt) => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                            <Stack direction="row" spacing={1.25} alignItems="center">
+                                {opt.icon}
+                                <span>{t(opt.labelKey)}</span>
+                            </Stack>
+                        </MenuItem>
+                    ))}
+                </TextField>
+
+                {/* Hedef firma (gerekiyorsa) */}
+                {showCompanyField && (
+                    <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                            {t('transfers:fields.to_company')}
+                        </Typography>
+
+                        {/* Firma seçili DEĞİLSE: arama alanını göster */}
+                        {!toCompany && (
+                            <CompanySearchField
+                                onCompanySelect={handleCompanySelect}
+                                excludeCompanyId={sourceAccount?.company?.id || sourceAccount?.id}
+                                minWidth="100%"
+                            />
                         )}
-                    </FormControl>
 
-                    {/* Tutar */}
-                    <TextField
-                        fullWidth
-                        label={t('transfers:fields.amount')}
-                        name="amount"
-                        type="number"
-                        inputProps={{step: '0.01', min: '0'}}
-                        value={formik.values.amount}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.amount && Boolean(formik.errors.amount)}
-                        helperText={formik.touched.amount && formik.errors.amount}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    {sourceAccount?.currency || 'EUR'}
-                                </InputAdornment>
-                            ),
-                        }}
-                        sx={{mb: 3}}
-                    />
-
-                    {/* Dinamik alanlar - Transfer tipine göre */}
-                    {/* Başka firmadaki kullanıcıya transfer - önce firma seç, sonra kullanıcı */}
-                    {currentTransferType?.requiresUser && currentTransferType?.requiresOtherCompany && (
-                        <>
-                            <Box sx={{mb: 3}}>
-                                <Typography variant="subtitle2" sx={{mb: 1, fontWeight: 600}}>
-                                    {t('transfers:steps.selectTargetCompany')}
-                                </Typography>
-                                <CompanySearchField
-                                    onCompanySelect={handleCompanySelect}
-                                    excludeCompanyId={sourceAccount?.company?.id || sourceAccount?.id}
-                                    minWidth="100%"
-                                />
-                                {formik.touched.toUserCompanyId && formik.errors.toUserCompanyId && (
-                                    <Typography color="error" variant="caption" sx={{mt: 0.5, display: 'block'}}>
-                                        {formik.errors.toUserCompanyId}
-                                    </Typography>
-                                )}
-                            </Box>
-
-                            {/* Seçilen firma bilgisi */}
-                            {selectedCompany && (
-                                <Alert severity="info" sx={{mb: 3, borderRadius: 2}}>
-                                    <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
-                                        {t('transfers:labels.selectedCompany')}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {selectedCompany.company_name}
-                                    </Typography>
-                                    <Box sx={{display: 'flex', gap: 1, mt: 0.5}}>
-                                        <Chip label={selectedCompany.sector} size="small" variant="outlined"/>
-                                        <Chip label={selectedCompany.currency} size="small" color="primary"/>
+                        {/* Firma seçiliyse: aramayı gizle, kart göster + çarpı ile temizle */}
+                        {toCompany && (
+                            <Box
+                                sx={{
+                                    mt: 1,
+                                    p: 1.5,
+                                    borderRadius: 1.5,
+                                    bgcolor: 'rgba(102,126,234,0.08)',
+                                    border: '1px solid rgba(102,126,234,0.25)',
+                                }}
+                            >
+                                <Stack direction="row" alignItems="center" spacing={1.5}>
+                                    <Business sx={{ color: 'primary.main' }} fontSize="small" />
+                                    <Box sx={{ flexGrow: 1 }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                            {toCompany.company_name}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {toCompany.currency} • {t('transfers:labels.companyId')}: {toCompany.id}
+                                        </Typography>
                                     </Box>
-                                </Alert>
-                            )}
+                                    <Tooltip title={t('common:remove')}>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => {
+                                                setToCompany(null);
+                                                setToUser(null); // firma temizlenince kullanıcıyı da sıfırla
+                                            }}
+                                        >
+                                            <Clear fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Stack>
+                            </Box>
+                        )}
+                    </Box>
+                )}
 
-                            {/* Firma seçildikten sonra kullanıcı seçimi */}
-                            {selectedCompany && (
-                                <Box sx={{mb: 3}}>
-                                    <Typography variant="subtitle2" sx={{mb: 1, fontWeight: 600}}>
-                                        {t('transfers:steps.selectUserFromCompany')}
-                                    </Typography>
+                {/* Hedef kullanıcı (gerekiyorsa) */}
+                {showUserField && (
+                    <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                            {t('transfers:fields.to_user')}
+                        </Typography>
+
+                        {/* Eğer önce firma seçmek gerekiyorsa ve firma seçilmemişse, kilitli uyarı */}
+                        {showCompanyField && !toCompany?.id ? (
+                            <TextField
+                                fullWidth
+                                disabled
+                                label={t('transfers:fields.to_user')}
+                                helperText={t('transfers:validations.select_company_first')}
+                            />
+                        ) : (
+                            <>
+                                {/* Kullanıcı seçili DEĞİLSE: arama alanını göster */}
+                                {!toUser && (
                                     <UserSearchField
-                                        companyId={selectedCompany.id}
-                                        searchScope="company"
+                                        searchScope="company" // ⬅️ senin istediğin zorunlu prop
+                                        companyId={
+                                            showCompanyField
+                                                ? toCompany?.id
+                                                : (sourceAccount?.company?.id || sourceAccount?.id)
+                                        }
                                         onUserSelect={handleUserSelect}
                                         minWidth="100%"
                                     />
-                                    {formik.touched.toUserId && formik.errors.toUserId && (
-                                        <Typography color="error" variant="caption" sx={{mt: 0.5, display: 'block'}}>
-                                            {formik.errors.toUserId}
-                                        </Typography>
-                                    )}
-                                </Box>
-                            )}
-
-                            {/* Seçilen kullanıcı bilgisi */}
-                            {selectedUser && (
-                                <Alert severity="success" sx={{mb: 3, borderRadius: 2}}>
-                                    <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
-                                        {t('transfers:labels.selectedUser')}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {selectedUser.name} {selectedUser.surname}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {selectedUser.email}
-                                    </Typography>
-                                </Alert>
-                            )}
-                        </>
-                    )}
-
-                    {/* Aynı firmadaki kullanıcıya transfer */}
-                    {currentTransferType?.requiresUser && !currentTransferType?.requiresOtherCompany && (
-                        <>
-                            <Box sx={{mb: 3}}>
-                                <Typography variant="subtitle2" sx={{mb: 1, fontWeight: 600}}>
-                                    {t('transfers:fields.receiverUser')}
-                                </Typography>
-                                <UserSearchField
-                                    companyId={sourceAccount?.company?.id || sourceAccount?.id}
-                                    searchScope="company"
-                                    onUserSelect={handleUserSelect}
-                                    minWidth="100%"
-                                />
-                                {formik.touched.toUserId && formik.errors.toUserId && (
-                                    <Typography color="error" variant="caption" sx={{mt: 0.5, display: 'block'}}>
-                                        {formik.errors.toUserId}
-                                    </Typography>
                                 )}
-                            </Box>
 
-                            {/* Seçilen kullanıcı bilgisi */}
-                            {selectedUser && (
-                                <Alert severity="success" sx={{mb: 3, borderRadius: 2}}>
-                                    <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
-                                        {t('transfers:labels.selectedUser')}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {selectedUser.name} {selectedUser.surname}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {selectedUser.email}
-                                    </Typography>
-                                </Alert>
-                            )}
-                        </>
-                    )}
-
-                    {currentTransferType?.requiresOtherCompany && !currentTransferType?.requiresUser && (
-                        <>
-                            <Box sx={{mb: 3}}>
-                                <Typography variant="subtitle2" sx={{mb: 1, fontWeight: 600}}>
-                                    {t('transfers:fields.targetCompany')}
-                                </Typography>
-                                <CompanySearchField
-                                    onCompanySelect={handleCompanySelect}
-                                    excludeCompanyId={sourceAccount?.company?.id || sourceAccount?.id}
-                                    minWidth="100%"
-                                />
-                                {formik.touched.toUserCompanyId && formik.errors.toUserCompanyId && (
-                                    <Typography color="error" variant="caption" sx={{mt: 0.5, display: 'block'}}>
-                                        {formik.errors.toUserCompanyId}
-                                    </Typography>
-                                )}
-                            </Box>
-
-                            {/* Seçilen firma bilgisi */}
-                            {selectedCompany && (
-                                <Alert severity="success" sx={{mb: 3, borderRadius: 2}}>
-                                    <Typography variant="body2" sx={{fontWeight: 600, mb: 0.5}}>
-                                        {t('transfers:labels.selectedCompany')}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {selectedCompany.company_name}
-                                    </Typography>
-                                    <Box sx={{display: 'flex', gap: 1, mt: 0.5}}>
-                                        <Chip label={selectedCompany.sector} size="small" variant="outlined"/>
-                                        <Chip label={selectedCompany.currency} size="small" color="primary"/>
+                                {/* Kullanıcı seçiliyse: aramayı gizle, kart göster + çarpı ile temizle */}
+                                {toUser && (
+                                    <Box
+                                        sx={{
+                                            mt: 1.5,
+                                            p: 1.5,
+                                            borderRadius: 1.5,
+                                            bgcolor: 'rgba(118,75,162,0.08)',
+                                            border: '1px solid rgba(118,75,162,0.25)',
+                                        }}
+                                    >
+                                        <Stack direction="row" spacing={1.5} alignItems="center">
+                                            <Person sx={{ color: 'secondary.main' }} fontSize="small" />
+                                            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 600 }} noWrap>
+                                                    {toUser.name} {toUser.surname}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary" noWrap>
+                                                    {toUser.username} • {toUser.email}
+                                                </Typography>
+                                            </Box>
+                                            <Tooltip title={t('common:remove')}>
+                                                <IconButton size="small" onClick={() => setToUser(null)}>
+                                                    <Clear fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Stack>
                                     </Box>
-                                    <Typography variant="caption" color="text.secondary"
-                                                sx={{display: 'block', mt: 0.5, fontFamily: 'monospace'}}>
-                                        {t('transfers:labels.companyId')}: {selectedCompany.id}
-                                    </Typography>
-                                </Alert>
-                            )}
-                        </>
-                    )}
+                                )}
+                            </>
+                        )}
+                    </Box>
+                )}
 
-                    {currentTransferType?.requiresExternal && (
-                        <TextField
-                            fullWidth
-                            label={t('transfers:fields.externalName')}
-                            name="toExternalName"
-                            value={formik.values.toExternalName}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.toExternalName && Boolean(formik.errors.toExternalName)}
-                            helperText={formik.touched.toExternalName && formik.errors.toExternalName}
-                            placeholder={t('transfers:placeholders.externalName')}
-                            sx={{mb: 3}}
-                        />
-                    )}
 
-                    {/* Açıklama */}
+                {/* External alıcı adı (gerekiyorsa) */}
+                {showToExternal && (
                     <TextField
                         fullWidth
-                        label={t('transfers:fields.description')}
-                        name="description"
-                        multiline
-                        rows={3}
-                        value={formik.values.description}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.description && Boolean(formik.errors.description)}
-                        helperText={formik.touched.description && formik.errors.description}
-                        placeholder={t('transfers:placeholders.description')}
-                        inputProps={{maxLength: 255}}
+                        label={t('transfers:fields.to_external_name')}
+                        value={toExternalName}
+                        onChange={(e) => setToExternalName(e.target.value)}
+                        inputProps={{ maxLength: 120 }}
+                        sx={{ mb: 2 }}
                     />
-                </DialogContent>
+                )}
 
-                <DialogActions sx={{
-                    px: 3,
-                    pb: 3,
-                    gap: 1,
-                    borderTop: 1,
-                    borderColor: 'divider',
-                    pt: 2,
-                }}>
+                <Divider sx={{ my: 1.5 }} />
+
+                {/* Tutar */}
+                <TextField
+                    fullWidth
+                    label={t('transfers:fields.amount')}
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">{symbol}</InputAdornment>,
+                    }}
+                    helperText={`${t('transfers:labels.currency')}: ${currency}`}
+                    sx={{ mb: 2 }}
+                />
+
+                {/* Açıklama */}
+                <TextField
+                    fullWidth
+                    multiline
+                    minRows={2}
+                    label={t('transfers:fields.description')}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    inputProps={{ maxLength: 255 }}
+                />
+
+                {/* scope info */}
+                {selectedType && (
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                        <InfoOutlined fontSize="small" />
+                        <Typography variant="caption" color="text.secondary">
+                            {t('transfers:labels.scopeInfo', {
+                                from: t(`transfers:scopes.${selectedType?.fromScope}`),
+                                to: t(`transfers:scopes.${selectedType?.toScope}`)
+                            })}
+                        </Typography>
+
+                    </Stack>
+                )}
+            </DialogContent>
+
+            <DialogActions sx={{ px: 3, py: 2 }}>
+                <Button onClick={handleClose} disabled={submitting}>
+                    {t('common:cancel')}
+                </Button>
+                <Box sx={{ position: 'relative' }}>
                     <Button
-                        onClick={onClose}
-                        variant="outlined"
-                        disabled={loading}
-                        sx={{
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            fontWeight: 600,
-                        }}
-                    >
-                        {t('transfers:actions.cancel')}
-                    </Button>
-                    <Button
-                        type="submit"
                         variant="contained"
-                        disabled={loading || !formik.isValid || !formik.values.transferType}
-                        startIcon={loading ? <CircularProgress size={20}/> : <Send/>}
-                        sx={{
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            px: 3,
-                        }}
+                        onClick={handleSubmit}
+                        startIcon={<Send />}
+                        disabled={!typeValue || submitting || loadingPerms}
                     >
-                        {loading ? t('transfers:actions.sending') : t('transfers:actions.send')}
+                        {submitting ? t('common:please_wait') : t('transfers:dialog.submit')}
                     </Button>
-                </DialogActions>
-            </form>
+                    {(submitting || loadingPerms) && (
+                        <CircularProgress
+                            size={24}
+                            sx={{ position: 'absolute', top: '50%', left: '50%', mt: '-12px', ml: '-12px' }}
+                        />
+                    )}
+                </Box>
+            </DialogActions>
         </Dialog>
     );
 }

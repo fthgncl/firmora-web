@@ -1,90 +1,87 @@
 {
-  "title": "Überweisung",
-  "fields": {
-    "transferType": "Überweisungstyp",
-    "amount": "Betrag",
-    "receiverUser": "Empfänger (Benutzer)",
-    "targetCompany": "Zielunternehmen",
-    "externalName": "Empfänger- / Firmenname",
-    "description": "Beschreibung (optional)"
-  },
-  "placeholders": {
-    "externalName": "Lieferant GmbH",
-    "description": "Überweisungsbeschreibung..."
-  },
-  "labels": {
-    "noPermission": "Keine Berechtigung",
-    "selectedUser": "Ausgewählter Benutzer",
-    "selectedCompany": "Ausgewähltes Unternehmen",
-    "companyId": "Unternehmens-ID"
-  },
-  "steps": {
-    "selectTargetCompany": "1. Zielunternehmen auswählen",
-    "selectUserFromCompany": "2. Benutzer aus diesem Unternehmen auswählen"
-  },
-  "info": {
-    "sender": "Absender",
-    "personalAccount": "Persönliches Konto",
-    "companyAccount": "Unternehmenskonto",
-    "currentBalance": "Aktueller Kontostand"
-  },
-  "actions": {
-    "cancel": "Abbrechen",
-    "send": "Senden",
-    "sending": "Wird gesendet..."
-  },
-  "messages": {
-    "success": "Überweisung wurde erfolgreich erstellt.",
-    "createFailed": "Überweisung konnte nicht erstellt werden.",
-    "genericError": "Während der Überweisung ist ein Fehler aufgetreten."
-  },
-  "validations": {
-    "transferTypeRequired": "Bitte einen Überweisungstyp auswählen",
-    "amountRequired": "Bitte einen Betrag eingeben",
-    "amountPositive": "Der Betrag muss positiv sein",
-    "maxDecimals": "Maximal 2 Dezimalstellen erlaubt",
-    "insufficientBalance": "Unzureichendes Guthaben",
-    "descriptionMax": "Die Beschreibung darf maximal 255 Zeichen lang sein",
-    "selectUser": "Bitte einen Benutzer auswählen",
-    "companyIdRequired": "Unternehmens-ID ist erforderlich",
-    "externalNameRequired": "Bitte den Empfängernamen eingeben"
-  },
   "types": {
     "company_to_user_same": {
-      "label": "Benutzer in demselben Unternehmen",
-      "description": "Überweisung vom Unternehmenskonto an einen Benutzer im selben Unternehmen"
+      "label": "Überweisung an Benutzer im selben Unternehmen",
+      "description": "Überweist Geld vom Unternehmenskonto an einen Benutzer im selben Unternehmen."
     },
     "company_to_user_other": {
-      "label": "Benutzer in einem anderen Unternehmen",
-      "description": "Überweisung vom Unternehmenskonto an einen Benutzer in einem anderen Unternehmen"
+      "label": "Überweisung an Benutzer in einem anderen Unternehmen",
+      "description": "Überweist Geld vom Unternehmenskonto an einen Benutzer in einem anderen Unternehmen."
     },
     "company_to_company_other": {
-      "label": "An ein anderes Unternehmen",
-      "description": "Überweisung vom Unternehmenskonto an ein anderes Unternehmen"
+      "label": "Überweisung an ein anderes Unternehmen",
+      "description": "Überweist Geld von einem Unternehmenskonto an ein anderes Unternehmen."
     },
     "company_to_external": {
-      "label": "Externer Empfänger",
-      "description": "Überweisung vom Unternehmenskonto an einen externen Empfänger"
+      "label": "Überweisung an externen Empfänger",
+      "description": "Überweist Geld vom Unternehmenskonto an einen externen Empfänger."
     },
     "user_to_user_same": {
-      "label": "Benutzer in demselben Unternehmen",
-      "description": "Überweisung vom Benutzerkonto an einen Benutzer im selben Unternehmen"
+      "label": "Überweisung an Benutzer im selben Unternehmen",
+      "description": "Überweist Geld vom Benutzerkonto an einen anderen Benutzer im selben Unternehmen."
     },
     "user_to_user_other": {
-      "label": "Benutzer in einem anderen Unternehmen",
-      "description": "Überweisung vom Benutzerkonto an einen Benutzer in einem anderen Unternehmen"
+      "label": "Überweisung an Benutzer in einem anderen Unternehmen",
+      "description": "Überweist Geld vom Benutzerkonto an einen Benutzer in einem anderen Unternehmen."
     },
     "user_to_company_same": {
-      "label": "An eigenes Unternehmen",
-      "description": "Überweisung vom Benutzerkonto an das eigene Unternehmen"
+      "label": "Überweisung an eigenes Unternehmen",
+      "description": "Überweist Geld vom Benutzerkonto an das eigene Unternehmen."
     },
     "user_to_company_other": {
-      "label": "An ein anderes Unternehmen",
-      "description": "Überweisung vom Benutzerkonto an ein anderes Unternehmen"
+      "label": "Überweisung an anderes Unternehmen",
+      "description": "Überweist Geld vom Benutzerkonto an ein anderes Unternehmen."
     },
     "user_to_external": {
-      "label": "Externer Empfänger",
-      "description": "Überweisung vom Benutzerkonto an einen externen Empfänger"
+      "label": "Überweisung an externen Empfänger",
+      "description": "Überweist Geld vom Benutzerkonto an einen externen Empfänger."
+    },
+    "external_to_user": {
+      "label": "Externe Überweisung an Benutzer",
+      "description": "Empfängt Geld von einer externen Quelle auf ein Benutzerkonto."
+    },
+    "external_to_company": {
+      "label": "Externe Überweisung an Unternehmen",
+      "description": "Empfängt Geld von einer externen Quelle auf ein Unternehmenskonto."
     }
+  },
+  "dialog": {
+    "title": "Geldüberweisung",
+    "submit": "Senden",
+    "submit_tip": "Überweisung absenden",
+    "loading_permissions": "Berechtigungen werden überprüft…",
+    "source_company": "Quellunternehmen",
+    "source_user": "Quellbenutzerkonto",
+    "user_account": "Benutzerkonto"
+  },
+  "fields": {
+    "transfer_type": "Überweisungsart",
+    "amount": "Betrag",
+    "description": "Beschreibung (optional)",
+    "to_company": "Zielunternehmen",
+    "to_user": "Zielbenutzer",
+    "to_external_name": "Empfängername (extern)"
+  },
+  "validations": {
+    "amount_positive": "Bitte geben Sie einen positiven Betrag ein.",
+    "company_required": "Bitte wählen Sie ein Zielunternehmen aus.",
+    "user_required": "Bitte wählen Sie einen Zielbenutzer aus.",
+    "to_external_name_required": "Bitte geben Sie den Empfängernamen ein.",
+    "select_company_first": "Bitte wählen Sie zuerst das Zielunternehmen aus."
+  },
+  "create": {
+    "success": "Überweisung erfolgreich abgeschlossen.",
+    "failed": "Überweisung fehlgeschlagen."
+  },
+  "labels": {
+    "companyId": "Unternehmens-ID",
+    "selected_target": "Ausgewähltes Ziel",
+    "scopeInfo": "Quelle: {{from}} → Ziel: {{to}}",
+    "currency": "Währung"
+  },
+  "scopes": {
+    "user": "Benutzer",
+    "company": "Unternehmen",
+    "external": "Extern"
   }
 }
