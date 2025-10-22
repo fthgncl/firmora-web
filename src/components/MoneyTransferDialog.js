@@ -1,5 +1,5 @@
 // src/components/MoneyTransferDialog.js
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, {useEffect, useMemo, useState, useCallback} from 'react';
 import axios from 'axios';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
@@ -18,31 +18,39 @@ import Send from '@mui/icons-material/Send';
 import Clear from '@mui/icons-material/Clear';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../contexts/AuthContext';
-import { useAlert } from '../contexts/AlertContext';
-import { permissionsService } from '../services/permissionsService';
+import {useTranslation} from 'react-i18next';
+import {useAuth} from '../contexts/AuthContext';
+import {useAlert} from '../contexts/AlertContext';
+import {permissionsService} from '../services/permissionsService';
 import UserSearchField from './UserSearchField';
 import CompanySearchField from './CompanySearchField';
+import Paper from "@mui/material/Paper";
 
 // -----------------------------
 // helpers
 // -----------------------------
 const currencySymbol = (code) => {
     switch (code) {
-        case 'USD': return '$';
-        case 'EUR': return '€';
-        case 'GBP': return '£';
-        case 'TRY': return '₺';
-        case 'JPY': return '¥';
-        case 'CHF': return 'CHF';
-        default: return code || '';
+        case 'USD':
+            return '$';
+        case 'EUR':
+            return '€';
+        case 'GBP':
+            return '£';
+        case 'TRY':
+            return '₺';
+        case 'JPY':
+            return '¥';
+        case 'CHF':
+            return 'CHF';
+        default:
+            return code || '';
     }
 };
 
 const formatAmount = (n) => {
     try {
-        return new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n ?? 0);
+        return new Intl.NumberFormat(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(n ?? 0);
     } catch {
         return String(n ?? 0);
     }
@@ -55,7 +63,7 @@ const ALL_TYPES = [
         value: 'company_to_user_same',
         labelKey: 'transfers:types.company_to_user_same.label',
         descKey: 'transfers:types.company_to_user_same.description',
-        icon: <Person />,
+        icon: <Person/>,
         fromScope: 'company',
         toScope: 'user',
         permission: 'can_transfer_company_to_same_company_user',
@@ -68,7 +76,7 @@ const ALL_TYPES = [
         value: 'company_to_user_other',
         labelKey: 'transfers:types.company_to_user_other.label',
         descKey: 'transfers:types.company_to_user_other.description',
-        icon: <Business />,
+        icon: <Business/>,
         fromScope: 'company',
         toScope: 'user',
         permission: 'can_transfer_company_to_other_company_user',
@@ -81,7 +89,7 @@ const ALL_TYPES = [
         value: 'company_to_company_other',
         labelKey: 'transfers:types.company_to_company_other.label',
         descKey: 'transfers:types.company_to_company_other.description',
-        icon: <Business />,
+        icon: <Business/>,
         fromScope: 'company',
         toScope: 'company',
         permission: 'can_transfer_company_to_other_company',
@@ -94,7 +102,7 @@ const ALL_TYPES = [
         value: 'company_to_external',
         labelKey: 'transfers:types.company_to_external.label',
         descKey: 'transfers:types.company_to_external.description',
-        icon: <AccountBalance />,
+        icon: <AccountBalance/>,
         fromScope: 'company',
         toScope: 'external',
         permission: 'can_transfer_company_to_external',
@@ -109,7 +117,7 @@ const ALL_TYPES = [
         value: 'user_to_user_same',
         labelKey: 'transfers:types.user_to_user_same.label',
         descKey: 'transfers:types.user_to_user_same.description',
-        icon: <Person />,
+        icon: <Person/>,
         fromScope: 'user',
         toScope: 'user',
         permission: 'can_transfer_user_to_same_company_user',
@@ -122,7 +130,7 @@ const ALL_TYPES = [
         value: 'user_to_user_other',
         labelKey: 'transfers:types.user_to_user_other.label',
         descKey: 'transfers:types.user_to_user_other.description',
-        icon: <Business />,
+        icon: <Business/>,
         fromScope: 'user',
         toScope: 'user',
         permission: 'can_transfer_user_to_other_company_user',
@@ -135,7 +143,7 @@ const ALL_TYPES = [
         value: 'user_to_company_same',
         labelKey: 'transfers:types.user_to_company_same.label',
         descKey: 'transfers:types.user_to_company_same.description',
-        icon: <TrendingUp />,
+        icon: <TrendingUp/>,
         fromScope: 'user',
         toScope: 'company',
         permission: 'can_transfer_user_to_own_company',
@@ -148,7 +156,7 @@ const ALL_TYPES = [
         value: 'user_to_company_other',
         labelKey: 'transfers:types.user_to_company_other.label',
         descKey: 'transfers:types.user_to_company_other.description',
-        icon: <SwapHoriz />,
+        icon: <SwapHoriz/>,
         fromScope: 'user',
         toScope: 'company',
         permission: 'can_transfer_user_to_other_company',
@@ -161,7 +169,7 @@ const ALL_TYPES = [
         value: 'user_to_external',
         labelKey: 'transfers:types.user_to_external.label',
         descKey: 'transfers:types.user_to_external.description',
-        icon: <AccountBalance />,
+        icon: <AccountBalance/>,
         fromScope: 'user',
         toScope: 'external',
         permission: 'can_transfer_user_to_external',
@@ -175,12 +183,12 @@ const ALL_TYPES = [
 // -----------------------------
 // component
 // -----------------------------
-export default function MoneyTransferDialog({ open, onClose, sourceAccount = null, fromScope }) {
-    const { t } = useTranslation(['transfers', 'common']);
+export default function MoneyTransferDialog({open, onClose, sourceAccount = null, fromScope}) {
+    const {t} = useTranslation(['transfers', 'common']);
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-    const { token, user } = useAuth();
-    const { showError, showSuccess } = useAlert();
+    const {token, user} = useAuth();
+    const {showError, showSuccess} = useAlert();
 
     // derived
     const companyId = sourceAccount?.company?.id || sourceAccount?.id || null;
@@ -239,7 +247,9 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                 if (!cancelled) setLoadingPerms(false);
             }
         })();
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+        };
     }, [open, token, user, companyId, scopedTypes]);
 
     // tip değişince bağımlı alanları sıfırla
@@ -383,7 +393,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
             maxWidth="sm"
             fullWidth
             fullScreen={fullScreen}
-            PaperProps={{ sx: { borderRadius: fullScreen ? 0 : 2 } }}
+            PaperProps={{sx: {borderRadius: fullScreen ? 0 : 2}}}
         >
             <DialogTitle
                 sx={{
@@ -407,55 +417,59 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                         top: 8,
                         color: 'white',
                         transition: 'opacity 0.2s ease',
-                        '&:hover': { opacity: 0.8 },
+                        '&:hover': {opacity: 0.8},
                     }}
                 >
-                    <CloseRounded />
+                    <CloseRounded/>
                 </IconButton>
             </DialogTitle>
 
 
-            <DialogContent dividers sx={{ pt: 2 }}>
+            <DialogContent dividers sx={{pt: 2}}>
                 {/* Kaynak Hesap Özeti */}
-                <Box
+                <Paper
+                    elevation={3}
                     sx={{
                         mb: 3,
                         p: 2.5,
-                        borderRadius: 2,
-                        bgcolor: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: 3,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         flexWrap: 'wrap',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            boxShadow: theme.shadows[6],
+                            borderColor: theme.palette.primary.main,
+                        },
                     }}
                 >
                     <Stack direction="row" alignItems="center" spacing={2}>
-                        {/* Sol ikon */}
-                        <Box
+                        {/* Sol ikon alanı */}
+                        <Paper
+                            elevation={2}
                             sx={{
-                                width: 44,
-                                height: 44,
-                                borderRadius: '12px',
-                                background: 'rgba(255,255,255,0.04)',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                backdropFilter: 'blur(6px)',
+                                width: 60,
+                                height: 60,
+                                borderRadius: 2,
+                                backgroundColor: theme.palette.background.paper,
+                                border: `1px solid ${theme.palette.divider}`,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                color: 'rgba(255,255,255,0.7)',
-                                transition: 'all 0.3s ease',
+                                color: theme.palette.text.primary,
+                                transition: 'all 0.25s ease',
                                 '&:hover': {
-                                    background: 'rgba(255,255,255,0.07)',
-                                    color: '#fff',
+                                    transform: 'translateY(-2px)',
+                                    color: theme.palette.primary.main,
+                                    borderColor: theme.palette.primary.main,
                                 },
                             }}
                         >
-                            {fromScope === 'company' && <Business />}
-                            {fromScope === 'user' && <Person />}
-                            {fromScope === 'external' && <AccountBalance />}
-                        </Box>
-
+                            {fromScope === 'company' && <Business fontSize="medium"/>}
+                            {fromScope === 'user' && <Person fontSize="medium"/>}
+                            {fromScope === 'external' && <AccountBalance fontSize="medium"/>}
+                        </Paper>
 
 
                         {/* Bilgi Alanı */}
@@ -476,20 +490,20 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
                             {fromScope === 'company' ? (
                                 <>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                    <Typography variant="subtitle1" sx={{fontWeight: 600}}>
                                         {sourceAccount?.company_name}
                                     </Typography>
-                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                    <Typography variant="caption" sx={{color: 'text.secondary'}}>
                                         {t('transfers:labels.companyId')}: {sourceAccount?.id}
                                     </Typography>
                                 </>
                             ) : (
                                 <>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                    <Typography variant="subtitle1" sx={{fontWeight: 600}}>
                                         {sourceAccount?.name || '-'}
                                     </Typography>
                                     {sourceAccount?.company?.company_name && (
-                                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                        <Typography variant="caption" sx={{color: 'text.secondary'}}>
                                             {sourceAccount.company.company_name}
                                         </Typography>
                                     )}
@@ -499,21 +513,21 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                     </Stack>
 
                     {/* Sağ taraf: Bakiye */}
-                    <Box sx={{ textAlign: 'right', mt: { xs: 2, sm: 0 } }}>
+                    <Box sx={{textAlign: 'right', mt: {xs: 2, sm: 0}}}>
                         <Typography
                             variant="caption"
-                            sx={{ color: 'text.secondary', display: 'block', textTransform: 'uppercase' }}
+                            sx={{color: 'text.secondary', display: 'block', textTransform: 'uppercase'}}
                         >
                             {t('common:balance')}
                         </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        <Typography variant="h6" sx={{fontWeight: 700}}>
                             {formatAmount(sourceAccount?.balance ?? 0)}{' '}
-                            <Typography component="span" variant="subtitle2" sx={{ ml: 0.5 }}>
+                            <Typography component="span" variant="subtitle2" sx={{ml: 0.5}}>
                                 {sourceAccount?.currency}
                             </Typography>
                         </Typography>
                     </Box>
-                </Box>
+                </Paper>
 
 
                 {/* Transfer tipi */}
@@ -531,7 +545,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                 ? t('transfers:dialog.loading_permissions')
                                 : ''
                     }
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                 >
                     {availableTypes.map((opt) => (
                         <MenuItem key={opt.value} value={opt.value}>
@@ -545,8 +559,8 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
                 {/* Hedef firma (gerekiyorsa) */}
                 {showCompanyField && (
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                    <Box sx={{mb: 2}}>
+                        <Typography variant="subtitle2" sx={{mb: 0.5}}>
                             {t('transfers:fields.to_company')}
                         </Typography>
 
@@ -571,9 +585,9 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                 }}
                             >
                                 <Stack direction="row" alignItems="center" spacing={1.5}>
-                                    <Business sx={{ color: 'primary.main' }} fontSize="small" />
-                                    <Box sx={{ flexGrow: 1 }}>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                                    <Business sx={{color: 'primary.main'}} fontSize="small"/>
+                                    <Box sx={{flexGrow: 1}}>
+                                        <Typography variant="subtitle2" sx={{fontWeight: 600}}>
                                             {toCompany.company_name}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
@@ -588,7 +602,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                                 setToUser(null); // firma temizlenince kullanıcıyı da sıfırla
                                             }}
                                         >
-                                            <Clear fontSize="small" />
+                                            <Clear fontSize="small"/>
                                         </IconButton>
                                     </Tooltip>
                                 </Stack>
@@ -599,8 +613,8 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
 
                 {/* Hedef kullanıcı (gerekiyorsa) */}
                 {showUserField && (
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                    <Box sx={{mb: 2}}>
+                        <Typography variant="subtitle2" sx={{mb: 0.5}}>
                             {t('transfers:fields.to_user')}
                         </Typography>
 
@@ -640,9 +654,9 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                         }}
                                     >
                                         <Stack direction="row" spacing={1.5} alignItems="center">
-                                            <Person sx={{ color: 'secondary.main' }} fontSize="small" />
-                                            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 600 }} noWrap>
+                                            <Person sx={{color: 'secondary.main'}} fontSize="small"/>
+                                            <Box sx={{flexGrow: 1, minWidth: 0}}>
+                                                <Typography variant="subtitle2" sx={{fontWeight: 600}} noWrap>
                                                     {toUser.name} {toUser.surname}
                                                 </Typography>
                                                 <Typography variant="caption" color="text.secondary" noWrap>
@@ -651,7 +665,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                                             </Box>
                                             <Tooltip title={t('common:remove')}>
                                                 <IconButton size="small" onClick={() => setToUser(null)}>
-                                                    <Clear fontSize="small" />
+                                                    <Clear fontSize="small"/>
                                                 </IconButton>
                                             </Tooltip>
                                         </Stack>
@@ -670,12 +684,12 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                         label={t('transfers:fields.to_external_name')}
                         value={toExternalName}
                         onChange={(e) => setToExternalName(e.target.value)}
-                        inputProps={{ maxLength: 120 }}
-                        sx={{ mb: 2 }}
+                        inputProps={{maxLength: 120}}
+                        sx={{mb: 2}}
                     />
                 )}
 
-                <Divider sx={{ my: 1.5 }} />
+                <Divider sx={{my: 1.5}}/>
 
                 {/* Tutar */}
                 <TextField
@@ -689,7 +703,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                         startAdornment: <InputAdornment position="start">{symbol}</InputAdornment>,
                     }}
                     helperText={`${t('transfers:labels.currency')}: ${currency}`}
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                 />
 
                 {/* Açıklama */}
@@ -700,13 +714,13 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                     label={t('transfers:fields.description')}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    inputProps={{ maxLength: 255 }}
+                    inputProps={{maxLength: 255}}
                 />
 
                 {/* scope info */}
                 {selectedType && (
-                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
-                        <InfoOutlined fontSize="small" />
+                    <Stack direction="row" spacing={1} alignItems="center" sx={{mt: 0.5}}>
+                        <InfoOutlined fontSize="small"/>
                         <Typography variant="caption" color="text.secondary">
                             {t('transfers:labels.scopeInfo', {
                                 from: t(`transfers:scopes.${selectedType?.fromScope}`),
@@ -718,15 +732,15 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                 )}
             </DialogContent>
 
-            <DialogActions sx={{ px: 3, py: 2 }}>
+            <DialogActions sx={{px: 3, py: 2}}>
                 <Button onClick={handleClose} disabled={submitting}>
                     {t('common:cancel')}
                 </Button>
-                <Box sx={{ position: 'relative' }}>
+                <Box sx={{position: 'relative'}}>
                     <Button
                         variant="contained"
                         onClick={handleSubmit}
-                        startIcon={<Send />}
+                        startIcon={<Send/>}
                         disabled={!typeValue || submitting || loadingPerms}
                     >
                         {submitting ? t('common:please_wait') : t('transfers:dialog.submit')}
@@ -734,7 +748,7 @@ export default function MoneyTransferDialog({ open, onClose, sourceAccount = nul
                     {(submitting || loadingPerms) && (
                         <CircularProgress
                             size={24}
-                            sx={{ position: 'absolute', top: '50%', left: '50%', mt: '-12px', ml: '-12px' }}
+                            sx={{position: 'absolute', top: '50%', left: '50%', mt: '-12px', ml: '-12px'}}
                         />
                     )}
                 </Box>
