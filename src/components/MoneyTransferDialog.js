@@ -358,7 +358,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                 }
             );
 
-            if (res?.data?.success) {
+            if (res?.data?.status === 'success') {
                 showSuccess(res?.data?.message || t('transfers:create.success'));
                 // reset
                 setAmount('');
