@@ -348,7 +348,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
         try {
             const requestData = buildRequest();
             const res = await axios.post(
-                `${process.env.REACT_APP_API_URL}/transfers/create-transfer`,
+                `${process.env.REACT_APP_API_URL}/transfers/create`,
                 requestData,
                 {
                     headers: {
