@@ -431,26 +431,22 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                     elevation={3}
                     sx={{
                         mb: 3,
-                        p: 2.5,
                         borderRadius: 3,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexWrap: 'wrap',
+                        overflow: 'hidden',
                         transition: 'all 0.3s ease',
                         '&:hover': {
                             boxShadow: theme.shadows[6],
-                            borderColor: theme.palette.primary.main,
                         },
                     }}
                 >
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                        {/* Sol ikon alanı */}
+                    {/* Üst kısım: İkon ve Bilgiler */}
+                    <Box sx={{p: 2.5, display: 'flex', alignItems: 'center', gap: 2}}>
                         <Paper
                             elevation={2}
                             sx={{
                                 width: 60,
                                 height: 60,
+                                flexShrink: 0,
                                 borderRadius: 2,
                                 backgroundColor: theme.palette.background.paper,
                                 border: `1px solid ${theme.palette.divider}`,
@@ -471,16 +467,15 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                             {fromScope === 'external' && <AccountBalance fontSize="medium"/>}
                         </Paper>
 
-
-                        {/* Bilgi Alanı */}
-                        <Box>
+                        <Box sx={{flex: 1, minWidth: 0}}>
                             <Typography
                                 variant="overline"
                                 sx={{
                                     color: 'text.secondary',
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     letterSpacing: 0.5,
                                     textTransform: 'uppercase',
+                                    display: 'block',
                                 }}
                             >
                                 {fromScope === 'company'
@@ -490,7 +485,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
 
                             {fromScope === 'company' ? (
                                 <>
-                                    <Typography variant="subtitle1" sx={{fontWeight: 600}}>
+                                    <Typography variant="subtitle1" sx={{fontWeight: 600, mb: 0.25}}>
                                         {sourceAccount?.company_name}
                                     </Typography>
                                     <Typography variant="caption" sx={{color: 'text.secondary'}}>
@@ -499,7 +494,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                                 </>
                             ) : (
                                 <>
-                                    <Typography variant="subtitle1" sx={{fontWeight: 600}}>
+                                    <Typography variant="subtitle1" sx={{fontWeight: 600, mb: 0.25}}>
                                         {sourceAccount?.name || '-'}
                                     </Typography>
                                     {sourceAccount?.company?.company_name && (
@@ -510,19 +505,49 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                                 </>
                             )}
                         </Box>
-                    </Stack>
+                    </Box>
 
-                    {/* Sağ taraf: Bakiye */}
-                    <Box sx={{textAlign: 'right', mt: {xs: 2, sm: 0}}}>
+                    {/* Alt kısım: Bakiye (renkli arka plan) */}
+                    <Box
+                        sx={{
+                            px: 2.5,
+                            py: 1.75,
+                            background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.primary.main}08 100%)`,
+                            borderTop: `1px solid ${theme.palette.divider}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                        }}
+                    >
                         <Typography
                             variant="caption"
-                            sx={{color: 'text.secondary', display: 'block', textTransform: 'uppercase'}}
+                            sx={{
+                                color: 'text.secondary',
+                                textTransform: 'uppercase',
+                                fontWeight: 600,
+                                letterSpacing: 0.5,
+                            }}
                         >
                             {t('common:balance')}
                         </Typography>
-                        <Typography variant="h6" sx={{fontWeight: 700}}>
-                            {formatAmount(sourceAccount?.balance ?? 0)}{' '}
-                            <Typography component="span" variant="subtitle2" sx={{ml: 0.5}}>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 700,
+                                color: 'text.primary',
+                                display: 'flex',
+                                alignItems: 'baseline',
+                                gap: 0.5,
+                            }}
+                        >
+                            <Box component="span" sx={{whiteSpace: 'nowrap'}}>
+                                {formatAmount(sourceAccount?.balance ?? 0)}
+                            </Box>
+                            <Typography
+                                component="span"
+                                variant="subtitle2"
+                                sx={{whiteSpace: 'nowrap', fontWeight: 600}}
+                            >
                                 {sourceAccount?.currency}
                             </Typography>
                         </Typography>
