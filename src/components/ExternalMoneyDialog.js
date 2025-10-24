@@ -119,7 +119,7 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
             }
 
             const response = await axios.post(
-                `${process.env.REACT_APP_API_URL}/transfers`,
+                `${process.env.REACT_APP_API_URL}/transfers/create-transfer`,
                 requestData,
                 {
                     headers: {
