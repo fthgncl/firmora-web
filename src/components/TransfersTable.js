@@ -69,8 +69,8 @@ const SORT_FIELDS = [
 ];
 
 const SORT_ORDERS = [
-    { value: 'ASC',  labelKey: 'list.sort.asc'  },
-    { value: 'DESC', labelKey: 'list.sort.desc' },
+    { value: 'ASC',  labelKey: 'sort.asc'  },
+    { value: 'DESC', labelKey: 'sort.desc' },
 ];
 
 // --- Yardımcılar ---
@@ -147,7 +147,6 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
     const [searchTerm, setSearchTerm] = useState('');
     const [status, setStatus] = useState('');
     const [transferType, setTransferType] = useState('');
-    const [currency, setCurrency] = useState('');
     const [fromScope, setFromScope] = useState('');
     const [toScope, setToScope] = useState('');
     const [startDate, setStartDate] = useState('');
@@ -182,7 +181,6 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
             searchTerm: searchTerm.trim(),
             status: status || null,
             transferType: transferType || null,
-            currency: currency?.trim() || null,
             fromScope: fromScope || null,
             toScope: toScope || null,
             startDate: startDate || null,
@@ -197,7 +195,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
             if (body[k] === '' || body[k] === null) delete body[k];
         });
         return body;
-    }, [companyId, searchTerm, status, transferType, currency, fromScope, toScope, startDate, endDate, limit, page, sortBy, sortOrder]);
+    }, [companyId, searchTerm, status, transferType, fromScope, toScope, startDate, endDate, limit, page, sortBy, sortOrder]);
 
     const fetchTransfers = useCallback(async () => {
         if (!companyId) {
@@ -233,7 +231,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
     React.useImperativeHandle(ref, () => ({ refresh: fetchTransfers }));
 
     // Arama yazıldıkça sayfayı başa al
-    useEffect(() => { setPage(0); }, [searchTerm, status, transferType, currency, fromScope, toScope, startDate, endDate, sortBy, sortOrder, limit]);
+    useEffect(() => { setPage(0); }, [searchTerm, status, transferType, fromScope, toScope, startDate, endDate, sortBy, sortOrder, limit]);
 
     // Kolon menüsü
     const openColsMenu = (e) => setAnchorEl(e.currentTarget);
@@ -425,15 +423,6 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                             ))}
                         </Select>
                     </FormControl>
-
-                    <TextField
-                        size="small"
-                        placeholder={t('transfers:list.filters.currency', 'Para birimi (örn. USD)')}
-                        value={currency}
-                        onChange={(e) => setCurrency(e.target.value.toUpperCase().slice(0,3))}
-                        sx={{ width: 160 }}
-                        inputProps={{ maxLength: 3, style: { textTransform: 'uppercase', letterSpacing: 1 } }}
-                    />
 
                     <FormControl size="small" sx={{ minWidth: 140 }}>
                         <Select value={fromScope} onChange={(e) => setFromScope(e.target.value)} displayEmpty>

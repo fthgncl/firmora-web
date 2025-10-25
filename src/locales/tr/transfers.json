@@ -62,6 +62,10 @@
     "to_user": "Hedef Kullanıcı",
     "to_external_name": "Alıcı Adı (Sistem Dışı)"
   },
+  "sort": {
+    "asc": "Artan",
+    "desc": "Azalan"
+  },
   "validations": {
     "amount_positive": "Lütfen pozitif bir tutar girin.",
     "company_required": "Lütfen hedef firmayı seçin.",

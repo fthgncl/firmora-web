@@ -62,6 +62,10 @@
     "to_user": "Target User",
     "to_external_name": "Recipient Name (External)"
   },
+  "sort": {
+    "asc": "Ascending",
+    "desc": "Descending"
+  },
   "validations": {
     "amount_positive": "Please enter a positive amount.",
     "company_required": "Please select a target company.",
