@@ -83,5 +83,64 @@
     "user": "Kullanıcı",
     "company": "Firma",
     "external": "Sistem Dışı"
+  },
+  "list": {
+    "title": "Transfer Listesi",
+    "total": "{{total}} kayıt",
+    "rowsPerPage": "Sayfa başı",
+    "displayedRows": "{{from}}–{{to}} / {{count}}",
+    "loading": "Yükleniyor...",
+    "noRecords": "Kayıt yok",
+    "noResultsForSearch": "Aramanıza uygun kayıt bulunamadı",
+    "search": { "placeholder": "ID, açıklama, dış alıcı..." },
+    "view": { "tooltip": "Kolonları seç", "columnsTitle": "Kolon Görünümü" },
+    "refresh": "Yenile",
+    "filters": {
+      "any": "Tümü",
+      "scope": { "user": "Kullanıcı", "company": "Firma", "external": "Harici" },
+      "startDate": "Başlangıç",
+      "endDate": "Bitiş",
+      "currency": "Para birimi (örn. USD)"
+    },
+    "status": {
+      "completed": "Tamamlandı",
+      "pending": "Beklemede",
+      "failed": "Başarısız",
+      "reversed": "Ters çevrildi"
+    },
+    "columns": {
+      "created_at": "Tarih",
+      "id": "ID",
+      "amount": "Tutar",
+      "currency": "PB",
+      "transfer_type": "Tür",
+      "status": "Durum",
+      "from_scope": "Kaynak",
+      "to_scope": "Hedef",
+      "sender": "Gönderen",
+      "sender_company_name": "Gönderen Firma",
+      "receiver": "Alıcı",
+      "receiver_company_name": "Alıcı Firma",
+      "description": "Açıklama",
+      "sender_final_balance": "Gönderen Son Bakiye",
+      "receiver_final_balance": "Alıcı Son Bakiye"
+    },
+    "errors": {
+      "fetchFailed": "Transferler alınamadı",
+      "unexpected": "Beklenmeyen bir hata oluştu"
+    },
+    "types": {
+      "company_to_user_same": "Firma → Kullanıcı (Aynı)",
+      "company_to_user_other": "Firma → Kullanıcı (Diğer Firma)",
+      "company_to_company_other": "Firma → Firma (Diğer)",
+      "user_to_user_same": "Kullanıcı → Kullanıcı (Aynı)",
+      "user_to_user_other": "Kullanıcı → Kullanıcı (Diğer Firma)",
+      "user_to_company_same": "Kullanıcı → Firma (Kendi)",
+      "user_to_company_other": "Kullanıcı → Firma (Diğer)",
+      "user_to_external": "Kullanıcı → Harici",
+      "company_to_external": "Firma → Harici",
+      "external_to_user": "Harici → Kullanıcı",
+      "external_to_company": "Harici → Firma"
+    }
   }
 }

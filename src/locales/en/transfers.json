@@ -83,5 +83,64 @@
     "user": "User",
     "company": "Company",
     "external": "External"
+  },
+  "list": {
+    "title": "Transfer List",
+    "total": "{{total}} records",
+    "rowsPerPage": "Rows per page",
+    "displayedRows": "{{from}}–{{to}} / {{count}}",
+    "loading": "Loading...",
+    "noRecords": "No records",
+    "noResultsForSearch": "No results match your search",
+    "search": { "placeholder": "ID, description, external recipient..." },
+    "view": { "tooltip": "Choose columns", "columnsTitle": "Column Visibility" },
+    "refresh": "Refresh",
+    "filters": {
+      "any": "All",
+      "scope": { "user": "User", "company": "Company", "external": "External" },
+      "startDate": "Start",
+      "endDate": "End",
+      "currency": "Currency (e.g. USD)"
+    },
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "failed": "Failed",
+      "reversed": "Reversed"
+    },
+    "columns": {
+      "created_at": "Date",
+      "id": "ID",
+      "amount": "Amount",
+      "currency": "Cur",
+      "transfer_type": "Type",
+      "status": "Status",
+      "from_scope": "From",
+      "to_scope": "To",
+      "sender": "Sender",
+      "sender_company_name": "Sender Company",
+      "receiver": "Receiver",
+      "receiver_company_name": "Receiver Company",
+      "description": "Description",
+      "sender_final_balance": "Sender Final Balance",
+      "receiver_final_balance": "Receiver Final Balance"
+    },
+    "errors": {
+      "fetchFailed": "Failed to fetch transfers",
+      "unexpected": "An unexpected error occurred"
+    },
+    "types": {
+      "company_to_user_same": "Company → User (Same)",
+      "company_to_user_other": "Company → User (Other Company)",
+      "company_to_company_other": "Company → Company (Other)",
+      "user_to_user_same": "User → User (Same)",
+      "user_to_user_other": "User → User (Other Company)",
+      "user_to_company_same": "User → Company (Own)",
+      "user_to_company_other": "User → Company (Other)",
+      "user_to_external": "User → External",
+      "company_to_external": "Company → External",
+      "external_to_user": "External → User",
+      "external_to_company": "External → Company"
+    }
   }
 }

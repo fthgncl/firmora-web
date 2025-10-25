@@ -83,5 +83,64 @@
     "user": "Benutzer",
     "company": "Unternehmen",
     "external": "Extern"
+  },
+  "list": {
+    "title": "Transferliste",
+    "total": "{{total}} Einträge",
+    "rowsPerPage": "Einträge pro Seite",
+    "displayedRows": "{{from}}–{{to}} / {{count}}",
+    "loading": "Wird geladen...",
+    "noRecords": "Keine Einträge",
+    "noResultsForSearch": "Keine Ergebnisse für Ihre Suche",
+    "search": { "placeholder": "ID, Beschreibung, externer Empfänger..." },
+    "view": { "tooltip": "Spalten auswählen", "columnsTitle": "Spaltensichtbarkeit" },
+    "refresh": "Aktualisieren",
+    "filters": {
+      "any": "Alle",
+      "scope": { "user": "Benutzer", "company": "Firma", "external": "Extern" },
+      "startDate": "Start",
+      "endDate": "Ende",
+      "currency": "Währung (z. B. USD)"
+    },
+    "status": {
+      "completed": "Abgeschlossen",
+      "pending": "Ausstehend",
+      "failed": "Fehlgeschlagen",
+      "reversed": "Storniert"
+    },
+    "columns": {
+      "created_at": "Datum",
+      "id": "ID",
+      "amount": "Betrag",
+      "currency": "Währ.",
+      "transfer_type": "Typ",
+      "status": "Status",
+      "from_scope": "Von",
+      "to_scope": "An",
+      "sender": "Absender",
+      "sender_company_name": "Absenderfirma",
+      "receiver": "Empfänger",
+      "receiver_company_name": "Empfängerfirma",
+      "description": "Beschreibung",
+      "sender_final_balance": "Endsaldo Absender",
+      "receiver_final_balance": "Endsaldo Empfänger"
+    },
+    "errors": {
+      "fetchFailed": "Transfers konnten nicht geladen werden",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "types": {
+      "company_to_user_same": "Firma → Nutzer (Gleiche)",
+      "company_to_user_other": "Firma → Nutzer (Andere Firma)",
+      "company_to_company_other": "Firma → Firma (Andere)",
+      "user_to_user_same": "Nutzer → Nutzer (Gleiche)",
+      "user_to_user_other": "Nutzer → Nutzer (Andere Firma)",
+      "user_to_company_same": "Nutzer → Firma (Eigen)",
+      "user_to_company_other": "Nutzer → Firma (Andere)",
+      "user_to_external": "Nutzer → Extern",
+      "company_to_external": "Firma → Extern",
+      "external_to_user": "Extern → Nutzer",
+      "external_to_company": "Extern → Firma"
+    }
   }
 }

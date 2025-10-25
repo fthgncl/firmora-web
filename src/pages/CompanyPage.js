@@ -31,6 +31,7 @@ import MoneyTransferDialog from '../components/MoneyTransferDialog';
 import ExternalMoneyDialog from '../components/ExternalMoneyDialog';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import TransfersTable from "../components/TransfersTable";
 
 export default function CompanyPage() {
     const {companyId} = useParams();
@@ -423,6 +424,11 @@ export default function CompanyPage() {
             {/* Kullanıcı Listesi */}
             <Grid sx={{mt: 4}}>
                 <UserList ref={userListRef} companyId={companyId}/>
+            </Grid>
+
+            {/* Transfer Kayıtları Listesi Listesi */}
+            <Grid sx={{mt: 4}}>
+                <TransfersTable companyId={companyId}/>
             </Grid>
 
             {/* Dialoglar */}
