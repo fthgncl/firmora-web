@@ -44,11 +44,11 @@ const COLUMN_DEFS = [
     { key: 'created_at',            labelKey: 'list.columns.created_at' },
     { key: 'id',                    labelKey: 'list.columns.id' },
     { key: 'amount',                labelKey: 'list.columns.amount' },
-    { key: 'transfer_type',         labelKey: 'list.columns.transfer_type' },
-    { key: 'status',                labelKey: 'list.columns.status' },
     { key: 'sender',                labelKey: 'list.columns.sender' },
     { key: 'receiver',              labelKey: 'list.columns.receiver' },
+    { key: 'transfer_type',         labelKey: 'list.columns.transfer_type' },
     { key: 'description',           labelKey: 'list.columns.description' },
+    { key: 'status',                labelKey: 'list.columns.status' },
     { key: 'sender_final_balance',  labelKey: 'list.columns.sender_final_balance' },
     { key: 'receiver_final_balance',labelKey: 'list.columns.receiver_final_balance' },
 ];
@@ -270,8 +270,14 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
         return <Chip size="small" color={color} label={t(`transfers:list.status.${label.toLowerCase()}`, label)} />;
     };
 
-    const senderFullName = (r) => [r?.sender_name, r?.sender_surname].filter(Boolean).join(' ') || '-';
-    const receiverFullName = (r) => [r?.receiver_name, r?.receiver_surname].filter(Boolean).join(' ') || '-';
+    const senderFullName = (r) => {
+        const fullName = [r?.sender_name, r?.sender_surname].filter(Boolean).join(' ');
+        return fullName || r?.from_external_name || '-';
+    };
+    const receiverFullName = (r) => {
+        const fullName = [r?.receiver_name, r?.receiver_surname].filter(Boolean).join(' ');
+        return fullName || r?.to_external_name || '-';
+    };
 
     return (
         <Card
@@ -546,8 +552,6 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                     {visibleCols.created_at && <TableCell>{formatDateTime(r.created_at)}</TableCell>}
                                     {visibleCols.id && <TableCell sx={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>{r.id}</TableCell>}
                                     {visibleCols.amount && <TableCell sx={{ fontWeight: 700 }}>{formatAmount(r.amount, r.currency)}</TableCell>}
-                                    {visibleCols.transfer_type && <TableCell>{renderTypeChip(r.transfer_type)}</TableCell>}
-                                    {visibleCols.status && <TableCell>{renderStatusChip(r.status)}</TableCell>}
                                     {visibleCols.sender && (
                                         <TableCell>
                                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
@@ -576,7 +580,9 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                             </Box>
                                         </TableCell>
                                     )}
+                                    {visibleCols.transfer_type && <TableCell>{renderTypeChip(r.transfer_type)}</TableCell>}
                                     {visibleCols.description && <TableCell sx={{ maxWidth: 260, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{r.description || '-'}</TableCell>}
+                                    {visibleCols.status && <TableCell>{renderStatusChip(r.status)}</TableCell>}
                                     {visibleCols.sender_final_balance && <TableCell>{r.sender_final_balance != null ? formatAmount(r.sender_final_balance, r.currency) : '-'}</TableCell>}
                                     {visibleCols.receiver_final_balance && <TableCell>{r.receiver_final_balance != null ? formatAmount(r.receiver_final_balance, r.currency) : '-'}</TableCell>}
                                 </TableRow>
