@@ -20,7 +20,8 @@
       "phone": "Telefon",
       "email": "E-Mail",
       "emailverified": "E-Mail-Bestätigung",
-      "created_at": "Erstellt am"
+      "created_at": "Erstellt am",
+        "balance": "Guthaben"
     },
     "sort": {
       "asc": "Aufsteigend",

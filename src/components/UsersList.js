@@ -51,6 +51,7 @@ const COLUMN_DEFS = [
     { key: 'name',          labelKey: 'list.columns.name' },
     { key: 'surname',       labelKey: 'list.columns.surname' },
     { key: 'username',      labelKey: 'list.columns.username' },
+    { key: 'balance',       labelKey: 'list.columns.balance' },
     { key: 'permissions',   labelKey: 'list.columns.permissions' },
     { key: 'phone',         labelKey: 'list.columns.phone' },
     { key: 'email',         labelKey: 'list.columns.email' },
@@ -202,6 +203,20 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
 
     const formatDate = (d) =>
         d ? new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+
+    const formatBalance = (balance, currency) => {
+        if (balance == null) return '-';
+        try {
+            const curr = currency && /^[A-Z]{3}$/.test(currency) ? currency : 'USD';
+            return new Intl.NumberFormat(undefined, {
+                style: 'currency',
+                currency: curr,
+                maximumFractionDigits: 2,
+            }).format(Number(balance));
+        } catch {
+            return `${balance} ${currency || ''}`.trim();
+        }
+    };
 
     return (
         <Card
@@ -529,6 +544,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.name && <TableCell>{u.name}</TableCell>}
                                     {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}
+                                    {visibleCols.balance && <TableCell sx={{ fontWeight: 600 }}>{formatBalance(u.balance, u.currency)}</TableCell>}
                                     {visibleCols.permissions && (
                                         <TableCell>
                                             <PermissionsDisplay

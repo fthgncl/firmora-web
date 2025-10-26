@@ -20,7 +20,8 @@
       "phone": "Telefon",
       "email": "E-posta",
       "emailverified": "E-posta Onayı",
-      "created_at": "Kayıt tarihi"
+      "created_at": "Kayıt tarihi",
+      "balance": "Bakiye"
     },
     "sort": {
       "asc": "Artan",

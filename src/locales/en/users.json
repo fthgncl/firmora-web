@@ -20,7 +20,8 @@
       "phone": "Phone",
       "email": "Email",
       "emailverified": "Email Verified",
-      "created_at": "Created at"
+      "created_at": "Created at",
+      "balance": "Balance"
     },
     "sort": {
       "asc": "Ascending",
