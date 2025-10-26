@@ -61,7 +61,7 @@ const COLUMN_DEFS = [
 ];
 
 const SORT_FIELDS = COLUMN_DEFS
-    .filter(c => ['name', 'surname', 'email', 'phone', 'username', 'created_at'].includes(c.key))
+    .filter(c => ['name', 'surname', 'email', 'phone', 'username', 'created_at', 'balance'].includes(c.key))
     .map(c => ({ value: c.key, labelKey: c.labelKey }));
 
 const SORT_ORDERS = [
@@ -150,6 +150,14 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     const hasAnyBalance = useMemo(() => {
         return canViewBalance && rows.some(u => u.balance != null);
     }, [canViewBalance, rows]);
+
+    // Sıralama alanları - bakiye yetkisi varsa bakiye ekle
+    const availableSortFields = useMemo(() => {
+        return SORT_FIELDS.filter(f => {
+            if (f.value === 'balance' && !hasAnyBalance) return false;
+            return true;
+        });
+    }, [hasAnyBalance]);
 
     const authHeaders = useMemo(
         () => ({
@@ -475,7 +483,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                             value={sortBy}
                             onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
                         >
-                            {SORT_FIELDS.map(f => (
+                            {availableSortFields.map(f => (
                                 <MenuItem key={f.value} value={f.value}>{t(`users:${f.labelKey}`)}</MenuItem>
                             ))}
                         </Select>
