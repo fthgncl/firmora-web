@@ -146,6 +146,11 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
         return filteredRows.slice(start, end);
     }, [filteredRows, page, limit]);
 
+    // Bakiye kontrolü için filtrelenmiş kullanıcılar
+    const hasAnyBalance = useMemo(() => {
+        return canViewBalance && rows.some(u => u.balance != null);
+    }, [canViewBalance, rows]);
+
     const authHeaders = useMemo(
         () => ({
             headers: {
@@ -508,7 +513,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     <TableHead>
                         <TableRow>
                             {COLUMN_DEFS.filter(c => {
-                                if (c.key === 'balance' && !canViewBalance) return false;
+                                if (c.key === 'balance' && !hasAnyBalance) return false;
                                 return visibleCols[c.key];
                             }).map(c => (
                                 <TableCell key={c.key}>{t(`users:${c.labelKey}`)}</TableCell>
@@ -519,7 +524,10 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={COLUMN_DEFS.length}>
+                                <TableCell colSpan={COLUMN_DEFS.filter(c => {
+                                    if (c.key === 'balance' && !hasAnyBalance) return false;
+                                    return visibleCols[c.key];
+                                }).length}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <CircularProgress size={18} />
                                         <Typography variant="body2" color="text.secondary">{t('list.loading')}</Typography>
@@ -528,7 +536,10 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                             </TableRow>
                         ) : paginatedRows.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={COLUMN_DEFS.length}>
+                                <TableCell colSpan={COLUMN_DEFS.filter(c => {
+                                    if (c.key === 'balance' && !hasAnyBalance) return false;
+                                    return visibleCols[c.key];
+                                }).length}>
                                     <Box
                                         sx={{
                                             py: 6,
@@ -566,7 +577,9 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.name && <TableCell>{u.name}</TableCell>}
                                     {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}
-                                    {visibleCols.balance && canViewBalance && <TableCell sx={{ fontWeight: 600 }}>{formatBalance(u.balance, u.currency)}</TableCell>}
+                                    {visibleCols.balance && hasAnyBalance && u.balance != null && (
+                                        <TableCell sx={{ fontWeight: 600 }}>{formatBalance(u.balance, u.currency)}</TableCell>
+                                    )}
                                     {visibleCols.permissions && (
                                         <TableCell>
                                             <PermissionsDisplay
@@ -648,8 +661,8 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                 </Typography>
                 <Divider sx={{ mb: 0.5 }} />
                 {COLUMN_DEFS.map(c => {
-                    // Bakiye sütununu yetki yoksa menüde gösterme
-                    if (c.key === 'balance' && !canViewBalance) return null;
+                    // Bakiye sütununu yetki yoksa veya hiç bakiye yoksa menüde gösterme
+                    if (c.key === 'balance' && !hasAnyBalance) return null;
                     return (
                         <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
                             <ListItemIcon>
