@@ -220,7 +220,28 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
         }
     }, [API_URL, authHeaders, buildRequestBody, companyId, t]);
 
-    useEffect(() => { fetchTransfers(); }, [fetchTransfers]);
+    // Debounce için timer ref
+    const debounceTimerRef = React.useRef(null);
+
+    // Debounced fetch
+    const debouncedFetchTransfers = useCallback(() => {
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        setLoading(true); // Bekleme süresince loading göster
+        debounceTimerRef.current = setTimeout(() => {
+            fetchTransfers();
+        }, 800); // 800ms bekle
+    }, [fetchTransfers]);
+
+    useEffect(() => {
+        debouncedFetchTransfers();
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [debouncedFetchTransfers]);
 
     React.useImperativeHandle(ref, () => ({ refresh: fetchTransfers }));
 
