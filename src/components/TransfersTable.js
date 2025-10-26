@@ -28,6 +28,7 @@ import {
     Paper,
     Avatar,
     TextField,
+    InputLabel,
 } from '@mui/material';
 import {
     Refresh,
@@ -327,7 +328,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
 
                 <Box sx={{ flex: 1, minWidth: 0, order: 1 }}>
                     <Typography variant="h6" noWrap sx={{ fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-                        {t('transfers:list.title', 'Transfer Listesi')}
+                        {t('transfers:list.title')}
                     </Typography>
                     <Typography
                         variant="caption"
@@ -348,7 +349,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                         order: 2,
                     }}
                 >
-                    <Tooltip title={t('transfers:list.view.tooltip', 'Kolonları seç')}>
+                    <Tooltip title={t('transfers:list.view.tooltip')}>
                         <IconButton
                             onClick={openColsMenu}
                             size="small"
@@ -364,7 +365,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip title={t('transfers:list.refresh', 'Yenile')}>
+                    <Tooltip title={t('transfers:list.refresh')}>
                         <IconButton
                             onClick={fetchTransfers}
                             size="small"
@@ -404,7 +405,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                             fullWidth
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder={t('transfers:list.search.placeholder', 'ID, açıklama, dış alıcı...')}
+                            placeholder={t('transfers:list.search.placeholder')}
                             InputProps={{ disableUnderline: true }}
                             sx={{ mx: 1 }}
                         />
@@ -416,87 +417,104 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                     </Paper>
                 </Box>
 
-                {/* Filtreler - İki satır */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                    {/* İlk satır: Durum, Transfer Tipi */}
-                    <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-                        <FormControl size="small" sx={{ flex: '1 1 200px', minWidth: 200 }}>
-                            <Select value={status} onChange={(e) => setStatus(e.target.value)} displayEmpty>
-                                {statusOptions.map((o) => (
-                                    <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                {/* Filtreler */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {/* Filtreler Bölümü */}
+                    <Box>
+                        <Typography variant="caption" sx={{ fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary' }}>
+                            {t('transfers:list.filters.title')}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                            <FormControl size="small" sx={{ flex: '1 1 200px', minWidth: 200 }}>
+                                <InputLabel>{t('transfers:list.filters.status')}</InputLabel>
+                                <Select value={status} onChange={(e) => setStatus(e.target.value)} label={t('transfers:list.filters.status')}>
+                                    {statusOptions.map((o) => (
+                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
-                        <FormControl size="small" sx={{ flex: '1 1 280px', minWidth: 280 }}>
-                            <Select value={transferType} onChange={(e) => setTransferType(e.target.value)} displayEmpty>
-                                {transferTypeOptions.map((o) => (
-                                    <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                            <FormControl size="small" sx={{ flex: '1 1 280px', minWidth: 280 }}>
+                                <InputLabel>{t('transfers:list.filters.transferType')}</InputLabel>
+                                <Select value={transferType} onChange={(e) => setTransferType(e.target.value)} label={t('transfers:list.filters.transferType')}>
+                                    {transferTypeOptions.map((o) => (
+                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <FormControl size="small" sx={{ flex: '1 1 180px', minWidth: 180 }}>
+                                <InputLabel>{t('transfers:list.filters.fromScope')}</InputLabel>
+                                <Select value={fromScope} onChange={(e) => setFromScope(e.target.value)} label={t('transfers:list.filters.fromScope')}>
+                                    {scopeOptions.map((o) => (
+                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <FormControl size="small" sx={{ flex: '1 1 180px', minWidth: 180 }}>
+                                <InputLabel>{t('transfers:list.filters.toScope')}</InputLabel>
+                                <Select value={toScope} onChange={(e) => setToScope(e.target.value)} label={t('transfers:list.filters.toScope')}>
+                                    {scopeOptions.map((o) => (
+                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <TextField
+                                size="small"
+                                type="date"
+                                label={t('transfers:list.filters.startDate')}
+                                InputLabelProps={{ shrink: true }}
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                sx={{ flex: '1 1 180px', minWidth: 180 }}
+                            />
+
+                            <TextField
+                                size="small"
+                                type="date"
+                                label={t('transfers:list.filters.endDate')}
+                                InputLabelProps={{ shrink: true }}
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                sx={{ flex: '1 1 180px', minWidth: 180 }}
+                            />
+                        </Box>
                     </Box>
 
-                    {/* İkinci satır: Kaynak, Hedef, Tarih Aralığı */}
-                    <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-                        <FormControl size="small" sx={{ flex: '1 1 160px', minWidth: 160 }}>
-                            <Select value={fromScope} onChange={(e) => setFromScope(e.target.value)} displayEmpty>
-                                {scopeOptions.map((o) => (
-                                    <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                    {/* Sıralama Bölümü */}
+                    <Box>
+                        <Typography variant="caption" sx={{ fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary' }}>
+                            {t('transfers:list.sort.title')}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                            <FormControl size="small" sx={{ flex: '1 1 200px', minWidth: 200 }}>
+                                <InputLabel>{t('transfers:list.sort.sortBy')}</InputLabel>
+                                <Select
+                                    value={sortBy}
+                                    onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
+                                    label={t('transfers:list.sort.sortBy')}
+                                >
+                                    {SORT_FIELDS.map(f => (
+                                        <MenuItem key={f.value} value={f.value}>{t(`transfers:${f.labelKey}`)}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
-                        <FormControl size="small" sx={{ flex: '1 1 160px', minWidth: 160 }}>
-                            <Select value={toScope} onChange={(e) => setToScope(e.target.value)} displayEmpty>
-                                {scopeOptions.map((o) => (
-                                    <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <TextField
-                            size="small"
-                            type="date"
-                            label={t('transfers:list.filters.startDate', 'Başlangıç')}
-                            InputLabelProps={{ shrink: true }}
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            sx={{ flex: '1 1 170px', minWidth: 170 }}
-                        />
-
-                        <TextField
-                            size="small"
-                            type="date"
-                            label={t('transfers:list.filters.endDate', 'Bitiş')}
-                            InputLabelProps={{ shrink: true }}
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            sx={{ flex: '1 1 170px', minWidth: 170 }}
-                        />
-
-                        {/* Sıralama */}
-                        <FormControl size="small" sx={{ flex: '1 1 180px', minWidth: 180 }}>
-                            <Select
-                                value={sortBy}
-                                onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
-                            >
-                                {SORT_FIELDS.map(f => (
-                                    <MenuItem key={f.value} value={f.value}>{t(`transfers:${f.labelKey}`)}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <FormControl size="small" sx={{ flex: '0 1 130px', minWidth: 130 }}>
-                            <Select
-                                value={sortOrder}
-                                onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}
-                            >
-                                {SORT_ORDERS.map(o => (
-                                    <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`)}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                            <FormControl size="small" sx={{ flex: '0 1 150px', minWidth: 150 }}>
+                                <InputLabel>{t('transfers:list.sort.order')}</InputLabel>
+                                <Select
+                                    value={sortOrder}
+                                    onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}
+                                    label={t('transfers:list.sort.order')}
+                                >
+                                    {SORT_ORDERS.map(o => (
+                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`)}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
                     </Box>
                 </Box>
             </Box>
@@ -531,7 +549,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                 <TableCell colSpan={COLUMN_DEFS.length}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center', py: 4 }}>
                                         <CircularProgress size={20} />
-                                        <Typography variant="body2" color="text.secondary">{t('transfers:list.loading', 'Yükleniyor...')}</Typography>
+                                        <Typography variant="body2" color="text.secondary">{t('transfers:list.loading')}</Typography>
                                     </Box>
                                 </TableCell>
                             </TableRow>
@@ -540,7 +558,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                 <TableCell colSpan={COLUMN_DEFS.length}>
                                     <Box sx={{ py: 6, textAlign: 'center', color: 'text.secondary' }}>
                                         <Typography variant="subtitle1" sx={{ mb: 0.5 }}>
-                                            {searchTerm ? t('transfers:list.noResultsForSearch', 'Aramaya uygun kayıt bulunamadı') : t('transfers:list.noRecords', 'Kayıt yok')}
+                                            {searchTerm ? t('transfers:list.noResultsForSearch') : t('transfers:list.noRecords')}
                                         </Typography>
                                         <Typography variant="body2" sx={{ mb: 2 }}>{t('transfers:list.search.placeholder')}</Typography>
                                     </Box>
@@ -602,7 +620,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                     rowsPerPage={limit}
                     onRowsPerPageChange={(e) => { setLimit(parseInt(e.target.value, 10)); setPage(0); }}
                     rowsPerPageOptions={[10, 20, 50, 100]}
-                    labelRowsPerPage={t('transfers:list.rowsPerPage', 'Sayfa başı')}
+                    labelRowsPerPage={t('transfers:list.rowsPerPage')}
                     labelDisplayedRows={({ from, to, count }) => t('transfers:list.displayedRows', { from, to, count })}
                     sx={{
                         '.MuiTablePagination-toolbar': { flexWrap: 'wrap', minHeight: { xs: 'auto', sm: 52 } },
@@ -620,7 +638,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                 PaperProps={{ sx: { width: 280, p: 1 } }}
             >
                 <Typography variant="subtitle2" sx={{ px: 1, pb: 0.5 }}>
-                    {t('transfers:list.view.columnsTitle', 'Kolon Görünümü')}
+                    {t('transfers:list.view.columnsTitle')}
                 </Typography>
                 <Divider sx={{ mb: 0.5 }} />
                 {COLUMN_DEFS.map(c => (

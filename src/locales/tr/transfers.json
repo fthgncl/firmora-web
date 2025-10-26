@@ -100,11 +100,21 @@
     "view": { "tooltip": "Kolonları seç", "columnsTitle": "Kolon Görünümü" },
     "refresh": "Yenile",
     "filters": {
+      "title": "Filtreler",
+      "status": "Durum",
+      "transferType": "Transfer Türü",
+      "toScope": "Alıcı",
+      "fromScope": "Gönderen",
       "any": "Tümü",
       "scope": { "user": "Kullanıcı", "company": "Firma", "external": "Harici" },
-      "startDate": "Başlangıç",
-      "endDate": "Bitiş",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
       "currency": "Para birimi (örn. USD)"
+    },
+    "sort":{
+      "title": "Sıralama",
+      "sortBy": "Sırala",
+      "order": "Yön"
     },
     "status": {
       "completed": "Tamamlandı",

@@ -100,11 +100,21 @@
     "view": { "tooltip": "Choose columns", "columnsTitle": "Column Visibility" },
     "refresh": "Refresh",
     "filters": {
+      "title": "Filters",
+      "status": "Status",
+      "transferType": "Transfer Type",
+      "fromScope": "From Scope",
+        "toScope": "To Scope",
       "any": "All",
       "scope": { "user": "User", "company": "Company", "external": "External" },
-      "startDate": "Start",
-      "endDate": "End",
+      "startDate": "Start Date",
+      "endDate": "End Date",
       "currency": "Currency (e.g. USD)"
+    },
+    "sort":{
+      "title": "Sorting",
+      "sortBy": "Sort by",
+      "order": "Order"
     },
     "status": {
       "completed": "Completed",

@@ -100,11 +100,21 @@
     "view": { "tooltip": "Spalten auswählen", "columnsTitle": "Spaltensichtbarkeit" },
     "refresh": "Aktualisieren",
     "filters": {
+      "title": "Filter",
+      "status": "Status",
+      "transferType": "Überweisungsart",
+      "fromScope": "Von Bereich",
+        "toScope": "An Bereich",
       "any": "Alle",
       "scope": { "user": "Benutzer", "company": "Firma", "external": "Extern" },
-      "startDate": "Start",
-      "endDate": "Ende",
+      "startDate": "Start Datum",
+      "endDate": "Ende Datum",
       "currency": "Währung (z. B. USD)"
+    },
+    "sort":{
+      "title": "Sortierung",
+      "sortBy": "Sortieren nach",
+      "order": "Reihenfolge"
     },
     "status": {
       "completed": "Abgeschlossen",
