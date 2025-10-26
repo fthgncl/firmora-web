@@ -46,6 +46,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import PermissionsDisplay from './PermissionsDisplay';
 import AddUserDialog from './AddUserDialog';
+import { permissionsService } from '../services/permissionsService';
 
 const COLUMN_DEFS = [
     { key: 'name',          labelKey: 'list.columns.name' },
@@ -70,8 +71,26 @@ const SORT_ORDERS = [
 
 const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) => {
     const { t } = useTranslation(['users']);
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
+
+    // Bakiye görüntüleme yetkisi kontrolü
+    const [canViewBalance, setCanViewBalance] = useState(false);
+
+    useEffect(() => {
+        const checkPermission = async () => {
+            if (token && user && companyId) {
+                const hasPermission = await permissionsService.checkUserRoles(
+                    token,
+                    user,
+                    companyId,
+                    ['can_view_other_users_transfer_history']
+                );
+                setCanViewBalance(hasPermission);
+            }
+        };
+        checkPermission();
+    }, [token, user, companyId]);
 
     const formatPhoneForTel = (val) => {
         if (!val) return null;
@@ -488,7 +507,10 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                 }}>
                     <TableHead>
                         <TableRow>
-                            {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
+                            {COLUMN_DEFS.filter(c => {
+                                if (c.key === 'balance' && !canViewBalance) return false;
+                                return visibleCols[c.key];
+                            }).map(c => (
                                 <TableCell key={c.key}>{t(`users:${c.labelKey}`)}</TableCell>
                             ))}
                         </TableRow>
@@ -544,7 +566,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.name && <TableCell>{u.name}</TableCell>}
                                     {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}
-                                    {visibleCols.balance && <TableCell sx={{ fontWeight: 600 }}>{formatBalance(u.balance, u.currency)}</TableCell>}
+                                    {visibleCols.balance && canViewBalance && <TableCell sx={{ fontWeight: 600 }}>{formatBalance(u.balance, u.currency)}</TableCell>}
                                     {visibleCols.permissions && (
                                         <TableCell>
                                             <PermissionsDisplay
@@ -625,14 +647,18 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     {t('list.view.columnsTitle')}
                 </Typography>
                 <Divider sx={{ mb: 0.5 }} />
-                {COLUMN_DEFS.map(c => (
-                    <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
-                        <ListItemIcon>
-                            <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1} disableRipple />
-                        </ListItemIcon>
-                        <ListItemText primary={t(`users:${c.labelKey}`)} />
-                    </ListItemButton>
-                ))}
+                {COLUMN_DEFS.map(c => {
+                    // Bakiye sütununu yetki yoksa menüde gösterme
+                    if (c.key === 'balance' && !canViewBalance) return null;
+                    return (
+                        <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
+                            <ListItemIcon>
+                                <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1} disableRipple />
+                            </ListItemIcon>
+                            <ListItemText primary={t(`users:${c.labelKey}`)} />
+                        </ListItemButton>
+                    );
+                })}
             </Popover>
 
             {/* AddUserDialog */}
