@@ -151,7 +151,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
         COLUMN_DEFS.reduce(
             (acc, c) => ({
                 ...acc,
-                [c.key]: !['id', 'description', 'sender_final_balance', 'receiver_final_balance'].includes(c.key),
+                [c.key]: !['id', 'sender_final_balance', 'receiver_final_balance'].includes(c.key),
             }),
             {}
         )
@@ -272,11 +272,11 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
 
     const senderFullName = (r) => {
         const fullName = [r?.sender_name, r?.sender_surname].filter(Boolean).join(' ');
-        return fullName || r?.from_external_name || '-';
+        return fullName || r?.from_external_name;
     };
     const receiverFullName = (r) => {
         const fullName = [r?.receiver_name, r?.receiver_surname].filter(Boolean).join(' ');
-        return fullName || r?.to_external_name || '-';
+        return fullName || r?.to_external_name;
     };
 
     return (
