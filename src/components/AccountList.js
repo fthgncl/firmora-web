@@ -12,7 +12,12 @@ import {
     Stack,
     IconButton,
     Menu,
-    MenuItem
+    MenuItem,
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import {
     AccountBalance,
@@ -20,17 +25,22 @@ import {
     CalendarToday,
     TrendingUp,
     Person,
-    MoreVert
+    MoreVert,
+    History,
+    Close
 } from '@mui/icons-material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
 import MoneyTransferDialog from './MoneyTransferDialog';
 import ExternalMoneyDialog from './ExternalMoneyDialog';
+import TransfersTable from './TransfersTable';
 import { useTranslation } from 'react-i18next';
 
 export default function AccountList() {
     const { t, i18n } = useTranslation(['accounts']);
     const {token} = useAuth();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [accounts, setAccounts] = useState([]);
     const [accountName, setAccountName] = useState('');
     const [loading, setLoading] = useState(true);
@@ -39,6 +49,7 @@ export default function AccountList() {
     const [selectedAccount, setSelectedAccount] = useState(null);
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
+    const [transfersDialogOpen, setTransfersDialogOpen] = useState(false);
 
     const mapLngToLocale = (lng) => {
         switch (lng) {
@@ -131,6 +142,16 @@ export default function AccountList() {
 
     const handleExternalMoneyDialogClose = () => {
         setExternalMoneyDialogOpen(false);
+        setSelectedAccount(null);
+    };
+
+    const handleTransfersHistoryClick = () => {
+        handleMenuClose();
+        setTransfersDialogOpen(true);
+    };
+
+    const handleTransfersDialogClose = () => {
+        setTransfersDialogOpen(false);
         setSelectedAccount(null);
     };
 
@@ -368,6 +389,10 @@ export default function AccountList() {
                 <MenuItem onClick={handleExternalMoneyClick}>
                     {t('accounts:menu.addIncome')}
                 </MenuItem>
+                <MenuItem onClick={handleTransfersHistoryClick}>
+                    <History sx={{ mr: 1, fontSize: 20 }} />
+                    {t('accounts:menu.viewTransferHistory', 'Geçmiş Transferleri Gör')}
+                </MenuItem>
             </Menu>
 
             <MoneyTransferDialog
@@ -383,6 +408,55 @@ export default function AccountList() {
                 targetAccount={selectedAccount}
                 targetScope="user"
             />
+
+            <Dialog
+                open={transfersDialogOpen}
+                onClose={handleTransfersDialogClose}
+                fullScreen={isMobile}
+                maxWidth="lg"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: isMobile ? 0 : 3,
+                        minHeight: isMobile ? '100vh' : '80vh',
+                    }
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        py: 1,
+                        px: 2,
+                        borderBottom: (t) => `1px solid ${t.palette.divider}`,
+                        bgcolor: 'background.paper',
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Person sx={{ fontSize: 20, color: 'text.secondary' }} />
+                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            {selectedAccount?.name}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            • {selectedAccount?.company?.company_name}
+                        </Typography>
+                    </Box>
+                    <IconButton
+                        onClick={handleTransfersDialogClose}
+                        size="small"
+                        sx={{ color: 'text.secondary' }}
+                        aria-label="close"
+                    >
+                        <Close />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ p: 0, bgcolor: 'background.default' }}>
+                    {selectedAccount?.company?.id && (
+                        <TransfersTable companyId={selectedAccount.company.id} />
+                    )}
+                </DialogContent>
+            </Dialog>
         </Container>
     );
 }
