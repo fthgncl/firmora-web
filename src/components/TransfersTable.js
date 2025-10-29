@@ -173,7 +173,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                     token,
                     user,
                     companyId,
-                    ['can_view_company_transfer_history', 'can_view_other_users_transfer_history']
+                    ['can_view_company_transfer_history']
                 );
                 setHasPermission(permission);
             } catch (error) {

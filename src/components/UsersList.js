@@ -151,11 +151,15 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
         return canViewBalance && rows.some(u => u.balance != null);
     }, [canViewBalance, rows]);
 
+    // Permissions kontrolü - herhangi bir kullanıcıda permissions verisi var mı?
+    const hasAnyPermissions = useMemo(() => {
+        return rows.some(u => u.permissions && Array.isArray(u.permissions) && u.permissions.length > 0);
+    }, [rows]);
+
     // Sıralama alanları - bakiye yetkisi varsa bakiye ekle
     const availableSortFields = useMemo(() => {
         return SORT_FIELDS.filter(f => {
-            if (f.value === 'balance' && !hasAnyBalance) return false;
-            return true;
+            return !(f.value === 'balance' && !hasAnyBalance);
         });
     }, [hasAnyBalance]);
 
@@ -522,6 +526,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         <TableRow>
                             {COLUMN_DEFS.filter(c => {
                                 if (c.key === 'balance' && !hasAnyBalance) return false;
+                                if (c.key === 'permissions' && !hasAnyPermissions) return false;
                                 return visibleCols[c.key];
                             }).map(c => (
                                 <TableCell key={c.key}>{t(`users:${c.labelKey}`)}</TableCell>
@@ -534,6 +539,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                             <TableRow>
                                 <TableCell colSpan={COLUMN_DEFS.filter(c => {
                                     if (c.key === 'balance' && !hasAnyBalance) return false;
+                                    if (c.key === 'permissions' && !hasAnyPermissions) return false;
                                     return visibleCols[c.key];
                                 }).length}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -546,6 +552,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                             <TableRow>
                                 <TableCell colSpan={COLUMN_DEFS.filter(c => {
                                     if (c.key === 'balance' && !hasAnyBalance) return false;
+                                    if (c.key === 'permissions' && !hasAnyPermissions) return false;
                                     return visibleCols[c.key];
                                 }).length}>
                                     <Box
@@ -588,7 +595,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.balance && hasAnyBalance && u.balance != null && (
                                         <TableCell sx={{ fontWeight: 600 }}>{formatBalance(u.balance, u.currency)}</TableCell>
                                     )}
-                                    {visibleCols.permissions && (
+                                    {visibleCols.permissions && hasAnyPermissions && (
                                         <TableCell>
                                             <PermissionsDisplay
                                                 onEditedUser={fetchUsers}
@@ -671,6 +678,8 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                 {COLUMN_DEFS.map(c => {
                     // Bakiye sütununu yetki yoksa veya hiç bakiye yoksa menüde gösterme
                     if (c.key === 'balance' && !hasAnyBalance) return null;
+                    // Permissions sütununu hiç permissions verisi yoksa menüde gösterme
+                    if (c.key === 'permissions' && !hasAnyPermissions) return null;
                     return (
                         <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
                             <ListItemIcon>
