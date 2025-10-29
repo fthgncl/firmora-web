@@ -39,6 +39,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { permissionsService } from '../services/permissionsService';
 
 // --- Kolon tanımları ---
 const COLUMN_DEFS = [
@@ -125,7 +126,7 @@ const formatAmount = (amount, currency) => {
 
 const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) => {
     const { t } = useTranslation(['transfers']);
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/transfers/list`;
 
     // --- State ---
@@ -137,6 +138,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [hasPermission, setHasPermission] = useState(false);
 
     // Filtreler
     const [searchTerm, setSearchTerm] = useState('');
@@ -158,6 +160,29 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
         )
     );
     const [anchorEl, setAnchorEl] = useState(null);
+
+    // Yetki kontrolü
+    useEffect(() => {
+        const checkPermissions = async () => {
+            if (!companyId || !user || !token) {
+                setHasPermission(false);
+                return;
+            }
+            try {
+                const permission = await permissionsService.checkUserRoles(
+                    token,
+                    user,
+                    companyId,
+                    ['can_view_company_transfer_history', 'can_view_other_users_transfer_history']
+                );
+                setHasPermission(permission);
+            } catch (error) {
+                console.error('Yetki kontrolü hatası:', error);
+                setHasPermission(false);
+            }
+        };
+        checkPermissions();
+    }, [companyId, user, token]);
 
     const authHeaders = useMemo(
         () => ({
@@ -279,6 +304,11 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
         const fullName = [r?.receiver_name, r?.receiver_surname].filter(Boolean).join(' ');
         return fullName || r?.to_external_name;
     };
+
+    // Yetki yoksa null döndür
+    if (!hasPermission) {
+        return null;
+    }
 
     return (
         <Card
