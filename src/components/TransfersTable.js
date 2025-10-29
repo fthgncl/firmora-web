@@ -599,7 +599,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                         </TableCell>
                                     )}
                                     {visibleCols.transfer_type && <TableCell>{renderTypeChip(r.transfer_type)}</TableCell>}
-                                    {visibleCols.description && <TableCell sx={{ maxWidth: 260, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{r.description || '-'}</TableCell>}
+                                    {visibleCols.description && <TableCell sx={{ maxWidth: 300, whiteSpace: 'normal', wordWrap: 'break-word' }}>{r.description || '-'}</TableCell>}
                                     {visibleCols.status && <TableCell>{renderStatusChip(r.status)}</TableCell>}
                                     {visibleCols.sender_final_balance && <TableCell>{r.sender_final_balance != null ? formatAmount(r.sender_final_balance, r.currency) : '-'}</TableCell>}
                                     {visibleCols.receiver_final_balance && <TableCell>{r.receiver_final_balance != null ? formatAmount(r.receiver_final_balance, r.currency) : '-'}</TableCell>}
