@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import axios from 'axios';
 import {
     Box,
@@ -37,77 +37,82 @@ import {
     Clear,
     ReceiptLong,
 } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../contexts/AuthContext';
-import { permissionsService } from '../services/permissionsService';
+import {useTranslation} from 'react-i18next';
+import {useAuth} from '../contexts/AuthContext';
+import {permissionsService} from '../services/permissionsService';
 
 // --- Kolon tanımları ---
 const COLUMN_DEFS = [
-    { key: 'created_at',            labelKey: 'list.columns.created_at' },
-    { key: 'id',                    labelKey: 'list.columns.id' },
-    { key: 'amount',                labelKey: 'list.columns.amount' },
-    { key: 'sender',                labelKey: 'list.columns.sender' },
-    { key: 'receiver',              labelKey: 'list.columns.receiver' },
-    { key: 'transfer_type',         labelKey: 'list.columns.transfer_type' },
-    { key: 'description',           labelKey: 'list.columns.description' },
-    { key: 'status',                labelKey: 'list.columns.status' },
-    { key: 'sender_final_balance',  labelKey: 'list.columns.sender_final_balance' },
-    { key: 'receiver_final_balance',labelKey: 'list.columns.receiver_final_balance' },
+    {key: 'created_at', labelKey: 'list.columns.created_at'},
+    {key: 'id', labelKey: 'list.columns.id'},
+    {key: 'amount', labelKey: 'list.columns.amount'},
+    {key: 'sender', labelKey: 'list.columns.sender'},
+    {key: 'receiver', labelKey: 'list.columns.receiver'},
+    {key: 'transfer_type', labelKey: 'list.columns.transfer_type'},
+    {key: 'description', labelKey: 'list.columns.description'},
+    {key: 'status', labelKey: 'list.columns.status'},
+    {key: 'sender_final_balance', labelKey: 'list.columns.sender_final_balance'},
+    {key: 'receiver_final_balance', labelKey: 'list.columns.receiver_final_balance'},
 ];
 
 const SORT_FIELDS = [
-    { value: 'created_at',   labelKey: 'list.columns.created_at' },
-    { value: 'id',           labelKey: 'list.columns.id' },
-    { value: 'amount',       labelKey: 'list.columns.amount' },
-    { value: 'status',       labelKey: 'list.columns.status' },
-    { value: 'transfer_type',labelKey: 'list.columns.transfer_type' },
-    { value: 'currency',     labelKey: 'list.columns.currency' },
+    {value: 'created_at', labelKey: 'list.columns.created_at'},
+    {value: 'id', labelKey: 'list.columns.id'},
+    {value: 'amount', labelKey: 'list.columns.amount'},
+    {value: 'status', labelKey: 'list.columns.status'},
+    {value: 'transfer_type', labelKey: 'list.columns.transfer_type'},
+    {value: 'currency', labelKey: 'list.columns.currency'},
 ];
 
 const SORT_ORDERS = [
-    { value: 'ASC',  labelKey: 'sort.asc'  },
-    { value: 'DESC', labelKey: 'sort.desc' },
+    {value: 'ASC', labelKey: 'sort.asc'},
+    {value: 'DESC', labelKey: 'sort.desc'},
 ];
 
 // --- Yardımcılar ---
 const statusChipProps = (status) => {
     switch ((status || '').toLowerCase()) {
-        case 'completed': return { color: 'success', label: 'Completed' };
-        case 'pending':   return { color: 'warning', label: 'Pending' };
-        case 'failed':    return { color: 'error',   label: 'Failed' };
-        case 'reversed':  return { color: 'default', label: 'Reversed' };
-        default:          return { color: 'default', label: status || '-' };
+        case 'completed':
+            return {color: 'success', label: 'Completed'};
+        case 'pending':
+            return {color: 'warning', label: 'Pending'};
+        case 'failed':
+            return {color: 'error', label: 'Failed'};
+        case 'reversed':
+            return {color: 'default', label: 'Reversed'};
+        default:
+            return {color: 'default', label: status || '-'};
     }
 };
 
 const scopeOptions = [
-    { value: '',         labelKey: 'list.filters.any' },
-    { value: 'user',     labelKey: 'list.filters.scope.user' },
-    { value: 'company',  labelKey: 'list.filters.scope.company' },
-    { value: 'external', labelKey: 'list.filters.scope.external' },
+    {value: '', labelKey: 'list.filters.any'},
+    {value: 'user', labelKey: 'list.filters.scope.user'},
+    {value: 'company', labelKey: 'list.filters.scope.company'},
+    {value: 'external', labelKey: 'list.filters.scope.external'},
 ];
 
 const statusOptions = [
-    { value: '',           labelKey: 'list.filters.any' },
-    { value: 'completed',  labelKey: 'list.status.completed' },
-    { value: 'pending',    labelKey: 'list.status.pending' },
-    { value: 'failed',     labelKey: 'list.status.failed' },
-    { value: 'reversed',   labelKey: 'list.status.reversed' },
+    {value: '', labelKey: 'list.filters.any'},
+    {value: 'completed', labelKey: 'list.status.completed'},
+    {value: 'pending', labelKey: 'list.status.pending'},
+    {value: 'failed', labelKey: 'list.status.failed'},
+    {value: 'reversed', labelKey: 'list.status.reversed'},
 ];
 
 const transferTypeOptions = [
-    { value: '',                          labelKey: 'list.filters.any' },
-    { value: 'company_to_user_same',      labelKey: 'list.types.company_to_user_same' },
-    { value: 'company_to_user_other',     labelKey: 'list.types.company_to_user_other' },
-    { value: 'company_to_company_other',  labelKey: 'list.types.company_to_company_other' },
-    { value: 'user_to_user_same',         labelKey: 'list.types.user_to_user_same' },
-    { value: 'user_to_user_other',        labelKey: 'list.types.user_to_user_other' },
-    { value: 'user_to_company_same',      labelKey: 'list.types.user_to_company_same' },
-    { value: 'user_to_company_other',     labelKey: 'list.types.user_to_company_other' },
-    { value: 'user_to_external',          labelKey: 'list.types.user_to_external' },
-    { value: 'company_to_external',       labelKey: 'list.types.company_to_external' },
-    { value: 'external_to_user',          labelKey: 'list.types.external_to_user' },
-    { value: 'external_to_company',       labelKey: 'list.types.external_to_company' },
+    {value: '', labelKey: 'list.filters.any'},
+    {value: 'company_to_user_same', labelKey: 'list.types.company_to_user_same'},
+    {value: 'company_to_user_other', labelKey: 'list.types.company_to_user_other'},
+    {value: 'company_to_company_other', labelKey: 'list.types.company_to_company_other'},
+    {value: 'user_to_user_same', labelKey: 'list.types.user_to_user_same'},
+    {value: 'user_to_user_other', labelKey: 'list.types.user_to_user_other'},
+    {value: 'user_to_company_same', labelKey: 'list.types.user_to_company_same'},
+    {value: 'user_to_company_other', labelKey: 'list.types.user_to_company_other'},
+    {value: 'user_to_external', labelKey: 'list.types.user_to_external'},
+    {value: 'company_to_external', labelKey: 'list.types.company_to_external'},
+    {value: 'external_to_user', labelKey: 'list.types.external_to_user'},
+    {value: 'external_to_company', labelKey: 'list.types.external_to_company'},
 ];
 
 const currencyGuess = (c) => (c && /^[A-Z]{3}$/.test(c) ? c : 'USD');
@@ -124,9 +129,10 @@ const formatAmount = (amount, currency) => {
     }
 };
 
-const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) => {
-    const { t } = useTranslation(['transfers']);
-    const { token, user } = useAuth();
+const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialLimit = 20, sx}, ref) => {
+
+    const {t} = useTranslation(['transfers']);
+    const {token, user} = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/transfers/list`;
 
     // --- State ---
@@ -169,10 +175,15 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                 return;
             }
             try {
+                if ( entitySearch === user.id ){
+                    setHasPermission(true);
+                    return;
+                }
                 const permission = await permissionsService.checkUserRoles(
                     token,
                     user,
                     companyId,
+                    entitySearch,
                     ['can_view_company_transfer_history']
                 );
                 setHasPermission(permission);
@@ -182,7 +193,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
             }
         };
         checkPermissions();
-    }, [companyId, user, token]);
+    }, [companyId, entitySearch, user, token]);
 
     const authHeaders = useMemo(
         () => ({
@@ -209,13 +220,14 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
             page: page + 1,
             sortBy,
             sortOrder,
+            entitySearch: user.id
         };
         // Boş değerleri tamamen silelim
         Object.keys(body).forEach((k) => {
             if (body[k] === '' || body[k] === null) delete body[k];
         });
         return body;
-    }, [companyId, searchTerm, status, transferType, fromScope, toScope, startDate, endDate, limit, page, sortBy, sortOrder]);
+    }, [user, companyId, searchTerm, status, transferType, fromScope, toScope, startDate, endDate, limit, page, sortBy, sortOrder]);
 
     const fetchTransfers = useCallback(async () => {
         if (!companyId) {
@@ -226,7 +238,7 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
             setLoading(true);
             setErrorMsg('');
             const body = buildRequestBody();
-            const { data } = await axios.post(API_URL, body, authHeaders);
+            const {data} = await axios.post(API_URL, body, authHeaders);
 
             if (data?.success !== false) {
                 const transfers = data?.data?.transfers ?? [];
@@ -269,31 +281,39 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
         };
     }, [debouncedFetchTransfers]);
 
-    React.useImperativeHandle(ref, () => ({ refresh: fetchTransfers }));
+    React.useImperativeHandle(ref, () => ({refresh: fetchTransfers}));
 
     // Arama yazıldıkça sayfayı başa al
-    useEffect(() => { setPage(0); }, [searchTerm, status, transferType, fromScope, toScope, startDate, endDate, sortBy, sortOrder, limit]);
+    useEffect(() => {
+        setPage(0);
+    }, [searchTerm, status, transferType, fromScope, toScope, startDate, endDate, sortBy, sortOrder, limit]);
 
     // Kolon menüsü
     const openColsMenu = (e) => setAnchorEl(e.currentTarget);
     const closeColsMenu = () => setAnchorEl(null);
-    const toggleCol = (key) => setVisibleCols((prev) => ({ ...prev, [key]: !prev[key] }));
+    const toggleCol = (key) => setVisibleCols((prev) => ({...prev, [key]: !prev[key]}));
 
     const formatDateTime = (d) =>
-        d ? new Date(d).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+        d ? new Date(d).toLocaleString('tr-TR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : '-';
 
     const renderTypeChip = (type) => (
         <Chip
             size="small"
             variant="outlined"
             label={t(`transfers:list.types.${type}`, type)}
-            sx={{ fontWeight: 600 }}
+            sx={{fontWeight: 600}}
         />
     );
 
     const renderStatusChip = (s) => {
-        const { color, label } = statusChipProps(s);
-        return <Chip size="small" color={color} label={t(`transfers:list.status.${label.toLowerCase()}`, label)} />;
+        const {color, label} = statusChipProps(s);
+        return <Chip size="small" color={color} label={t(`transfers:list.status.${label.toLowerCase()}`, label)}/>;
     };
 
     const senderFullName = (r) => {
@@ -327,13 +347,13 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
             {/* Başlık Şeridi */}
             <Box
                 sx={{
-                    px: { xs: 1.5, sm: 2.5 },
-                    py: { xs: 1.25, sm: 2 },
+                    px: {xs: 1.5, sm: 2.5},
+                    py: {xs: 1.25, sm: 2},
                     display: 'flex',
                     alignItems: 'center',
                     flexWrap: 'wrap',
-                    rowGap: { xs: 1, sm: 1.5 },
-                    columnGap: { xs: 1, sm: 1.5 },
+                    rowGap: {xs: 1, sm: 1.5},
+                    columnGap: {xs: 1, sm: 1.5},
                     boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
                     borderBottom: '1px solid rgba(255,255,255,0.15)',
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -345,26 +365,32 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                     sx={{
                         color: 'white',
                         bgcolor: 'rgba(255,255,255,0.18)',
-                        width: { xs: 36, sm: 42 },
-                        height: { xs: 36, sm: 42 },
+                        width: {xs: 36, sm: 42},
+                        height: {xs: 36, sm: 42},
                         backdropFilter: 'blur(4px)',
                         boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
                         flexShrink: 0,
                         order: 0,
                     }}
                 >
-                    <ReceiptLong />
+                    <ReceiptLong/>
                 </Avatar>
 
-                <Box sx={{ flex: 1, minWidth: 0, order: 1 }}>
-                    <Typography variant="h6" noWrap sx={{ fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+                <Box sx={{flex: 1, minWidth: 0, order: 1}}>
+                    <Typography variant="h6" noWrap
+                                sx={{fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)'}}>
                         {t('transfers:list.title')}
                     </Typography>
                     <Typography
                         variant="caption"
-                        sx={{ opacity: 0.9, textShadow: '0 1px 2px rgba(0,0,0,0.25)', display: 'block', whiteSpace: { xs: 'normal', sm: 'nowrap' } }}
+                        sx={{
+                            opacity: 0.9,
+                            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+                            display: 'block',
+                            whiteSpace: {xs: 'normal', sm: 'nowrap'}
+                        }}
                     >
-                        {t('transfers:list.total', { total })} • {t('transfers:list.rowsPerPage')} {limit}
+                        {t('transfers:list.total', {total})} • {t('transfers:list.rowsPerPage')} {limit}
                     </Typography>
                 </Box>
 
@@ -374,8 +400,8 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                         alignItems: 'center',
                         gap: 1,
                         flexWrap: 'wrap',
-                        justifyContent: { xs: 'flex-end', sm: 'flex-end' },
-                        width: { xs: 'auto', sm: 'auto' },
+                        justifyContent: {xs: 'flex-end', sm: 'flex-end'},
+                        width: {xs: 'auto', sm: 'auto'},
                         order: 2,
                     }}
                 >
@@ -387,11 +413,11 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                 color: '#fff',
                                 bgcolor: 'rgba(255,255,255,0.18)',
                                 border: '1px solid rgba(255,255,255,0.25)',
-                                '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                                '&:hover': {bgcolor: 'rgba(255,255,255,0.28)'},
                                 transition: 'all 0.2s ease',
                             }}
                         >
-                            <ViewColumn />
+                            <ViewColumn/>
                         </IconButton>
                     </Tooltip>
 
@@ -403,20 +429,20 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                 color: '#fff',
                                 bgcolor: 'rgba(255,255,255,0.18)',
                                 border: '1px solid rgba(255,255,255,0.25)',
-                                '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                                '&:hover': {bgcolor: 'rgba(255,255,255,0.28)'},
                                 transition: 'all 0.2s ease',
                             }}
                         >
-                            <Refresh />
+                            <Refresh/>
                         </IconButton>
                     </Tooltip>
                 </Box>
             </Box>
 
             {/* Araç Çubuğu (Filtreler) */}
-            <Box sx={{ px: 2.5, py: 2 }}>
+            <Box sx={{px: 2.5, py: 2}}>
                 {/* Arama */}
-                <Box sx={{ mb: 2 }}>
+                <Box sx={{mb: 2}}>
                     <Paper
                         elevation={0}
                         sx={{
@@ -429,64 +455,73 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                             bgcolor: 'background.paper',
                         }}
                     >
-                        <Search fontSize="small" style={{ opacity: 0.75 }} />
+                        <Search fontSize="small" style={{opacity: 0.75}}/>
                         <TextField
                             variant="standard"
                             fullWidth
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder={t('transfers:list.search.placeholder')}
-                            InputProps={{ disableUnderline: true }}
-                            sx={{ mx: 1 }}
+                            InputProps={{disableUnderline: true}}
+                            sx={{mx: 1}}
                         />
                         {searchTerm && (
                             <IconButton size="small" onClick={() => setSearchTerm('')}>
-                                <Clear fontSize="small" />
+                                <Clear fontSize="small"/>
                             </IconButton>
                         )}
                     </Paper>
                 </Box>
 
                 {/* Filtreler */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
                     {/* Filtreler Bölümü */}
                     <Box>
-                        <Typography variant="caption" sx={{ fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary' }}>
+                        <Typography variant="caption"
+                                    sx={{fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary'}}>
                             {t('transfers:list.filters.title')}
                         </Typography>
-                        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-                            <FormControl size="small" sx={{ flex: '1 1 200px', minWidth: 200 }}>
+                        <Box sx={{display: 'flex', gap: 1.5, flexWrap: 'wrap'}}>
+                            <FormControl size="small" sx={{flex: '1 1 200px', minWidth: 200}}>
                                 <InputLabel>{t('transfers:list.filters.status')}</InputLabel>
-                                <Select value={status} onChange={(e) => setStatus(e.target.value)} label={t('transfers:list.filters.status')}>
+                                <Select value={status} onChange={(e) => setStatus(e.target.value)}
+                                        label={t('transfers:list.filters.status')}>
                                     {statusOptions.map((o) => (
-                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                        <MenuItem key={o.value}
+                                                  value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
 
-                            <FormControl size="small" sx={{ flex: '1 1 280px', minWidth: 280 }}>
+                            <FormControl size="small" sx={{flex: '1 1 280px', minWidth: 280}}>
                                 <InputLabel>{t('transfers:list.filters.transferType')}</InputLabel>
-                                <Select value={transferType} onChange={(e) => setTransferType(e.target.value)} label={t('transfers:list.filters.transferType')}>
+                                <Select value={transferType} onChange={(e) => setTransferType(e.target.value)}
+                                        label={t('transfers:list.filters.transferType')}>
                                     {transferTypeOptions.map((o) => (
-                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                        <MenuItem key={o.value}
+                                                  value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
 
-                            <FormControl size="small" sx={{ flex: '1 1 180px', minWidth: 180 }}>
+                            <FormControl size="small" sx={{flex: '1 1 180px', minWidth: 180}}>
                                 <InputLabel>{t('transfers:list.filters.fromScope')}</InputLabel>
-                                <Select value={fromScope} onChange={(e) => setFromScope(e.target.value)} label={t('transfers:list.filters.fromScope')}>
+                                <Select value={fromScope} onChange={(e) => setFromScope(e.target.value)}
+                                        label={t('transfers:list.filters.fromScope')}>
                                     {scopeOptions.map((o) => (
-                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                        <MenuItem key={o.value}
+                                                  value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
 
-                            <FormControl size="small" sx={{ flex: '1 1 180px', minWidth: 180 }}>
+                            <FormControl size="small" sx={{flex: '1 1 180px', minWidth: 180}}>
                                 <InputLabel>{t('transfers:list.filters.toScope')}</InputLabel>
-                                <Select value={toScope} onChange={(e) => setToScope(e.target.value)} label={t('transfers:list.filters.toScope')}>
+                                <Select value={toScope} onChange={(e) => setToScope(e.target.value)}
+                                        label={t('transfers:list.filters.toScope')}>
                                     {scopeOptions.map((o) => (
-                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                        <MenuItem key={o.value}
+                                                  value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
@@ -495,52 +530,61 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                 size="small"
                                 type="date"
                                 label={t('transfers:list.filters.startDate')}
-                                InputLabelProps={{ shrink: true }}
+                                InputLabelProps={{shrink: true}}
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
-                                sx={{ flex: '1 1 180px', minWidth: 180 }}
+                                sx={{flex: '1 1 180px', minWidth: 180}}
                             />
 
                             <TextField
                                 size="small"
                                 type="date"
                                 label={t('transfers:list.filters.endDate')}
-                                InputLabelProps={{ shrink: true }}
+                                InputLabelProps={{shrink: true}}
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
-                                sx={{ flex: '1 1 180px', minWidth: 180 }}
+                                sx={{flex: '1 1 180px', minWidth: 180}}
                             />
                         </Box>
                     </Box>
 
                     {/* Sıralama Bölümü */}
                     <Box>
-                        <Typography variant="caption" sx={{ fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary' }}>
+                        <Typography variant="caption"
+                                    sx={{fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary'}}>
                             {t('transfers:list.sort.title')}
                         </Typography>
-                        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-                            <FormControl size="small" sx={{ flex: '1 1 200px', minWidth: 200 }}>
+                        <Box sx={{display: 'flex', gap: 1.5, flexWrap: 'wrap'}}>
+                            <FormControl size="small" sx={{flex: '1 1 200px', minWidth: 200}}>
                                 <InputLabel>{t('transfers:list.sort.sortBy')}</InputLabel>
                                 <Select
                                     value={sortBy}
-                                    onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
+                                    onChange={(e) => {
+                                        setSortBy(e.target.value);
+                                        setPage(0);
+                                    }}
                                     label={t('transfers:list.sort.sortBy')}
                                 >
                                     {SORT_FIELDS.map(f => (
-                                        <MenuItem key={f.value} value={f.value}>{t(`transfers:${f.labelKey}`)}</MenuItem>
+                                        <MenuItem key={f.value}
+                                                  value={f.value}>{t(`transfers:${f.labelKey}`)}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
 
-                            <FormControl size="small" sx={{ flex: '0 1 150px', minWidth: 150 }}>
+                            <FormControl size="small" sx={{flex: '0 1 150px', minWidth: 150}}>
                                 <InputLabel>{t('transfers:list.sort.order')}</InputLabel>
                                 <Select
                                     value={sortOrder}
-                                    onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}
+                                    onChange={(e) => {
+                                        setSortOrder(e.target.value);
+                                        setPage(0);
+                                    }}
                                     label={t('transfers:list.sort.order')}
                                 >
                                     {SORT_ORDERS.map(o => (
-                                        <MenuItem key={o.value} value={o.value}>{t(`transfers:${o.labelKey}`)}</MenuItem>
+                                        <MenuItem key={o.value}
+                                                  value={o.value}>{t(`transfers:${o.labelKey}`)}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
@@ -549,21 +593,21 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                 </Box>
             </Box>
 
-            <Divider />
+            <Divider/>
 
             {/* Hata */}
-            {errorMsg && <Alert severity="error" sx={{ m: 2 }}>{errorMsg}</Alert>}
+            {errorMsg && <Alert severity="error" sx={{m: 2}}>{errorMsg}</Alert>}
 
             {/* Tablo */}
-            <TableContainer sx={{ overflowX: 'auto' }}>
+            <TableContainer sx={{overflowX: 'auto'}}>
                 <Table size="small" sx={{
                     minWidth: 900,
-                    'thead th': { fontWeight: 700, whiteSpace: 'nowrap' },
+                    'thead th': {fontWeight: 700, whiteSpace: 'nowrap'},
                     'tbody tr': {
                         transition: 'background-color 120ms ease, transform 120ms ease',
-                        '&:hover': { bgcolor: 'action.hover' }
+                        '&:hover': {bgcolor: 'action.hover'}
                     },
-                    '& thead th, & tbody td': { textAlign: 'center', verticalAlign: 'middle' }
+                    '& thead th, & tbody td': {textAlign: 'center', verticalAlign: 'middle'}
                 }}>
                     <TableHead>
                         <TableRow>
@@ -577,20 +621,28 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                         {loading ? (
                             <TableRow>
                                 <TableCell colSpan={COLUMN_DEFS.length}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center', py: 4 }}>
-                                        <CircularProgress size={20} />
-                                        <Typography variant="body2" color="text.secondary">{t('transfers:list.loading')}</Typography>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        justifyContent: 'center',
+                                        py: 4
+                                    }}>
+                                        <CircularProgress size={20}/>
+                                        <Typography variant="body2"
+                                                    color="text.secondary">{t('transfers:list.loading')}</Typography>
                                     </Box>
                                 </TableCell>
                             </TableRow>
                         ) : rows.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={COLUMN_DEFS.length}>
-                                    <Box sx={{ py: 6, textAlign: 'center', color: 'text.secondary' }}>
-                                        <Typography variant="subtitle1" sx={{ mb: 0.5 }}>
+                                    <Box sx={{py: 6, textAlign: 'center', color: 'text.secondary'}}>
+                                        <Typography variant="subtitle1" sx={{mb: 0.5}}>
                                             {searchTerm ? t('transfers:list.noResultsForSearch') : t('transfers:list.noRecords')}
                                         </Typography>
-                                        <Typography variant="body2" sx={{ mb: 2 }}>{t('transfers:list.search.placeholder')}</Typography>
+                                        <Typography variant="body2"
+                                                    sx={{mb: 2}}>{t('transfers:list.search.placeholder')}</Typography>
                                     </Box>
                                 </TableCell>
                             </TableRow>
@@ -598,12 +650,19 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                             rows.map((r) => (
                                 <TableRow key={r.id} hover>
                                     {visibleCols.created_at && <TableCell>{formatDateTime(r.created_at)}</TableCell>}
-                                    {visibleCols.id && <TableCell sx={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>{r.id}</TableCell>}
-                                    {visibleCols.amount && <TableCell sx={{ fontWeight: 700 }}>{formatAmount(r.amount, r.currency)}</TableCell>}
+                                    {visibleCols.id && <TableCell
+                                        sx={{fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'}}>{r.id}</TableCell>}
+                                    {visibleCols.amount && <TableCell
+                                        sx={{fontWeight: 700}}>{formatAmount(r.amount, r.currency)}</TableCell>}
                                     {visibleCols.sender && (
                                         <TableCell>
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: 0.5
+                                            }}>
+                                                <Typography variant="body2" sx={{fontWeight: 600}}>
                                                     {senderFullName(r)}
                                                 </Typography>
                                                 {r.sender_company_name && (
@@ -616,8 +675,13 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                     )}
                                     {visibleCols.receiver && (
                                         <TableCell>
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: 0.5
+                                            }}>
+                                                <Typography variant="body2" sx={{fontWeight: 600}}>
                                                     {receiverFullName(r)}
                                                 </Typography>
                                                 {r.receiver_company_name && (
@@ -628,11 +692,18 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                                             </Box>
                                         </TableCell>
                                     )}
-                                    {visibleCols.transfer_type && <TableCell>{renderTypeChip(r.transfer_type)}</TableCell>}
-                                    {visibleCols.description && <TableCell sx={{ maxWidth: 300, whiteSpace: 'normal', wordWrap: 'break-word' }}>{r.description || '-'}</TableCell>}
+                                    {visibleCols.transfer_type &&
+                                        <TableCell>{renderTypeChip(r.transfer_type)}</TableCell>}
+                                    {visibleCols.description && <TableCell sx={{
+                                        maxWidth: 300,
+                                        whiteSpace: 'normal',
+                                        wordWrap: 'break-word'
+                                    }}>{r.description || '-'}</TableCell>}
                                     {visibleCols.status && <TableCell>{renderStatusChip(r.status)}</TableCell>}
-                                    {visibleCols.sender_final_balance && <TableCell>{r.sender_final_balance != null ? formatAmount(r.sender_final_balance, r.currency) : '-'}</TableCell>}
-                                    {visibleCols.receiver_final_balance && <TableCell>{r.receiver_final_balance != null ? formatAmount(r.receiver_final_balance, r.currency) : '-'}</TableCell>}
+                                    {visibleCols.sender_final_balance &&
+                                        <TableCell>{r.sender_final_balance != null ? formatAmount(r.sender_final_balance, r.currency) : '-'}</TableCell>}
+                                    {visibleCols.receiver_final_balance &&
+                                        <TableCell>{r.receiver_final_balance != null ? formatAmount(r.receiver_final_balance, r.currency) : '-'}</TableCell>}
                                 </TableRow>
                             ))
                         )}
@@ -641,19 +712,22 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
             </TableContainer>
 
             {/* Alt bar - Sunucu tarafı sayfalama */}
-            <Box sx={{ px: 2, py: 1.5 }}>
+            <Box sx={{px: 2, py: 1.5}}>
                 <TablePagination
                     component="div"
                     count={total}
                     page={page}
                     onPageChange={(_, newPage) => setPage(newPage)}
                     rowsPerPage={limit}
-                    onRowsPerPageChange={(e) => { setLimit(parseInt(e.target.value, 10)); setPage(0); }}
+                    onRowsPerPageChange={(e) => {
+                        setLimit(parseInt(e.target.value, 10));
+                        setPage(0);
+                    }}
                     rowsPerPageOptions={[10, 20, 50, 100]}
                     labelRowsPerPage={t('transfers:list.rowsPerPage')}
-                    labelDisplayedRows={({ from, to, count }) => t('transfers:list.displayedRows', { from, to, count })}
+                    labelDisplayedRows={({from, to, count}) => t('transfers:list.displayedRows', {from, to, count})}
                     sx={{
-                        '.MuiTablePagination-toolbar': { flexWrap: 'wrap', minHeight: { xs: 'auto', sm: 52 } },
+                        '.MuiTablePagination-toolbar': {flexWrap: 'wrap', minHeight: {xs: 'auto', sm: 52}},
                     }}
                 />
             </Box>
@@ -663,20 +737,21 @@ const TransfersTable = React.forwardRef(({ companyId, initialLimit = 20, sx }, r
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
                 onClose={closeColsMenu}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                PaperProps={{ sx: { width: 280, p: 1 } }}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                transformOrigin={{vertical: 'top', horizontal: 'right'}}
+                PaperProps={{sx: {width: 280, p: 1}}}
             >
-                <Typography variant="subtitle2" sx={{ px: 1, pb: 0.5 }}>
+                <Typography variant="subtitle2" sx={{px: 1, pb: 0.5}}>
                     {t('transfers:list.view.columnsTitle')}
                 </Typography>
-                <Divider sx={{ mb: 0.5 }} />
+                <Divider sx={{mb: 0.5}}/>
                 {COLUMN_DEFS.map(c => (
                     <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
                         <ListItemIcon>
-                            <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1} disableRipple />
+                            <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1}
+                                      disableRipple/>
                         </ListItemIcon>
-                        <ListItemText primary={t(`transfers:${c.labelKey}`)} />
+                        <ListItemText primary={t(`transfers:${c.labelKey}`)}/>
                     </ListItemButton>
                 ))}
             </Popover>

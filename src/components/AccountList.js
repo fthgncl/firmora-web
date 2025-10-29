@@ -38,7 +38,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function AccountList() {
     const { t, i18n } = useTranslation(['accounts']);
-    const {token} = useAuth();
+    const {token, user} = useAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [accounts, setAccounts] = useState([]);
@@ -453,7 +453,7 @@ export default function AccountList() {
                 </DialogTitle>
                 <DialogContent sx={{ p: 0, bgcolor: 'background.default' }}>
                     {selectedAccount?.company?.id && (
-                        <TransfersTable companyId={selectedAccount.company.id} />
+                        <TransfersTable entitySearch={user.id} companyId={selectedAccount.company.id} />
                     )}
                 </DialogContent>
             </Dialog>
