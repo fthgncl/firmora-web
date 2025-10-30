@@ -12,12 +12,7 @@ import {
     Stack,
     IconButton,
     Menu,
-    MenuItem,
-    Dialog,
-    DialogContent,
-    DialogTitle,
-    useMediaQuery,
-    useTheme
+    MenuItem
 } from '@mui/material';
 import {
     AccountBalance,
@@ -26,21 +21,18 @@ import {
     TrendingUp,
     Person,
     MoreVert,
-    History,
-    Close
+    History
 } from '@mui/icons-material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
 import MoneyTransferDialog from './MoneyTransferDialog';
 import ExternalMoneyDialog from './ExternalMoneyDialog';
-import TransfersTable from './TransfersTable';
+import TransfersDialog from './TransfersDialog';
 import { useTranslation } from 'react-i18next';
 
 export default function AccountList() {
     const { t, i18n } = useTranslation(['accounts']);
     const {token, user} = useAuth();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [accounts, setAccounts] = useState([]);
     const [accountName, setAccountName] = useState('');
     const [loading, setLoading] = useState(true);
@@ -409,54 +401,12 @@ export default function AccountList() {
                 targetScope="user"
             />
 
-            <Dialog
+            <TransfersDialog
                 open={transfersDialogOpen}
                 onClose={handleTransfersDialogClose}
-                fullScreen={isMobile}
-                maxWidth="lg"
-                fullWidth
-                PaperProps={{
-                    sx: {
-                        borderRadius: isMobile ? 0 : 3,
-                        minHeight: isMobile ? '100vh' : '80vh',
-                    }
-                }}
-            >
-                <DialogTitle
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        py: 1,
-                        px: 2,
-                        borderBottom: (t) => `1px solid ${t.palette.divider}`,
-                        bgcolor: 'background.paper',
-                    }}
-                >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Person sx={{ fontSize: 20, color: 'text.secondary' }} />
-                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                            {selectedAccount?.name}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            • {selectedAccount?.company?.company_name}
-                        </Typography>
-                    </Box>
-                    <IconButton
-                        onClick={handleTransfersDialogClose}
-                        size="small"
-                        sx={{ color: 'text.secondary' }}
-                        aria-label="close"
-                    >
-                        <Close />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContent sx={{ p: 0, bgcolor: 'background.default' }}>
-                    {selectedAccount?.company?.id && (
-                        <TransfersTable entitySearch={user.id} companyId={selectedAccount.company.id} />
-                    )}
-                </DialogContent>
-            </Dialog>
+                selectedAccount={selectedAccount}
+                userId={user.id}
+            />
         </Container>
     );
 }
