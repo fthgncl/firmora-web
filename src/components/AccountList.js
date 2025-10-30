@@ -34,7 +34,6 @@ export default function AccountList() {
     const { t, i18n } = useTranslation(['accounts']);
     const {token, user} = useAuth();
     const [accounts, setAccounts] = useState([]);
-    const [accountName, setAccountName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [anchorEl, setAnchorEl] = useState(null);
@@ -66,9 +65,6 @@ export default function AccountList() {
 
                 if (response.data.status === 'success') {
                     setAccounts(response.data.accounts);
-                    if (response.data.user?.name && response.data.user?.surname) {
-                        setAccountName(`${response.data.user.name} ${response.data.user.surname}`);
-                    }
                 }
             } catch (err) {
                 console.error(t('accounts:errors.consoleLoadError'), err);
@@ -109,7 +105,6 @@ export default function AccountList() {
 
     const handleMenuOpen = (event, account) => {
         setAnchorEl(event.currentTarget);
-        account.name = accountName;
         setSelectedAccount(account);
     };
 
@@ -248,14 +243,11 @@ export default function AccountList() {
 
                                     <Box>
                                         {/* Kullanıcı adı */}
-                                        {accountName && (
-                                            <Typography
-                                                variant="subtitle1"
-                                                sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.1 }}
-                                            >
-                                                {accountName}
-                                            </Typography>
-                                        )}
+                                        <Typography
+                                                variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.1 }}
+                                        >
+                                            {account.name}
+                                        </Typography>
 
                                         {/* Firma adı (accountName altı) */}
                                         <Typography
