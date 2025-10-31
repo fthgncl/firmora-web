@@ -227,7 +227,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
             if (body[k] === '' || body[k] === null) delete body[k];
         });
         return body;
-    }, [user, companyId, searchTerm, status, transferType, fromScope, toScope, startDate, endDate, limit, page, sortBy, sortOrder]);
+    }, [companyId, searchTerm, status, transferType, fromScope, toScope, startDate, endDate, limit, page, sortBy, sortOrder, entitySearch]);
 
     const fetchTransfers = useCallback(async () => {
         if (!companyId) {

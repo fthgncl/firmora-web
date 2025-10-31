@@ -39,7 +39,7 @@ import {
     PersonAdd,
     Group,
     Phone,
-    Receipt
+    History
 } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
@@ -613,10 +613,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}
                                     {visibleCols.balance && hasAnyBalance && u.balance != null && (
                                         <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                                                <Typography sx={{ fontWeight: 600 }}>
-                                                    {formatBalance(u.balance, u.currency)}
-                                                </Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <Tooltip title={t('list.viewTransfers', 'Transfer Geçmişi')}>
                                                     <IconButton
                                                         size="small"
@@ -631,9 +628,12 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                                         }}
                                                         aria-label={t('list.viewTransfers', 'Transfer Geçmişi')}
                                                     >
-                                                        <Receipt fontSize="small" />
+                                                        <History fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
+                                                <Typography sx={{ fontWeight: 600 }}>
+                                                    {formatBalance(u.balance, u.currency)}
+                                                </Typography>
                                             </Box>
                                         </TableCell>
                                     )}
