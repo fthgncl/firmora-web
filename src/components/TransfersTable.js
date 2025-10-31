@@ -220,7 +220,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
             page: page + 1,
             sortBy,
             sortOrder,
-            entitySearch: user.id
+            entitySearch
         };
         // Boş değerleri tamamen silelim
         Object.keys(body).forEach((k) => {
