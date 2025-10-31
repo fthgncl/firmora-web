@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -7,14 +7,59 @@ import {
     Box,
     Typography,
     useMediaQuery,
-    useTheme
+    useTheme,
+    CircularProgress,
+    Alert
 } from '@mui/material';
 import { Close, Person } from '@mui/icons-material';
+import axios from 'axios';
 import TransfersTable from './TransfersTable';
+import {useAuth} from "../contexts/AuthContext";
 
-export default function TransfersDialog({ open, onClose, selectedAccount, userId }) {
+export default function TransfersDialog({ open, onClose, accountId, userId }) {
     const theme = useTheme();
+    const { token } = useAuth();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [accountData, setAccountData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchAccountData = async () => {
+            if (!accountId || !open) return;
+
+            setLoading(true);
+            setError(null);
+
+            try {
+                const response = await axios.post(
+                    `${process.env.REACT_APP_API_URL}/accounts/get`,
+                    { accountId },
+                    {
+                        headers: {
+                            'x-access-token': token,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+                
+                if (response.data.status === "success") {
+                    setAccountData({
+                        ...response.data.account,
+                        company: response.data.company
+                    });
+                } else {
+                    setError(response.data.message || 'Hesap bilgileri alınamadı');
+                }
+            } catch (err) {
+                setError(err.response?.data?.message || 'Hesap bilgileri alınırken bir hata oluştu');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAccountData();
+    }, [accountId, open, token]);
 
     return (
         <Dialog
@@ -44,11 +89,13 @@ export default function TransfersDialog({ open, onClose, selectedAccount, userId
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Person sx={{ fontSize: 20, color: 'text.secondary' }} />
                     <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        {selectedAccount?.name}
+                        {accountData?.name || 'Yükleniyor...'}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        • {selectedAccount?.company?.company_name}
-                    </Typography>
+                    {accountData?.company?.company_name && (
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            • {accountData.company.company_name}
+                        </Typography>
+                    )}
                 </Box>
                 <IconButton
                     onClick={onClose}
@@ -60,8 +107,18 @@ export default function TransfersDialog({ open, onClose, selectedAccount, userId
                 </IconButton>
             </DialogTitle>
             <DialogContent sx={{ p: 0, bgcolor: 'background.default' }}>
-                {selectedAccount?.company?.id && (
-                    <TransfersTable entitySearch={userId} companyId={selectedAccount.company.id} />
+                {loading && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
+                        <CircularProgress />
+                    </Box>
+                )}
+                {error && (
+                    <Box sx={{ p: 3 }}>
+                        <Alert severity="error">{error}</Alert>
+                    </Box>
+                )}
+                {!loading && !error && accountData?.company?.id && (
+                    <TransfersTable entitySearch={userId} companyId={accountData.company.id} />
                 )}
             </DialogContent>
         </Dialog>

@@ -396,7 +396,7 @@ export default function AccountList() {
             <TransfersDialog
                 open={transfersDialogOpen}
                 onClose={handleTransfersDialogClose}
-                selectedAccount={selectedAccount}
+                accountId={selectedAccount?.id || null}
                 userId={user.id}
             />
         </Container>
