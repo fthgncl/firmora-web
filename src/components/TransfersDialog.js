@@ -16,7 +16,7 @@ import axios from 'axios';
 import TransfersTable from './TransfersTable';
 import {useAuth} from "../contexts/AuthContext";
 
-export default function TransfersDialog({ open, onClose, accountId, userId }) {
+export default function TransfersDialog({ open, onClose, accountId }) {
     const theme = useTheme();
     const { token } = useAuth();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -30,7 +30,6 @@ export default function TransfersDialog({ open, onClose, accountId, userId }) {
 
             setLoading(true);
             setError(null);
-
             try {
                 const response = await axios.post(
                     `${process.env.REACT_APP_API_URL}/accounts/get`,
@@ -42,7 +41,7 @@ export default function TransfersDialog({ open, onClose, accountId, userId }) {
                         }
                     }
                 );
-                
+
                 if (response.data.status === "success") {
                     setAccountData({
                         ...response.data.account,
@@ -117,8 +116,8 @@ export default function TransfersDialog({ open, onClose, accountId, userId }) {
                         <Alert severity="error">{error}</Alert>
                     </Box>
                 )}
-                {!loading && !error && accountData?.company?.id && (
-                    <TransfersTable entitySearch={userId} companyId={accountData.company.id} />
+                {!loading && !error && accountData?.company?.id && accountData?.user_id && (
+                    <TransfersTable entitySearch={accountData.user_id} companyId={accountData.company.id} />
                 )}
             </DialogContent>
         </Dialog>

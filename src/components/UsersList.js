@@ -38,7 +38,8 @@ import {
     Clear,
     PersonAdd,
     Group,
-    Phone
+    Phone,
+    Receipt
 } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
@@ -46,6 +47,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import PermissionsDisplay from './PermissionsDisplay';
 import AddUserDialog from './AddUserDialog';
+import TransfersDialog from './TransfersDialog';
 import { permissionsService } from '../services/permissionsService';
 
 const COLUMN_DEFS = [
@@ -103,6 +105,23 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     };
 
     const [openAddDialog, setOpenAddDialog] = useState(false);
+    const [transfersDialogOpen, setTransfersDialogOpen] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [selectedAccountId, setSelectedAccountId] = useState(null);
+
+    const handleOpenTransfersDialog = (user) => {
+        // user nesnesinden account_id veya id alanını kullan
+        const accountId = user.accountId;
+        setSelectedUserId(user.id);
+        setSelectedAccountId(accountId);
+        setTransfersDialogOpen(true);
+    };
+
+    const handleCloseTransfersDialog = () => {
+        setTransfersDialogOpen(false);
+        setSelectedUserId(null);
+        setSelectedAccountId(null);
+    };
 
     // table state
     const [rows, setRows] = useState([]);
@@ -593,7 +612,30 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}
                                     {visibleCols.balance && hasAnyBalance && u.balance != null && (
-                                        <TableCell sx={{ fontWeight: 600 }}>{formatBalance(u.balance, u.currency)}</TableCell>
+                                        <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                                                <Typography sx={{ fontWeight: 600 }}>
+                                                    {formatBalance(u.balance, u.currency)}
+                                                </Typography>
+                                                <Tooltip title={t('list.viewTransfers', 'Transfer Geçmişi')}>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleOpenTransfersDialog(u);
+                                                        }}
+                                                        sx={{
+                                                            border: (theme) => `1px solid ${theme.palette.divider}`,
+                                                            bgcolor: 'action.hover',
+                                                            '&:hover': { bgcolor: 'action.selected' }
+                                                        }}
+                                                        aria-label={t('list.viewTransfers', 'Transfer Geçmişi')}
+                                                    >
+                                                        <Receipt fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
+                                        </TableCell>
                                     )}
                                     {visibleCols.permissions && hasAnyPermissions && (
                                         <TableCell>
@@ -697,6 +739,14 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                 onClose={() => setOpenAddDialog(false)}
                 companyId={companyId}
                 onUserAdded={fetchUsers}
+            />
+
+            {/* TransfersDialog */}
+            <TransfersDialog
+                open={transfersDialogOpen}
+                onClose={handleCloseTransfersDialog}
+                accountId={selectedAccountId}
+                userId={selectedUserId}
             />
         </Card>
     );
