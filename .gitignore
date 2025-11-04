@@ -1,6 +1,7 @@
 
 # dependencies
 /.idea
+/.aiassistant
 /node_modules
 /package-lock.json
 .pnp
