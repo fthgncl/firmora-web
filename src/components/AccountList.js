@@ -21,7 +21,9 @@ import {
     TrendingUp,
     Person,
     MoreVert,
-    History
+    History,
+    SwapHoriz,
+    AddCircle
 } from '@mui/icons-material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
@@ -368,9 +370,11 @@ export default function AccountList() {
                 }}
             >
                 <MenuItem onClick={handleTransferClick}>
+                    <SwapHoriz sx={{ mr: 1, fontSize: 20 }} />
                     {t('accounts:menu.moneyTransfer')}
                 </MenuItem>
                 <MenuItem onClick={handleExternalMoneyClick}>
+                    <AddCircle sx={{ mr: 1, fontSize: 20 }} />
                     {t('accounts:menu.addIncome')}
                 </MenuItem>
                 <MenuItem onClick={handleTransfersHistoryClick}>
