@@ -183,7 +183,6 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
                     token,
                     user,
                     companyId,
-                    entitySearch,
                     ['can_view_company_transfer_history']
                 );
                 setHasPermission(permission);
