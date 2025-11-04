@@ -614,7 +614,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.balance && hasAnyBalance && u.balance != null && (
                                         <TableCell>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Tooltip title={t('list.viewTransfers', 'Transfer Geçmişi')}>
+                                                <Tooltip title={t('list.viewTransfers')}>
                                                     <IconButton
                                                         size="small"
                                                         onClick={(e) => {
@@ -626,7 +626,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                                             bgcolor: 'action.hover',
                                                             '&:hover': { bgcolor: 'action.selected' }
                                                         }}
-                                                        aria-label={t('list.viewTransfers', 'Transfer Geçmişi')}
+                                                        aria-label={t('list.viewTransfers')}
                                                     >
                                                         <History fontSize="small" />
                                                     </IconButton>
