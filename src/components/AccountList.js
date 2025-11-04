@@ -375,7 +375,7 @@ export default function AccountList() {
                 </MenuItem>
                 <MenuItem onClick={handleTransfersHistoryClick}>
                     <History sx={{ mr: 1, fontSize: 20 }} />
-                    {t('accounts:menu.viewTransferHistory', 'Geçmiş Transferleri Gör')}
+                    {t('accounts:menu.viewTransferHistory')}
                 </MenuItem>
             </Menu>
 

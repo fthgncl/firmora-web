@@ -5,7 +5,8 @@
   "registeredAt": "Registered on: {{date}}",
   "menu": {
     "moneyTransfer": "Money Transfer",
-    "addIncome": "Add Income"
+    "addIncome": "Add Income",
+    "viewTransferHistory": "View Transfer History"
   },
   "aria": {
     "more": "More options"

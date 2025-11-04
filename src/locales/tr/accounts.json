@@ -5,7 +5,8 @@
   "registeredAt": "Kayıt Tarihi: {{date}}",
   "menu": {
     "moneyTransfer": "Para Transferi",
-    "addIncome": "Gelir Ekle"
+    "addIncome": "Gelir Ekle",
+    "viewTransferHistory": "Transfer Geçmişini Görüntüle"
   },
   "aria": {
     "more": "Daha fazla seçenek"

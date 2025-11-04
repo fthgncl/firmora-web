@@ -5,7 +5,8 @@
   "registeredAt": "Registriert am: {{date}}",
   "menu": {
     "moneyTransfer": "Geldüberweisung",
-    "addIncome": "Einnahme hinzufügen"
+    "addIncome": "Einnahme hinzufügen",
+    "viewTransferHistory": "Überweisungsverlauf anzeigen"
   },
   "aria": {
     "more": "Weitere Optionen"
