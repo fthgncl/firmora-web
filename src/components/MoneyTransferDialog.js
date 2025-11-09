@@ -17,6 +17,11 @@ import SwapHoriz from '@mui/icons-material/SwapHoriz';
 import Send from '@mui/icons-material/Send';
 import Clear from '@mui/icons-material/Clear';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
+import AttachFile from '@mui/icons-material/AttachFile';
+import CameraAlt from '@mui/icons-material/CameraAlt';
+import InsertDriveFile from '@mui/icons-material/InsertDriveFile';
+import Image from '@mui/icons-material/Image';
+import PictureAsPdf from '@mui/icons-material/PictureAsPdf';
 
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
@@ -208,6 +213,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
 
     const [amount, setAmount] = useState('');
     const [description, setDescription] = useState('');
+    const [attachedFiles, setAttachedFiles] = useState([]);
 
     // filtre: bu dialog sadece verilen fromScope için tipleri gösterir
     const scopedTypes = useMemo(
@@ -277,6 +283,29 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
 
     const handleUserSelect = useCallback((userObj) => setToUser(userObj), []);
 
+    // dosya yönetimi
+    const handleFileSelect = useCallback((event) => {
+        const files = Array.from(event.target.files || []);
+        const validFiles = files.filter(file => {
+            const isValidType = file.type.startsWith('image/') || file.type === 'application/pdf';
+            const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
+            if (!isValidType) showError(t('transfers:validations.invalid_file_type'));
+            if (!isValidSize) showError(t('transfers:validations.file_too_large'));
+            return isValidType && isValidSize;
+        });
+        setAttachedFiles(prev => [...prev, ...validFiles]);
+    }, [showError, t]);
+
+    const handleRemoveFile = useCallback((index) => {
+        setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+    }, []);
+
+    const getFileIcon = (file) => {
+        if (file.type === 'application/pdf') return <PictureAsPdf sx={{color: '#d32f2f'}}/>;
+        if (file.type.startsWith('image/')) return <Image sx={{color: '#1976d2'}}/>;
+        return <InsertDriveFile/>;
+    };
+
     // doğrulama
     const validate = () => {
         if (!selectedType) {
@@ -313,32 +342,36 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
     // payload oluştur
     const buildRequest = () => {
         const amt = Number(String(amount).replace(',', '.'));
-        const base = {
-            transfer_type: selectedType.value,
-            currency,
-            amount: amt,
-            description: description?.trim() || undefined,
-            from_scope: selectedType.fromScope,
-            to_scope: selectedType.toScope,
-            company_id: companyId,
-        };
+        const formData = new FormData();
+
+        formData.append('transfer_type', selectedType.value);
+        formData.append('currency', currency);
+        formData.append('amount', amt);
+        if (description?.trim()) formData.append('description', description.trim());
+        formData.append('from_scope', selectedType.fromScope);
+        formData.append('to_scope', selectedType.toScope);
+        formData.append('company_id', companyId);
 
         if (selectedType.requiresUser && toUser?.id) {
-            base.to_user_id = toUser.id;
-            base.to_user_company_id = selectedType.requiresOtherCompany
-                ? toCompany?.id
-                : companyId; // same-company senaryosu
+            formData.append('to_user_id', toUser.id);
+            formData.append('to_user_company_id', selectedType.requiresOtherCompany ? toCompany?.id : companyId);
         } else if (selectedType.requiresOtherCompany && toCompany?.id) {
-            base.to_user_company_id = toCompany.id;
+            formData.append('to_user_company_id', toCompany.id);
         }
 
         if (selectedType.value === 'user_to_company_same') {
-            base.to_user_company_id = companyId;
+            formData.append('to_user_company_id', companyId);
         }
         if (selectedType.requiresToExternalName) {
-            base.to_external_name = toExternalName.trim();
+            formData.append('to_external_name', toExternalName.trim());
         }
-        return base;
+
+        // dosyaları ekle
+        attachedFiles.forEach((file, index) => {
+            formData.append('attachments', file);
+        });
+
+        return formData;
     };
 
     // submit
@@ -353,7 +386,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                 {
                     headers: {
                         'x-access-token': token,
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-data',
                     },
                 }
             );
@@ -366,6 +399,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                 setToCompany(null);
                 setToUser(null);
                 setToExternalName('');
+                setAttachedFiles([]);
                 onClose?.(res.data);
             } else {
                 showError(res?.data?.message || t('transfers:create.failed'));
@@ -740,7 +774,91 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     inputProps={{maxLength: 255}}
+                    sx={{mb: 2}}
                 />
+
+                {/* Dosya Yükleme */}
+                <Box sx={{mb: 2}}>
+                    <Typography variant="subtitle2" sx={{mb: 1}}>
+                        {t('transfers:fields.attachments')} ({t('common:optional')})
+                    </Typography>
+
+                    <Stack direction="row" spacing={1} sx={{mb: 1.5}}>
+                        <Button
+                            component="label"
+                            variant="outlined"
+                            startIcon={<AttachFile/>}
+                            size="small"
+                        >
+                            {t('transfers:buttons.attach_files')}
+                            <input
+                                type="file"
+                                hidden
+                                multiple
+                                accept="image/*,application/pdf"
+                                onChange={handleFileSelect}
+                            />
+                        </Button>
+
+                        <Button
+                            component="label"
+                            variant="outlined"
+                            startIcon={<CameraAlt/>}
+                            size="small"
+                            sx={{display: {xs: 'inline-flex', sm: 'none'}}}
+                        >
+                            {t('transfers:buttons.take_photo')}
+                            <input
+                                type="file"
+                                hidden
+                                accept="image/*"
+                                capture="environment"
+                                onChange={handleFileSelect}
+                            />
+                        </Button>
+                    </Stack>
+
+                    {attachedFiles.length > 0 && (
+                        <Stack spacing={1}>
+                            {attachedFiles.map((file, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        p: 1.5,
+                                        borderRadius: 1.5,
+                                        bgcolor: 'rgba(0,0,0,0.03)',
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                    }}
+                                >
+                                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                                        {getFileIcon(file)}
+                                        <Box sx={{flexGrow: 1, minWidth: 0}}>
+                                            <Typography variant="body2" noWrap sx={{fontWeight: 500}}>
+                                                {file.name}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {(file.size / 1024).toFixed(1)} KB
+                                            </Typography>
+                                        </Box>
+                                        <Tooltip title={t('common:remove')}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleRemoveFile(index)}
+                                            >
+                                                <Clear fontSize="small"/>
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Stack>
+                                </Box>
+                            ))}
+                        </Stack>
+                    )}
+
+                    <Typography variant="caption" color="text.secondary" sx={{display: 'block', mt: 0.5}}>
+                        {t('transfers:hints.file_upload')}
+                    </Typography>
+                </Box>
 
                 {/* scope info */}
                 {selectedType && (

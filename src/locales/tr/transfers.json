@@ -60,7 +60,15 @@
     "description": "Açıklama (opsiyonel)",
     "to_company": "Hedef Firma",
     "to_user": "Hedef Kullanıcı",
-    "to_external_name": "Alıcı Adı (Sistem Dışı)"
+    "to_external_name": "Alıcı Adı (Sistem Dışı)",
+    "attachments": "Ekler"
+  },
+  "buttons": {
+    "attach_files": "Dosya ekle",
+    "take_photo": "Fotoğraf çek"
+  },
+  "hints": {
+    "file_upload": "Dosyalar transferle birlikte yüklenecektir."
   },
   "sort": {
     "asc": "Artan",
@@ -71,7 +79,9 @@
     "company_required": "Lütfen hedef firmayı seçin.",
     "user_required": "Lütfen hedef kullanıcıyı seçin.",
     "to_external_name_required": "Lütfen alıcı adını girin.",
-    "select_company_first": "Önce hedef firmayı seçin."
+    "select_company_first": "Önce hedef firmayı seçin.",
+    "invalid_file_type": "Lütfen geçerli bir dosya türü yükleyin.",
+    "file_too_large": "Lütfen daha küçük bir dosya yükleyin. Maksimum boyut: {{maxSize}} MB."
   },
   "create": {
     "success": "Transfer başarıyla tamamlandı.",

@@ -58,5 +58,6 @@
   "role": "Role",
   "success_message": "Operation completed successfully.",
   "error_message": "An error occurred. Please try again.",
-  "balance": "Balance"
+  "balance": "Balance",
+  "optional": "Optional"
 }

@@ -60,7 +60,15 @@
     "description": "Description (optional)",
     "to_company": "Target Company",
     "to_user": "Target User",
-    "to_external_name": "Recipient Name (External)"
+    "to_external_name": "Recipient Name (External)",
+    "attachments": "Attachments"
+  },
+  "buttons": {
+    "attach_files": "Attach files",
+    "take_photo": "Take photo"
+  },
+  "hints": {
+    "file_upload": "Files will be uploaded along with the transfer."
   },
   "sort": {
     "asc": "Ascending",
@@ -71,7 +79,9 @@
     "company_required": "Please select a target company.",
     "user_required": "Please select a target user.",
     "to_external_name_required": "Please enter the recipient name.",
-    "select_company_first": "Please select the target company first."
+    "select_company_first": "Please select the target company first.",
+    "invalid_file_type": "Please upload a valid file type.",
+    "file_too_large": "Please upload a smaller file. Maximum size: {{maxSize}} MB."
   },
   "create": {
     "success": "Transfer completed successfully.",

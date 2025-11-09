@@ -60,7 +60,15 @@
     "description": "Beschreibung (optional)",
     "to_company": "Zielunternehmen",
     "to_user": "Zielbenutzer",
-    "to_external_name": "Empfängername (extern)"
+    "to_external_name": "Empfängername (extern)",
+    "attachments": "Anhänge"
+  },
+  "buttons": {
+    "attach_files": "Dateien anhängen",
+    "take_photo": "Foto aufnehmen"
+  },
+  "hints": {
+    "file_upload": "Dateien werden zusammen mit der Überweisung hochgeladen."
   },
   "sort": {
     "asc": "Aufsteigend",
@@ -71,7 +79,9 @@
     "company_required": "Bitte wählen Sie ein Zielunternehmen aus.",
     "user_required": "Bitte wählen Sie einen Zielbenutzer aus.",
     "to_external_name_required": "Bitte geben Sie den Empfängernamen ein.",
-    "select_company_first": "Bitte wählen Sie zuerst das Zielunternehmen aus."
+    "select_company_first": "Bitte wählen Sie zuerst das Zielunternehmen aus.",
+    "invalid_file_type": "Bitte laden Sie einen gültigen Dateityp hoch.",
+    "file_too_large": "Bitte laden Sie eine kleinere Datei hoch. Maximale Größe: {{maxSize}} MB."
   },
   "create": {
     "success": "Überweisung erfolgreich abgeschlossen.",

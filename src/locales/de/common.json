@@ -58,5 +58,6 @@
   "role": "Rolle",
   "success_message": "Vorgang erfolgreich abgeschlossen.",
   "error_message": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-  "balance": "Kontostand"
+  "balance": "Kontostand",
+  "optional": "Optional"
 }
