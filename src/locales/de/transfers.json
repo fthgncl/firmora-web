@@ -147,7 +147,8 @@
       "receiver_company_name": "Empfängerfirma",
       "description": "Beschreibung",
       "sender_final_balance": "Endsaldo Absender",
-      "receiver_final_balance": "Endsaldo Empfänger"
+      "receiver_final_balance": "Endsaldo Empfänger",
+      "files_count": "Hochgeladene Dateien"
     },
     "errors": {
       "fetchFailed": "Transfers konnten nicht geladen werden",

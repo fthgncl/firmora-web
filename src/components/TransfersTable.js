@@ -36,6 +36,7 @@ import {
     Search,
     Clear,
     ReceiptLong,
+    AttachFile,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
@@ -50,6 +51,7 @@ const COLUMN_DEFS = [
     {key: 'receiver', labelKey: 'list.columns.receiver'},
     {key: 'transfer_type', labelKey: 'list.columns.transfer_type'},
     {key: 'description', labelKey: 'list.columns.description'},
+    {key: 'files_count', labelKey: 'list.columns.files_count'},
     {key: 'status', labelKey: 'list.columns.status'},
     {key: 'sender_final_balance', labelKey: 'list.columns.sender_final_balance'},
     {key: 'receiver_final_balance', labelKey: 'list.columns.receiver_final_balance'},
@@ -698,6 +700,20 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
                                         whiteSpace: 'normal',
                                         wordWrap: 'break-word'
                                     }}>{r.description || '-'}</TableCell>}
+                                    {visibleCols.files_count && (
+                                        <TableCell>
+                                            {r.files_count > 0 ? (
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                                                    <AttachFile fontSize="small" sx={{ color: 'text.secondary' }} />
+                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                        {r.files_count}
+                                                    </Typography>
+                                                </Box>
+                                            ) : (
+                                                '-'
+                                            )}
+                                        </TableCell>
+                                    )}
                                     {visibleCols.status && <TableCell>{renderStatusChip(r.status)}</TableCell>}
                                     {visibleCols.sender_final_balance &&
                                         <TableCell>{r.sender_final_balance != null ? formatAmount(r.sender_final_balance, r.currency) : '-'}</TableCell>}

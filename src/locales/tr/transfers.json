@@ -147,7 +147,8 @@
       "receiver_company_name": "Alıcı Firma",
       "description": "Açıklama",
       "sender_final_balance": "Gönderen Son Bakiye",
-      "receiver_final_balance": "Alıcı Son Bakiye"
+      "receiver_final_balance": "Alıcı Son Bakiye",
+      "files_count": "Yüklenen Dosyalar"
     },
     "errors": {
       "fetchFailed": "Transferler alınamadı",

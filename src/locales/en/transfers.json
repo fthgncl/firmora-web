@@ -147,7 +147,8 @@
       "receiver_company_name": "Receiver Company",
       "description": "Description",
       "sender_final_balance": "Sender Final Balance",
-      "receiver_final_balance": "Receiver Final Balance"
+      "receiver_final_balance": "Receiver Final Balance",
+      "files_count": "Uploaded Files"
     },
     "errors": {
       "fetchFailed": "Failed to fetch transfers",
