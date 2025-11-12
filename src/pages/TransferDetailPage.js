@@ -86,11 +86,13 @@ export default function TransferDetailPage() {
     const [transfer, setTransfer] = useState(null);
     const [attachments, setAttachments] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchTransferDetail = async () => {
             try {
                 setLoading(true);
+                setError(null);
                 const response = await axios.post(
                     `${process.env.REACT_APP_API_URL}/transfers/get`,
                     {
@@ -140,11 +142,15 @@ export default function TransferDetailPage() {
                         setAttachments([]);
                     }
                 } else {
-                    showError(response.data?.message || t('list.errors.fetchFailed'));
+                    const errorMessage = response.data?.message || t('list.errors.fetchFailed');
+                    setError(errorMessage);
+                    showError(errorMessage);
                 }
             } catch (error) {
                 console.error('Transfer detayı yüklenirken hata:', error);
-                showError(error?.response?.data?.message || t('list.errors.fetchFailed'));
+                const errorMessage = error?.response?.data?.message || t('list.errors.fetchFailed');
+                setError(errorMessage);
+                showError(errorMessage);
             } finally {
                 setLoading(false);
             }
@@ -153,7 +159,7 @@ export default function TransferDetailPage() {
         if (transferId && token) {
             fetchTransferDetail();
         }
-    }, [transferId, token, showError, t]);
+    }, [transferId, token]);
 
     const getFileUrl = (attachment) => {
         // Backend'den gelen path'i URL'e dönüştür
@@ -187,11 +193,11 @@ export default function TransferDetailPage() {
         );
     }
 
-    if (!transfer) {
+    if (!transfer && !loading) {
         return (
             <Container maxWidth="lg" sx={{py: 4}}>
                 <Alert severity="error" sx={{mb: 2}}>
-                    {t('list.errors.notFound')}
+                    {error || t('list.errors.notFound')}
                 </Alert>
                 <Button startIcon={<ArrowBack/>} onClick={() => navigate(-1)}>
                     {t('back', { ns: 'common' })}
