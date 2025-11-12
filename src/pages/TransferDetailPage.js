@@ -106,9 +106,23 @@ export default function TransferDetailPage() {
                     }
                 );
 
-                if (response.data?.status === 'success' && response.data?.data) {
-                    const transferData = response.data.data;
-                    setTransfer(transferData);
+                console.log(response.data);
+
+                if (response.data?.status === 'success' && response.data?.data?.transfer) {
+                    const transferData = response.data.data.transfer;
+                    const senderData = response.data.data.sender;
+                    const receiverData = response.data.data.receiver;
+
+                    // Transfer verisine sender ve receiver bilgilerini ekle
+                    const enrichedTransfer = {
+                        ...transferData,
+                        sender_name: senderData?.name,
+                        sender_surname: senderData?.surname,
+                        receiver_name: receiverData?.name,
+                        receiver_surname: receiverData?.surname,
+                    };
+
+                    setTransfer(enrichedTransfer);
 
                     // files JSON string'ini parse et
                     if (transferData.files) {
@@ -218,7 +232,7 @@ export default function TransferDetailPage() {
                     {t('back', { ns: 'common' })}
                 </Button>
                 <Typography variant="h4" sx={{fontWeight: 700, flex: 1}}>
-                    {t('list.detail.title')} #{transfer.id}
+                    {t('list.detail.title')}
                 </Typography>
                 <Chip
                     color={statusColor}
@@ -232,9 +246,14 @@ export default function TransferDetailPage() {
                 <Grid item xs={12} md={8}>
                     <Card sx={{borderRadius: 3, mb: 3}}>
                         <CardContent sx={{p: 3}}>
-                            <Typography variant="h6" sx={{mb: 2, fontWeight: 600}}>
-                                {t('list.detail.transferInfo')}
-                            </Typography>
+                            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
+                                <Typography variant="h6" sx={{fontWeight: 600}}>
+                                    {t('list.detail.transferInfo')}
+                                </Typography>
+                                <Typography variant="body2" sx={{color: 'text.secondary', fontWeight: 400}}>
+                                    #{transfer.id}
+                                </Typography>
+                            </Box>
                             <Divider sx={{mb: 2}}/>
 
                             {/* Tutar */}
