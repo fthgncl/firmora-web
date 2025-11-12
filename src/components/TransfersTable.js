@@ -41,6 +41,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import {permissionsService} from '../services/permissionsService';
+import {useNavigate} from 'react-router-dom';
 
 // --- Kolon tanımları ---
 const COLUMN_DEFS = [
@@ -135,6 +136,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
 
     const {t} = useTranslation(['transfers']);
     const {token, user} = useAuth();
+    const navigate = useNavigate();
     const API_URL = `${process.env.REACT_APP_API_URL}/transfers/list`;
 
     // --- State ---
@@ -649,7 +651,12 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
                             </TableRow>
                         ) : (
                             rows.map((r) => (
-                                <TableRow key={r.id} hover>
+                                <TableRow 
+                                    key={r.id} 
+                                    hover 
+                                    onClick={() => navigate(`/transfer/${r.id}`)}
+                                    sx={{ cursor: 'pointer' }}
+                                >
                                     {visibleCols.created_at && <TableCell>{formatDateTime(r.created_at)}</TableCell>}
                                     {visibleCols.id && <TableCell
                                         sx={{fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'}}>{r.id}</TableCell>}

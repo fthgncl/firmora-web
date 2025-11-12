@@ -121,6 +121,14 @@
       "endDate": "End Date",
       "currency": "Currency (e.g. USD)"
     },
+    "detail": {
+      "title": "Transfer Details",
+      "transferInfo": "Transfer Information",
+      "sender": "Gönderen",
+      "receiver": "Alıcı",
+      "additionalInfo": "Additional Information",
+      "attachments": "Attachments"
+    },
     "sort":{
       "title": "Sorting",
       "sortBy": "Sort by",
@@ -152,7 +160,8 @@
     },
     "errors": {
       "fetchFailed": "Failed to fetch transfers",
-      "unexpected": "An unexpected error occurred"
+      "unexpected": "An unexpected error occurred",
+      "notFound": "No transfers found"
     },
     "types": {
       "company_to_user_same": "Company → User (Same)",

@@ -8,6 +8,7 @@ import SignInUpPage from "./pages/SignInUpPage";
 import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import CompanyPage from "./pages/CompanyPage";
+import TransferDetailPage from "./pages/TransferDetailPage";
 import React from "react";
 import AppBar from "./components/AppBar";
 
@@ -57,6 +58,12 @@ function App() {
                         redirectTo="/sign-in"
                         requireRoles={['sys_admin','personnel_manager','can_view_company_transfer_history','can_view_other_users_transfer_history']}>
                         <CompanyPage/>
+                    </AuthRoute>
+                }/>
+
+                <Route path="/transfer/:transferId" element={
+                    <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                        <TransferDetailPage/>
                     </AuthRoute>
                 }/>
 

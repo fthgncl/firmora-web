@@ -121,6 +121,14 @@
       "endDate": "Ende Datum",
       "currency": "Währung (z. B. USD)"
     },
+    "detail": {
+      "title": "Überweisungsdetails",
+      "transferInfo": "Überweisungsinformationen",
+      "sender": "Absender",
+      "receiver": "Empfänger",
+      "additionalInfo": "Zusätzliche Informationen",
+      "attachments": "Anhänge"
+    },
     "sort":{
       "title": "Sortierung",
       "sortBy": "Sortieren nach",
@@ -152,7 +160,8 @@
     },
     "errors": {
       "fetchFailed": "Transfers konnten nicht geladen werden",
-      "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten",
+      "notFound": "Keine Überweisungen gefunden"
     },
     "types": {
       "company_to_user_same": "Firma → Nutzer (Gleiche)",

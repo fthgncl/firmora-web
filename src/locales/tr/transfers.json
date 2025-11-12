@@ -121,6 +121,14 @@
       "endDate": "Bitiş Tarihi",
       "currency": "Para birimi (örn. USD)"
     },
+    "detail": {
+      "title": "Transfer Detayları",
+      "transferInfo": "Transfer Bilgisi",
+      "sender": "Gönderen",
+      "receiver": "Alıcı",
+      "additionalInfo": "Ek Bilgi",
+      "attachments": "Ekler"
+    },
     "sort":{
       "title": "Sıralama",
       "sortBy": "Sırala",
@@ -152,7 +160,8 @@
     },
     "errors": {
       "fetchFailed": "Transferler alınamadı",
-      "unexpected": "Beklenmeyen bir hata oluştu"
+      "unexpected": "Beklenmeyen bir hata oluştu",
+      "notFound": "Transfer bulunamadı"
     },
     "types": {
       "company_to_user_same": "Firma → Kullanıcı (Aynı)",
