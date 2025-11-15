@@ -21,6 +21,8 @@ import {
     Fade,
     Grow,
     Zoom,
+    useTheme,
+    useMediaQuery
 } from '@mui/material';
 import {
     ArrowBack,
@@ -39,11 +41,13 @@ import {
     Error as ErrorIcon,
     Cancel,
 } from '@mui/icons-material';
+
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import {useAlert} from '../contexts/AlertContext';
 import axios from 'axios';
 import PDFViewer from '../components/PDFViewer';
+
 
 const statusChipProps = (status) => {
     switch ((status || '').toLowerCase()) {
@@ -195,7 +199,13 @@ function ImageViewer({ attachment, token }) {
 
     if (loading) {
         return (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, p: 4 }}>
+            <Box sx={{
+                p: 2,
+                textAlign: 'center',
+                bgcolor: 'grey.100',
+                maxHeight: '100vh',
+                overflow: 'auto',
+            }}>
                 <CircularProgress />
             </Box>
         );
@@ -236,6 +246,9 @@ export default function TransferDetailPage() {
     const [attachments, setAttachments] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [error, setError] = useState(null);
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     useEffect(() => {
         const fetchTransferDetail = async () => {
@@ -759,6 +772,13 @@ export default function TransferDetailPage() {
                     onClose={() => setSelectedFile(null)}
                     maxWidth="lg"
                     fullWidth
+                    fullScreen={isMobile}
+                    PaperProps={{
+                        sx: {
+                            m: 0,
+                            borderRadius: isMobile ? 0 : 2, // mobilde köşeleri sıfırla
+                        },
+                    }}
                 >
                     <DialogTitle sx={{
                         display: 'flex',
@@ -776,7 +796,14 @@ export default function TransferDetailPage() {
                             <Close/>
                         </IconButton>
                     </DialogTitle>
-                    <DialogContent sx={{p: 0}}>
+                    <DialogContent
+                        sx={{
+                            p: isMobile ? 0 : 2,
+                            height: isMobile ? '100vh' : 'auto',
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}
+                    >
                         {selectedFile && (
                             <>
                                 {selectedFile.mime_type?.startsWith('image/') ? (
