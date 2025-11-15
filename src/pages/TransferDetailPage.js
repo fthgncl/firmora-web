@@ -75,6 +75,74 @@ const formatDateTime = (d) =>
         second: '2-digit'
     }) : '-';
 
+// Görsel önizleme için yardımcı component
+function ImagePreview({ attachment, token }) {
+    const [imageUrl, setImageUrl] = useState(null);
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+        let objectUrl = null;
+
+        const loadImage = async () => {
+            try {
+                const response = await axios.get(
+                    `${process.env.REACT_APP_API_URL}/transfers${attachment.download_url}`,
+                    {
+                        headers: {
+                            'x-access-token': token,
+                        },
+                        responseType: 'blob',
+                    }
+                );
+
+                objectUrl = window.URL.createObjectURL(response.data);
+                setImageUrl(objectUrl);
+            } catch (err) {
+                console.error('Görsel yüklenirken hata:', err);
+                setError(true);
+            }
+        };
+
+        loadImage();
+
+        // Cleanup: blob URL'i temizle
+        return () => {
+            if (objectUrl) {
+                window.URL.revokeObjectURL(objectUrl);
+            }
+        };
+    }, [attachment.download_url, token]);
+
+    if (error) {
+        return (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 120 }}>
+                <Typography variant="caption" color="error">Görsel yüklenemedi</Typography>
+            </Box>
+        );
+    }
+
+    if (!imageUrl) {
+        return (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 120 }}>
+                <CircularProgress size={24} />
+            </Box>
+        );
+    }
+
+    return (
+        <img
+            src={imageUrl}
+            alt={attachment.file_name}
+            style={{
+                width: '100%',
+                height: 120,
+                objectFit: 'cover',
+                borderRadius: 8
+            }}
+        />
+    );
+}
+
 export default function TransferDetailPage() {
     const {transferId} = useParams();
     const navigate = useNavigate();
@@ -106,8 +174,6 @@ export default function TransferDetailPage() {
                     }
                 );
 
-                console.log(response.data);
-
                 if (response.data?.status === 'success' && response.data?.data?.transfer) {
                     const transferData = response.data.data.transfer;
                     const senderData = response.data.data.sender;
@@ -124,35 +190,41 @@ export default function TransferDetailPage() {
 
                     setTransfer(enrichedTransfer);
 
-                    // files JSON string'ini parse et
-                    if (transferData.files) {
-                        try {
-                            const filesArray = JSON.parse(transferData.files);
-                            const formattedAttachments = filesArray.map((filePath, index) => {
-                                const fileName = filePath.split('\\').pop() || filePath.split('/').pop();
-                                const fileExtension = fileName.split('.').pop()?.toLowerCase();
-                                let mimeType = 'application/octet-stream';
+                    // Transfer dosya listesini API'den çek
+                    try {
+                        const filesResponse = await axios.post(
+                            `${process.env.REACT_APP_API_URL}/transfers/files`,
+                            {
+                                transferId: transferData.id
+                            },
+                            {
+                                headers: {
+                                    'x-access-token': token,
+                                    'Content-Type': 'application/json',
+                                },
+                            }
+                        );
 
-                                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
-                                    mimeType = `image/${fileExtension === 'jpg' ? 'jpeg' : fileExtension}`;
-                                } else if (fileExtension === 'pdf') {
-                                    mimeType = 'application/pdf';
-                                }
+                        if (filesResponse.data?.status === "success" && filesResponse.data?.files) {
+                            const filesData = filesResponse.data.files;
+                            const formattedAttachments = filesData.map((file, index) => ({
+                                id: index,
+                                file_name: file.fileName || `file-${index + 1}.${file.extension || 'bin'}`,
+                                mime_type: file.mimeType || 'application/octet-stream',
+                                file_size: file.size || 0,
+                                download_url: file.downloadUrl, // /file/TOKEN formatında geliyor
+                                extension: file.extension || '',
+                            }));
 
-                                return {
-                                    id: index,
-                                    file_path: filePath,
-                                    file_name: fileName,
-                                    mime_type: mimeType,
-                                    file_size: 0, // Backend'den gelmiyor, varsayılan değer
-                                };
-                            });
                             setAttachments(formattedAttachments);
-                        } catch (parseError) {
-                            console.error('Dosyalar parse edilirken hata:', parseError);
+                        } else {
+                            console.log('Dosya bulunamadı veya API yanıtı beklenen formatta değil');
                             setAttachments([]);
                         }
-                    } else {
+                    } catch (filesError) {
+                        console.error('Dosyalar yüklenirken hata:', filesError);
+                        console.error('Hata detayı:', filesError.response?.data);
+                        // Dosya hatası olsa bile transfer bilgisi gösterilsin
                         setAttachments([]);
                     }
                 } else {
@@ -173,12 +245,12 @@ export default function TransferDetailPage() {
         if (transferId && token) {
             fetchTransferDetail();
         }
+        // eslint-disable-next-line
     }, [transferId, token]);
 
     const getFileUrl = (attachment) => {
-        // Backend'den gelen path'i URL'e dönüştür
-        const encodedPath = encodeURIComponent(attachment.file_path);
-        return `${process.env.REACT_APP_API_URL}/uploads/${attachment.file_path.replace(/\\/g, '/')}`;
+        // API'den gelen downloadUrl zaten /file/TOKEN formatında geliyor
+        return `${process.env.REACT_APP_API_URL}/transfers${attachment.download_url}`;
     };
 
     const handleDownload = (attachment) => {
@@ -409,7 +481,7 @@ export default function TransferDetailPage() {
                                                 }}
                                                 onClick={() => {
                                                     if (attachment.mime_type?.startsWith('image/')) {
-                                                        setSelectedImage(getFileUrl(attachment));
+                                                        setSelectedImage(attachment);
                                                     } else {
                                                         handleDownload(attachment);
                                                     }
@@ -417,19 +489,9 @@ export default function TransferDetailPage() {
                                             >
                                                 <Box sx={{textAlign: 'center', mb: 1}}>
                                                     {attachment.mime_type?.startsWith('image/') ? (
-                                                        <img
-                                                            src={getFileUrl(attachment)}
-                                                            alt={attachment.file_name}
-                                                            style={{
-                                                                width: '100%',
-                                                                height: 120,
-                                                                objectFit: 'cover',
-                                                                borderRadius: 8
-                                                            }}
-                                                            onError={(e) => {
-                                                                e.target.style.display = 'none';
-                                                                e.target.parentElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 120px;">Görsel yüklenemedi</div>';
-                                                            }}
+                                                        <ImagePreview 
+                                                            attachment={attachment} 
+                                                            token={token}
                                                         />
                                                     ) : (
                                                         getFileIcon(attachment.mime_type)
@@ -484,10 +546,9 @@ export default function TransferDetailPage() {
                         <Close/>
                     </IconButton>
                     {selectedImage && (
-                        <img
-                            src={selectedImage}
-                            alt="Preview"
-                            style={{width: '100%', height: 'auto', display: 'block'}}
+                        <ImagePreview 
+                            attachment={selectedImage} 
+                            token={token}
                         />
                     )}
                 </DialogContent>
