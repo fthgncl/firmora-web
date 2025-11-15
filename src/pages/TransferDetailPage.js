@@ -15,6 +15,7 @@ import {
     IconButton,
     Dialog,
     DialogContent,
+    DialogTitle,
     Avatar,
     Stack,
     Fade,
@@ -42,6 +43,7 @@ import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import {useAlert} from '../contexts/AlertContext';
 import axios from 'axios';
+import PDFViewer from '../components/PDFViewer';
 
 const statusChipProps = (status) => {
     switch ((status || '').toLowerCase()) {
@@ -81,7 +83,7 @@ const formatDateTime = (d) =>
         second: '2-digit'
     }) : '-';
 
-// Görsel önizleme için yardımcı component
+// Küçük görsel önizleme için yardımcı component
 function ImagePreview({ attachment, token }) {
     const [imageUrl, setImageUrl] = useState(null);
     const [error, setError] = useState(false);
@@ -149,6 +151,79 @@ function ImagePreview({ attachment, token }) {
     );
 }
 
+// Büyük görsel görüntüleme için component
+function ImageViewer({ attachment, token }) {
+    const [imageUrl, setImageUrl] = useState(null);
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let objectUrl = null;
+
+        const loadImage = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get(
+                    `${process.env.REACT_APP_API_URL}/transfers${attachment.download_url}`,
+                    {
+                        headers: {
+                            'x-access-token': token,
+                        },
+                        responseType: 'blob',
+                    }
+                );
+
+                objectUrl = window.URL.createObjectURL(response.data);
+                setImageUrl(objectUrl);
+            } catch (err) {
+                console.error('Görsel yüklenirken hata:', err);
+                setError(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadImage();
+
+        // Cleanup: blob URL'i temizle
+        return () => {
+            if (objectUrl) {
+                window.URL.revokeObjectURL(objectUrl);
+            }
+        };
+    }, [attachment.download_url, token]);
+
+    if (loading) {
+        return (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, p: 4 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (error) {
+        return (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400, p: 4 }}>
+                <Typography variant="body1" color="error">Görsel yüklenirken hata oluştu</Typography>
+            </Box>
+        );
+    }
+
+    return (
+        <Box sx={{ p: 2, textAlign: 'center', bgcolor: 'grey.100' }}>
+            <img
+                src={imageUrl}
+                alt={attachment.file_name}
+                style={{
+                    maxWidth: '100%',
+                    maxHeight: '80vh',
+                    objectFit: 'contain',
+                }}
+            />
+        </Box>
+    );
+}
+
 export default function TransferDetailPage() {
     const {transferId} = useParams();
     const navigate = useNavigate();
@@ -159,7 +234,7 @@ export default function TransferDetailPage() {
     const [loading, setLoading] = useState(true);
     const [transfer, setTransfer] = useState(null);
     const [attachments, setAttachments] = useState([]);
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -630,8 +705,8 @@ export default function TransferDetailPage() {
                                                                 },
                                                             }}
                                                             onClick={() => {
-                                                                if (attachment.mime_type?.startsWith('image/')) {
-                                                                    setSelectedImage(attachment);
+                                                                if (attachment.mime_type?.startsWith('image/') || attachment.mime_type?.includes('pdf')) {
+                                                                    setSelectedFile(attachment);
                                                                 } else {
                                                                     handleDownload(attachment);
                                                                 }
@@ -678,35 +753,41 @@ export default function TransferDetailPage() {
                     </Grid>
                 </Grid>
 
-                {/* Resim önizleme dialog */}
+                {/* Dosya önizleme dialog */}
                 <Dialog
-                    open={!!selectedImage}
-                    onClose={() => setSelectedImage(null)}
+                    open={!!selectedFile}
+                    onClose={() => setSelectedFile(null)}
                     maxWidth="lg"
                     fullWidth
                 >
-                    <DialogContent sx={{p: 0, position: 'relative'}}>
+                    <DialogTitle sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        py: 1.5,
+                    }}>
+                        <Typography variant="h6" sx={{fontWeight: 600}}>
+                            {selectedFile?.file_name}
+                        </Typography>
                         <IconButton
-                            sx={{
-                                position: 'absolute',
-                                top: 8,
-                                right: 8,
-                                bgcolor: 'background.paper',
-                                zIndex: 1,
-                            }}
-                            onClick={() => setSelectedImage(null)}
+                            onClick={() => setSelectedFile(null)}
+                            size="small"
                         >
                             <Close/>
                         </IconButton>
-                        {selectedImage && (
-                            <img
-                                src={`${process.env.REACT_APP_API_URL}/transfers${selectedImage.download_url}`}
-                                alt={selectedImage.file_name}
-                                style={{
-                                    width: '100%',
-                                    height: 'auto',
-                                }}
-                            />
+                    </DialogTitle>
+                    <DialogContent sx={{p: 0}}>
+                        {selectedFile && (
+                            <>
+                                {selectedFile.mime_type?.startsWith('image/') ? (
+                                    <ImageViewer attachment={selectedFile} token={token} />
+                                ) : selectedFile.mime_type?.includes('pdf') ? (
+                                    <PDFViewer
+                                        fileUrl={`${process.env.REACT_APP_API_URL}/transfers${selectedFile.download_url}`}
+                                        token={token}
+                                    />
+                                ) : null}
+                            </>
                         )}
                     </DialogContent>
                 </Dialog>
