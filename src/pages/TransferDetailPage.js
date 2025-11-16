@@ -19,10 +19,8 @@ import {
     Avatar,
     Stack,
     Fade,
-    Grow,
-    Zoom,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
 } from '@mui/material';
 import {
     ArrowBack,
@@ -47,7 +45,6 @@ import {useAuth} from '../contexts/AuthContext';
 import {useAlert} from '../contexts/AlertContext';
 import axios from 'axios';
 import PDFViewer from '../components/PDFViewer';
-
 
 const statusChipProps = (status) => {
     switch ((status || '').toLowerCase()) {
@@ -87,7 +84,7 @@ const formatDateTime = (d) =>
         second: '2-digit'
     }) : '-';
 
-// Küçük görsel önizleme için yardımcı component
+// Küçük görsel önizleme
 function ImagePreview({ attachment, token }) {
     const [imageUrl, setImageUrl] = useState(null);
     const [error, setError] = useState(false);
@@ -117,7 +114,6 @@ function ImagePreview({ attachment, token }) {
 
         loadImage();
 
-        // Cleanup: blob URL'i temizle
         return () => {
             if (objectUrl) {
                 window.URL.revokeObjectURL(objectUrl);
@@ -127,7 +123,7 @@ function ImagePreview({ attachment, token }) {
 
     if (error) {
         return (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 120 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 90 }}>
                 <Typography variant="caption" color="error">Görsel yüklenemedi</Typography>
             </Box>
         );
@@ -135,8 +131,8 @@ function ImagePreview({ attachment, token }) {
 
     if (!imageUrl) {
         return (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 120 }}>
-                <CircularProgress size={24} />
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 90 }}>
+                <CircularProgress size={18} />
             </Box>
         );
     }
@@ -147,7 +143,7 @@ function ImagePreview({ attachment, token }) {
             alt={attachment.file_name}
             style={{
                 width: '100%',
-                height: 120,
+                height: 90,
                 objectFit: 'cover',
                 borderRadius: 8
             }}
@@ -155,7 +151,7 @@ function ImagePreview({ attachment, token }) {
     );
 }
 
-// Büyük görsel görüntüleme için component
+// Büyük görsel
 function ImageViewer({ attachment, token }) {
     const [imageUrl, setImageUrl] = useState(null);
     const [error, setError] = useState(false);
@@ -189,7 +185,6 @@ function ImageViewer({ attachment, token }) {
 
         loadImage();
 
-        // Cleanup: blob URL'i temizle
         return () => {
             if (objectUrl) {
                 window.URL.revokeObjectURL(objectUrl);
@@ -273,7 +268,6 @@ export default function TransferDetailPage() {
                     const senderData = response.data.data.sender;
                     const receiverData = response.data.data.receiver;
 
-                    // Transfer verisine sender ve receiver bilgilerini ekle
                     const enrichedTransfer = {
                         ...transferData,
                         sender_name: senderData?.name,
@@ -284,7 +278,6 @@ export default function TransferDetailPage() {
 
                     setTransfer(enrichedTransfer);
 
-                    // Transfer dosya listesini API'den çek
                     try {
                         const filesResponse = await axios.post(
                             `${process.env.REACT_APP_API_URL}/transfers/files`,
@@ -306,19 +299,17 @@ export default function TransferDetailPage() {
                                 file_name: file.fileName || `file-${index + 1}.${file.extension || 'bin'}`,
                                 mime_type: file.mimeType || 'application/octet-stream',
                                 file_size: file.size || 0,
-                                download_url: file.downloadUrl, // /file/TOKEN formatında geliyor
+                                download_url: file.downloadUrl,
                                 extension: file.extension || '',
                             }));
 
                             setAttachments(formattedAttachments);
                         } else {
-                            console.log('Dosya bulunamadı veya API yanıtı beklenen formatta değil');
                             setAttachments([]);
                         }
                     } catch (filesError) {
                         console.error('Dosyalar yüklenirken hata:', filesError);
                         console.error('Hata detayı:', filesError.response?.data);
-                        // Dosya hatası olsa bile transfer bilgisi gösterilsin
                         setAttachments([]);
                     }
                 } else {
@@ -343,7 +334,6 @@ export default function TransferDetailPage() {
     }, [transferId, token]);
 
     const getFileUrl = (attachment) => {
-        // API'den gelen downloadUrl zaten /file/TOKEN formatında geliyor
         return `${process.env.REACT_APP_API_URL}/transfers${attachment.download_url}`;
     };
 
@@ -358,9 +348,9 @@ export default function TransferDetailPage() {
     };
 
     const getFileIcon = (mimeType) => {
-        if (mimeType?.includes('pdf')) return <PictureAsPdf sx={{color: '#d32f2f', fontSize: 48}}/>;
-        if (mimeType?.startsWith('image/')) return <ImageIcon sx={{color: '#1976d2', fontSize: 48}}/>;
-        return <AttachFile sx={{fontSize: 48}}/>;
+        if (mimeType?.includes('pdf')) return <PictureAsPdf sx={{color: '#d32f2f', fontSize: 30}}/>;
+        if (mimeType?.startsWith('image/')) return <ImageIcon sx={{color: '#1976d2', fontSize: 30}}/>;
+        return <AttachFile sx={{fontSize: 28}}/>;
     };
 
     if (loading) {
@@ -397,371 +387,427 @@ export default function TransferDetailPage() {
     };
 
     const getScopeColor = (scope) => {
-        if (scope === 'external') return '#1976d2';
-        if (scope === 'company') return '#9c27b0';
-        return '#2e7d32';
+        if (scope === 'external') return theme.palette.info.main;
+        if (scope === 'company') return theme.palette.secondary.main;
+        return theme.palette.success.main;
     };
 
     return (
-        <Container maxWidth="lg" sx={{py: 4}}>
-            {/* Başlık */}
-            <Fade in timeout={500}>
+        <Box
+            sx={{
+                minHeight: '100vh',
+                py: {xs: 3, md: 6},
+                background: (t) =>
+                    `radial-gradient(circle at top left, ${t.palette.primary.light}22, transparent 55%),
+                     radial-gradient(circle at bottom right, ${t.palette.secondary.light}18, transparent 55%)`,
+            }}
+        >
+            <Container maxWidth="lg">
+                {/* Üst bar: geri + başlık + durum */}
                 <Box sx={{mb: 3}}>
-                    <Paper elevation={1} sx={{p: 2.5, borderRadius: 2}}>
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                            <IconButton 
-                                onClick={() => navigate(-1)} 
-                                sx={{
-                                    bgcolor: 'primary.main',
-                                    color: 'white',
-                                    '&:hover': {
-                                        bgcolor: 'primary.dark',
-                                        transform: 'scale(1.05)',
-                                    },
-                                    transition: 'all 0.3s',
-                                }}
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<ArrowBack />}
+                            onClick={() => navigate(-1)}
+                            sx={{
+                                borderRadius: 999,
+                                textTransform: 'none',
+                                fontWeight: 500,
+                            }}
+                        >
+                            {t('back', { ns: 'common' })}
+                        </Button>
+
+                        <Box sx={{flex: 1, minWidth: 0}}>
+                            <Typography
+                                variant="h5"
+                                sx={{fontWeight: 700, letterSpacing: 0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}
                             >
-                                <ArrowBack/>
-                            </IconButton>
-                            <Typography variant="h4" sx={{fontWeight: 800, flex: 1, color: 'primary.main'}}>
                                 {t('list.detail.title')}
                             </Typography>
-                            <Chip
-                                icon={statusIcon}
-                                color={statusColor}
-                                label={t(`list.status.${statusLabel.toLowerCase()}`, statusLabel)}
-                                sx={{
-                                    fontWeight: 700,
-                                    fontSize: '0.95rem',
-                                    px: 1,
-                                    py: 2.5,
-                                    boxShadow: 2,
-                                }}
-                            />
-                        </Stack>
-                    </Paper>
+                            <Typography variant="caption" color="text.secondary">
+                                #{transfer.id}
+                            </Typography>
+                        </Box>
+
+                        <Chip
+                            icon={statusIcon}
+                            label={t(`list.status.${statusLabel.toLowerCase()}`, statusLabel)}
+                            sx={{
+                                fontWeight: 700,
+                                px: 1.5,
+                                py: 0.5,
+                                borderRadius: 999,
+                                bgcolor: (theme) => {
+                                    switch (statusColor) {
+                                        case 'success':
+                                            return theme.palette.success.main;
+                                        case 'warning':
+                                            return theme.palette.warning.main;
+                                        case 'error':
+                                            return theme.palette.error.main;
+                                        default:
+                                            return 'rgba(255,255,255,0.18)';
+                                    }
+                                },
+                                color: '#fff',
+                                '& .MuiChip-icon': {
+                                    color: '#fff',
+                                },
+                            }}
+                        />
+
+
+                    </Stack>
                 </Box>
-                                </Fade>
 
-                                <Grid container spacing={3}>
-                    {/* Sol Kolon - Transfer Bilgileri */}
-                    <Grid item xs={12} md={8}>
-                        {/* Ana Transfer Kartı */}
-                        <Grow in timeout={700}>
-                            <Card sx={{mb: 3}}>
-                                <CardContent sx={{p: 4}}>
-                                    {/* Transfer ID Badge */}
-                                    <Box sx={{
-                                        display: 'flex',
-                                        justifyContent: 'flex-end',
-                                        mb: 2,
-                                    }}>
-                                        <Chip 
-                                            label={`#${transfer.id}`}
-                                            size="small"
-                                            sx={{
-                                                bgcolor: 'rgba(102, 126, 234, 0.1)',
-                                                color: 'primary.main',
-                                                fontWeight: 700,
-                                                fontSize: '0.85rem',
-                                            }}
-                                        />
-                                    </Box>
+                {/* Hero özet kartı (Tutar + Tarih + Transfer Türü) */}
+                <Fade in timeout={500}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            mb: 4,
+                            borderRadius: 3,
+                            overflow: 'hidden',
+                            background: "linear-gradient(135deg, #2b2b2b, #125696 70%, #bfa76f33)",
+                            color: '#fff', // her zaman beyaz
+                            px: {xs: 3, md: 4},
+                            py: {xs: 3, md: 4},
+                        }}
+                    >
+                        <Grid container spacing={3} alignItems="center">
+                            {/* Amount */}
+                            <Grid item xs={12} md={8}>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        textTransform: 'uppercase',
+                                        letterSpacing: 1.6,
+                                        opacity: 0.8,
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {t('list.columns.amount')}
+                                </Typography>
+                                <Typography
+                                    variant="h3"
+                                    sx={{
+                                        fontWeight: 800,
+                                        lineHeight: 1.1,
+                                        mt: 1,
+                                        wordBreak: 'break-word'
+                                    }}
+                                >
+                                    {formatAmount(transfer.amount, transfer.currency)}
+                                </Typography>
+                            </Grid>
 
-                                    {/* Büyük Tutar Gösterimi */}
-                                    <Zoom in timeout={1000}>
-                                        <Box sx={{
-                                            textAlign: 'center',
-                                            py: 4,
-                                            mb: 4,
-                                            bgcolor: 'primary.main',
-                                            borderRadius: 2,
-                                        }}>
-                                            <Typography variant="caption" sx={{
-                                                color: 'primary.contrastText',
-                                                textTransform: 'uppercase',
-                                                letterSpacing: 1.5,
-                                                fontWeight: 600,
-                                                mb: 1,
-                                                display: 'block',
-                                                opacity: 0.9,
-                                            }}>
-                                                {t('list.columns.amount')}
-                                            </Typography>
-                                            <Typography variant="h2" sx={{
-                                                fontWeight: 700,
-                                                color: 'primary.contrastText',
-                                            }}>
-                                                {formatAmount(transfer.amount, transfer.currency)}
-                                            </Typography>
-                                        </Box>
-                                    </Zoom>
+                            {/* Tarih + Transfer türü */}
+                            <Grid item xs={12} md={4}>
+                                <Stack
+                                    spacing={1.5}
+                                    alignItems={{xs: 'flex-start', md: 'flex-end'}}
+                                    justifyContent="center"
+                                >
+                                    <Stack direction="row" spacing={1} alignItems="center">
+                                        <CalendarToday fontSize="small" sx={{ color: '#fff', opacity: 0.9 }} />
 
-                                    {/* Timeline Görünümü - Gönderici ve Alıcı */}
-                                    <Box sx={{position: 'relative', mb: 4}}>
-                                        <Grid container spacing={3} alignItems="stretch">
-                                            {/* Gönderici */}
-                                            <Grid item xs={12} md={5}>
-                                                <Fade in timeout={1200}>
-                                                    <Paper elevation={2} sx={{
-                                                        p: 3,
-                                                        height: '100%',
-                                                        borderLeft: 4,
-                                                        borderColor: getScopeColor(transfer.from_scope),
-                                                    }}>
-                                                        <Stack direction="row" spacing={2} alignItems="center" sx={{mb: 2}}>
-                                                            <Avatar sx={{
-                                                                bgcolor: getScopeColor(transfer.from_scope),
-                                                                width: 48,
-                                                                height: 48,
-                                                            }}>
-                                                                {getScopeIcon(transfer.from_scope)}
-                                                            </Avatar>
-                                                            <Box>
-                                                                <Typography variant="caption" sx={{
-                                                                    color: 'text.secondary',
-                                                                    textTransform: 'uppercase',
-                                                                    letterSpacing: 1,
-                                                                    fontWeight: 600,
-                                                                }}>
-                                                                    {t('list.detail.sender')}
-                                                                </Typography>
-                                                                <Typography variant="h6" sx={{fontWeight: 700, color: getScopeColor(transfer.from_scope)}}>
-                                                                    {senderFullName || '-'}
-                                                                </Typography>
-                                                            </Box>
-                                                        </Stack>
-                                                        {transfer.sender_company_name && (
-                                                            <Typography variant="body2" color="text.secondary" sx={{fontWeight: 500, mb: 2}}>
-                                                                <Business sx={{fontSize: 16, verticalAlign: 'middle', mr: 0.5}}/>
-                                                                {transfer.sender_company_name}
-                                                            </Typography>
-                                                        )}
-                                                        {transfer.sender_final_balance != null && (
-                                                            <Box sx={{mt: 2, p: 1.5, bgcolor: 'action.hover', borderRadius: 1}}>
-                                                                <Typography variant="caption" color="text.secondary" sx={{display: 'block', mb: 0.5}}>
-                                                                    {t('list.columns.sender_final_balance')}
-                                                                </Typography>
-                                                                <Typography variant="body1" sx={{fontWeight: 600}}>
-                                                                    {formatAmount(transfer.sender_final_balance, transfer.currency)}
-                                                                </Typography>
-                                                            </Box>
-                                                        )}
-                                                    </Paper>
-                                                </Fade>
-                                            </Grid>
-
-                                            {/* Ok işareti - Orta */}
-                                            <Grid item xs={12} md={2} sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                            }}>
-                                                <Avatar sx={{
-                                                    bgcolor: 'white',
-                                                    color: 'primary.main',
-                                                    width: 56,
-                                                    height: 56,
-                                                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
-                                                    border: '3px solid',
-                                                    borderColor: 'primary.main',
-                                                }}>
-                                                    <TrendingFlat sx={{fontSize: 32}}/>
-                                                </Avatar>
-                                            </Grid>
-
-                                            {/* Alıcı */}
-                                            <Grid item xs={12} md={5}>
-                                                <Fade in timeout={1400}>
-                                                    <Paper elevation={2} sx={{
-                                                        p: 3,
-                                                        height: '100%',
-                                                        borderLeft: 4,
-                                                        borderColor: getScopeColor(transfer.to_scope),
-                                                    }}>
-                                                        <Stack direction="row" spacing={2} alignItems="center" sx={{mb: 2}}>
-                                                            <Avatar sx={{
-                                                                bgcolor: getScopeColor(transfer.to_scope),
-                                                                width: 48,
-                                                                height: 48,
-                                                            }}>
-                                                                {getScopeIcon(transfer.to_scope)}
-                                                            </Avatar>
-                                                            <Box>
-                                                                <Typography variant="caption" sx={{
-                                                                    color: 'text.secondary',
-                                                                    textTransform: 'uppercase',
-                                                                    letterSpacing: 1,
-                                                                    fontWeight: 600,
-                                                                }}>
-                                                                    {t('list.detail.receiver')}
-                                                                </Typography>
-                                                                <Typography variant="h6" sx={{fontWeight: 700, color: getScopeColor(transfer.to_scope)}}>
-                                                                    {receiverFullName || '-'}
-                                                                </Typography>
-                                                            </Box>
-                                                        </Stack>
-                                                        {transfer.receiver_company_name && (
-                                                            <Typography variant="body2" color="text.secondary" sx={{fontWeight: 500, mb: 2}}>
-                                                                <Business sx={{fontSize: 16, verticalAlign: 'middle', mr: 0.5}}/>
-                                                                {transfer.receiver_company_name}
-                                                            </Typography>
-                                                        )}
-                                                        {transfer.receiver_final_balance != null && (
-                                                            <Box sx={{mt: 2, p: 1.5, bgcolor: 'action.hover', borderRadius: 1}}>
-                                                                <Typography variant="caption" color="text.secondary" sx={{display: 'block', mb: 0.5}}>
-                                                                    {t('list.columns.receiver_final_balance')}
-                                                                </Typography>
-                                                                <Typography variant="body1" sx={{fontWeight: 600}}>
-                                                                    {formatAmount(transfer.receiver_final_balance, transfer.currency)}
-                                                                </Typography>
-                                                            </Box>
-                                                        )}
-                                                    </Paper>
-                                                </Fade>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-
-                                    {/* Açıklama */}
-                                    {transfer.description && (
-                                        <Fade in timeout={1600}>
-                                            <Paper elevation={0} sx={{
-                                                p: 3,
-                                                bgcolor: 'action.hover',
-                                                borderLeft: 4,
-                                                borderColor: 'primary.main',
-                                            }}>
-                                                <Stack direction="row" spacing={2} alignItems="flex-start">
-                                                    <Description color="primary" />
-                                                    <Box sx={{flex: 1}}>
-                                                        <Typography variant="subtitle2" color="text.secondary" sx={{mb: 1}}>
-                                                            {t('list.columns.description')}
-                                                        </Typography>
-                                                        <Typography variant="body1">
-                                                            {transfer.description}
-                                                        </Typography>
-                                                    </Box>
-                                                </Stack>
-                                            </Paper>
-                                        </Fade>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </Grow>
-                    </Grid>
-
-                    {/* Sağ Kolon - Ek Bilgiler ve Dosyalar */}
-                    <Grid item xs={12} md={4}>
-                        {/* Tarih ve Tip Bilgileri */}
-                        <Grow in timeout={900}>
-                            <Card sx={{mb: 3}}>
-                                <CardContent>
-                                    <Typography variant="h6" sx={{mb: 2, fontWeight: 600}}>
-                                        {t('list.detail.additionalInfo')}
-                                    </Typography>
-
-                                                                                <Stack spacing={2}>
-                                        {/* Tarih */}
-                                        <Box sx={{display: 'flex', gap: 1.5, alignItems: 'center'}}>
-                                            <CalendarToday fontSize="small" color="action"/>
-                                            <Box>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {t('list.columns.created_at')}
-                                                </Typography>
-                                                <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                    {formatDateTime(transfer.created_at)}
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-
-                                        {/* Transfer Tipi */}
                                         <Box>
-                                            <Typography variant="caption" color="text.secondary" sx={{display: 'block', mb: 0.5}}>
-                                                {t('list.columns.transfer_type')}
+                                            <Typography variant="caption" sx={{opacity: 0.85}}>
+                                                {t('list.columns.created_at')}
                                             </Typography>
-                                            <Chip
-                                                label={t(`list.types.${transfer.transfer_type}`, transfer.transfer_type)}
-                                                size="small"
-                                                color="primary"
-                                                sx={{fontWeight: 600}}
-                                            />
+                                            <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                {formatDateTime(transfer.created_at)}
+                                            </Typography>
                                         </Box>
                                     </Stack>
-                                </CardContent>
-                            </Card>
-                        </Grow>
 
-                        {/* Dosya Ekleri */}
+                                    <Box>
+                                        <Typography
+                                            variant="caption"
+                                            sx={{opacity: 0.85, display: 'block', mb: 0.5}}
+                                        >
+                                            {t('list.columns.transfer_type')}
+                                        </Typography>
+                                        <Chip
+                                            label={t(`list.types.${transfer.transfer_type}`, transfer.transfer_type)}
+                                            size="small"
+                                            sx={{
+                                                fontWeight: 600,
+                                                backgroundColor: 'rgba(0,0,0,0.25)',
+                                                color: '#fff',
+                                                '& .MuiChip-label': {
+                                                    color: '#fff',
+                                                },
+                                            }}
+                                        />
+
+                                    </Box>
+                                </Stack>
+                            </Grid>
+                        </Grid>
+                    </Card>
+                </Fade>
+
+                <Grid container spacing={3}>
+                    {/* Sol taraf: katılımcılar + açıklama */}
+                    <Grid item xs={12} md={8}>
+                        {/* Katılımcılar */}
+                        <Card elevation={0} sx={{mb: 3, borderRadius: 3, p: 3, border: '1px solid', borderColor: 'divider'}}>
+                            <Typography variant="subtitle2" color="text.secondary" sx={{mb: 2, textTransform: 'uppercase', letterSpacing: 1}}>
+                                {t('list.detail.participants', 'Participants')}
+                            </Typography>
+
+                            <Grid container spacing={2} alignItems="stretch">
+                                {/* Gönderici */}
+                                <Grid item xs={12} md={5.5}>
+                                    <Paper
+                                        variant="outlined"
+                                        sx={{
+                                            height: '100%',
+                                            borderRadius: 2,
+                                            p: 2,
+                                            borderColor: getScopeColor(transfer.from_scope),
+                                            backgroundColor: 'background.paper',
+                                        }}
+                                    >
+                                        <Stack direction="row" spacing={2} alignItems="center" sx={{mb: 1.5}}>
+                                            <Avatar
+                                                sx={{
+                                                    bgcolor: getScopeColor(transfer.from_scope),
+                                                    color: 'primary.contrastText',
+                                                    width: 52,
+                                                    height: 52,
+                                                }}
+                                            >
+                                                {getScopeIcon(transfer.from_scope)}
+                                            </Avatar>
+                                            <Box>
+                                                <Typography variant="overline" sx={{color: 'text.secondary', letterSpacing: 1}}>
+                                                    {t('list.detail.sender')}
+                                                </Typography>
+                                                <Typography variant="subtitle1" sx={{fontWeight: 700}}>
+                                                    {senderFullName || '-'}
+                                                </Typography>
+                                                {transfer.sender_company_name && (
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        <Business sx={{fontSize: 16, mr: 0.5, verticalAlign: 'middle'}}/>
+                                                        {transfer.sender_company_name}
+                                                    </Typography>
+                                                )}
+                                            </Box>
+                                        </Stack>
+                                        {transfer.sender_final_balance != null && (
+                                            <Box sx={{mt: 1.5}}>
+                                                <Typography variant="caption" color="text.secondary" sx={{display: 'block'}}>
+                                                    {t('list.columns.sender_final_balance')}
+                                                </Typography>
+                                                <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                    {formatAmount(transfer.sender_final_balance, transfer.currency)}
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Paper>
+                                </Grid>
+
+                                {/* Ok */}
+                                <Grid
+                                    item
+                                    xs={12}
+                                    md={1}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <Avatar
+                                        sx={{
+                                            bgcolor: 'background.paper',
+                                            color: 'primary.main',
+                                            width: 44,
+                                            height: 44,
+                                            border: '1px solid',
+                                            borderColor: 'primary.main',
+                                        }}
+                                    >
+                                        <TrendingFlat/>
+                                    </Avatar>
+                                </Grid>
+
+                                {/* Alıcı */}
+                                <Grid item xs={12} md={5.5}>
+                                    <Paper
+                                        variant="outlined"
+                                        sx={{
+                                            height: '100%',
+                                            borderRadius: 2,
+                                            p: 2,
+                                            borderColor: getScopeColor(transfer.to_scope),
+                                            backgroundColor: 'background.paper',
+                                        }}
+                                    >
+                                        <Stack direction="row" spacing={2} alignItems="center" sx={{mb: 1.5}}>
+                                            <Avatar
+                                                sx={{
+                                                    bgcolor: getScopeColor(transfer.to_scope),
+                                                    color: 'primary.contrastText',
+                                                    width: 52,
+                                                    height: 52,
+                                                }}
+                                            >
+                                                {getScopeIcon(transfer.to_scope)}
+                                            </Avatar>
+                                            <Box>
+                                                <Typography variant="overline" sx={{color: 'text.secondary', letterSpacing: 1}}>
+                                                    {t('list.detail.receiver')}
+                                                </Typography>
+                                                <Typography variant="subtitle1" sx={{fontWeight: 700}}>
+                                                    {receiverFullName || '-'}
+                                                </Typography>
+                                                {transfer.receiver_company_name && (
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        <Business sx={{fontSize: 16, mr: 0.5, verticalAlign: 'middle'}}/>
+                                                        {transfer.receiver_company_name}
+                                                    </Typography>
+                                                )}
+                                            </Box>
+                                        </Stack>
+                                        {transfer.receiver_final_balance != null && (
+                                            <Box sx={{mt: 1.5}}>
+                                                <Typography variant="caption" color="text.secondary" sx={{display: 'block'}}>
+                                                    {t('list.columns.receiver_final_balance')}
+                                                </Typography>
+                                                <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                    {formatAmount(transfer.receiver_final_balance, transfer.currency)}
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Paper>
+                                </Grid>
+                            </Grid>
+                        </Card>
+
+                        {/* Açıklama */}
+                        {transfer.description && (
+                            <Card elevation={0} sx={{borderRadius: 3, p: 3, border: '1px dashed', borderColor: 'divider'}}>
+                                <Stack direction="row" spacing={2} alignItems="flex-start">
+                                    <Avatar
+                                        sx={{
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: 2,
+                                            backdropFilter: 'blur(6px)',
+                                            background: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.10))'
+                                                    : 'linear-gradient(135deg, rgba(0,0,0,0.10), rgba(0,0,0,0.05))',
+                                            color: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? theme.palette.common.white
+                                                    : theme.palette.common.black,
+                                        }}
+                                    >
+                                        <Description
+                                            sx={{
+                                                fontSize: 22,
+                                                color: (theme) =>
+                                                    theme.palette.mode === 'dark'
+                                                        ? theme.palette.common.white
+                                                        : theme.palette.common.black,
+                                            }}
+                                        />
+                                    </Avatar>
+
+                                    <Box sx={{flex: 1}}>
+                                        <Typography variant="subtitle2" sx={{mb: 0.5}}>
+                                            {t('list.columns.description')}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {transfer.description}
+                                        </Typography>
+                                    </Box>
+                                </Stack>
+                            </Card>
+                        )}
+                    </Grid>
+
+                    {/* Sağ taraf: sadece Ekler (galeri) */}
+                    <Grid item xs={12} md={4}>
                         {attachments.length > 0 && (
-                            <Grow in timeout={1100}>
-                                <Card>
-                                    <CardContent>
-                                        <Typography variant="h6" sx={{mb: 2, fontWeight: 600}}>
+                            <Card
+                                elevation={0}
+                                sx={{
+                                    borderRadius: 3,
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <CardContent>
+                                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{mb: 2}}>
+                                        <Typography variant="subtitle2">
                                             <AttachFile sx={{verticalAlign: 'middle', mr: 1}}/>
                                             {t('list.detail.attachments')} ({attachments.length})
                                         </Typography>
+                                    </Stack>
 
-                                        <Grid container spacing={2}>
-                                            {attachments.map((attachment, index) => (
-                                                <Grid item xs={6} key={attachment.id}>
-                                                    <Zoom in timeout={1200 + index * 100}>
-                                                        <Paper
-                                                            elevation={1}
-                                                            sx={{
-                                                                p: 2,
-                                                                cursor: 'pointer',
-                                                                transition: 'all 0.2s',
-                                                                '&:hover': {
-                                                                    elevation: 3,
-                                                                    transform: 'translateY(-4px)',
-                                                                },
-                                                            }}
-                                                            onClick={() => {
-                                                                if (attachment.mime_type?.startsWith('image/') || attachment.mime_type?.includes('pdf')) {
-                                                                    setSelectedFile(attachment);
-                                                                } else {
-                                                                    handleDownload(attachment);
-                                                                }
-                                                            }}
-                                                        >
-                                                            <Box sx={{
-                                                                textAlign: 'center',
-                                                                mb: 1,
-                                                            }}>
-                                                                {attachment.mime_type?.startsWith('image/') ? (
-                                                                    <ImagePreview 
-                                                                        attachment={attachment} 
-                                                                        token={token}
-                                                                    />
-                                                                ) : (
-                                                                    <Box sx={{py: 2}}>
-                                                                        {getFileIcon(attachment.mime_type)}
-                                                                    </Box>
-                                                                )}
+                                    {/* Galeri tarzı grid (isimler yok) */}
+                                    <Grid container spacing={1.5}>
+                                        {attachments.map((attachment) => {
+                                            const isPreviewable =
+                                                attachment.mime_type?.startsWith('image/') ||
+                                                attachment.mime_type?.includes('pdf');
+                                            return (
+                                                <Grid item xs={4} sm={3} md={4} key={attachment.id}>
+                                                    <Paper
+                                                        elevation={1}
+                                                        sx={{
+                                                            borderRadius: 2,
+                                                            overflow: 'hidden',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            p: attachment.mime_type?.startsWith('image/') ? 0 : 1.5,
+                                                            height: 90,
+                                                            '&:hover': {
+                                                                boxShadow: 4,
+                                                                transform: 'translateY(-2px)',
+                                                            },
+                                                            transition: 'all 0.15s ease-out',
+                                                        }}
+                                                        onClick={() => {
+                                                            if (isPreviewable) {
+                                                                setSelectedFile(attachment);
+                                                            } else {
+                                                                handleDownload(attachment);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {attachment.mime_type?.startsWith('image/') ? (
+                                                            <ImagePreview attachment={attachment} token={token} />
+                                                        ) : (
+                                                            <Box
+                                                                sx={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    width: '100%',
+                                                                    height: '100%',
+                                                                }}
+                                                            >
+                                                                {getFileIcon(attachment.mime_type)}
                                                             </Box>
-                                                            <Typography variant="caption" sx={{
-                                                                display: 'block',
-                                                                textAlign: 'center',
-                                                                fontWeight: 700,
-                                                                mb: 0.5,
-                                                            }} noWrap>
-                                                                {attachment.file_name}
-                                                            </Typography>
-                                                            {attachment.file_size > 0 && (
-                                                                <Typography variant="caption" color="text.secondary"
-                                                                            sx={{display: 'block', textAlign: 'center'}}>
-                                                                    {(attachment.file_size / 1024).toFixed(1)} KB
-                                                                </Typography>
-                                                            )}
-                                                        </Paper>
-                                                    </Zoom>
+                                                        )}
+                                                    </Paper>
                                                 </Grid>
-                                            ))}
-                                        </Grid>
-                                    </CardContent>
-                                </Card>
-                            </Grow>
+                                            );
+                                        })}
+                                    </Grid>
+                                </CardContent>
+                            </Card>
                         )}
                     </Grid>
                 </Grid>
@@ -776,23 +822,22 @@ export default function TransferDetailPage() {
                     PaperProps={{
                         sx: {
                             m: 0,
-                            borderRadius: isMobile ? 0 : 2, // mobilde köşeleri sıfırla
+                            borderRadius: isMobile ? 0 : 2,
                         },
                     }}
                 >
-                    <DialogTitle sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        py: 1.5,
-                    }}>
+                    <DialogTitle
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            py: 1.5,
+                        }}
+                    >
                         <Typography variant="h6" sx={{fontWeight: 600}}>
                             {selectedFile?.file_name}
                         </Typography>
-                        <IconButton
-                            onClick={() => setSelectedFile(null)}
-                            size="small"
-                        >
+                        <IconButton onClick={() => setSelectedFile(null)} size="small">
                             <Close/>
                         </IconButton>
                     </DialogTitle>
@@ -818,6 +863,7 @@ export default function TransferDetailPage() {
                         )}
                     </DialogContent>
                 </Dialog>
-        </Container>
+            </Container>
+        </Box>
     );
 }
