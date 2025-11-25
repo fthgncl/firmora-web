@@ -9,6 +9,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import CompanyPage from "./pages/CompanyPage";
 import TransferDetailPage from "./pages/TransferDetailPage";
+import ResetPassword from "./pages/ResetPassword";
 import React from "react";
 import AppBar from "./components/AppBar";
 
@@ -68,6 +69,7 @@ function App() {
                 }/>
 
                 {/* Herkesin girebileği sayfalar */}
+                <Route path="/reset-password/:token" element={<ResetPassword/>}/>
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
         </Box>
