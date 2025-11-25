@@ -59,5 +59,6 @@
   "success_message": "İşlem başarıyla tamamlandı.",
   "error_message": "Bir hata oluştu, lütfen tekrar deneyin.",
   "balance": "Bakiye",
-  "optional": "İsteğe bağlı"
+  "optional": "İsteğe bağlı",
+  "rightsReserved": "Tüm hakları saklıdır."
 }

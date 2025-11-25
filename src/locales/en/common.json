@@ -59,5 +59,6 @@
   "success_message": "Operation completed successfully.",
   "error_message": "An error occurred. Please try again.",
   "balance": "Balance",
-  "optional": "Optional"
+  "optional": "Optional",
+  "rightsReserved": "All rights reserved."
 }

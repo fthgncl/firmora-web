@@ -59,5 +59,6 @@
   "success_message": "Vorgang erfolgreich abgeschlossen.",
   "error_message": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
   "balance": "Kontostand",
-  "optional": "Optional"
+  "optional": "Optional",
+  "rightsReserved": "Alle Rechte vorbehalten."
 }
