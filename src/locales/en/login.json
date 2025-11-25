@@ -6,6 +6,20 @@
   "loginButton": "Sign In",
   "noAccount": "Don’t have an account?",
   "signUp": "Sign Up",
+  "forgotPassword": "Passwort vergessen?",
+  "forgotPasswordDialog": {
+    "title": "Passwort zurücksetzen",
+    "description": "Bitte geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts.",
+    "emailPlaceholder": "E-Mail-Adresse",
+    "emailRequired": "E-Mail-Adresse ist erforderlich.",
+    "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "success": "Der Link zum Zurücksetzen des Passworts wurde an Ihre E-Mail-Adresse gesendet.",
+    "userNotFound": "Kein Benutzer unter dieser E-Mail-Adresse gefunden.",
+    "error": "E-Mail zum Zurücksetzen des Passworts konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
+    "connectionError": "Verbindungsfehler. Bitte überprüfen Sie Ihre Internetverbindung.",
+    "cancel": "Abbrechen",
+    "send": "Senden"
+  },
   "aria": {
     "togglePassword": "Toggle password visibility"
   },

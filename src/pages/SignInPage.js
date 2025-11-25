@@ -16,7 +16,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Visibility from "@mui/icons-material/Visibility";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
-import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import * as React from "react";
 import {useAuth} from "../contexts/AuthContext";
@@ -26,6 +25,13 @@ import Copyright from '../components/Copyright';
 import {useHideAppBar} from "../contexts/AppBarContext";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Snackbar from '@mui/material/Snackbar';
 
 export default function SignInSide() {
     const { t } = useTranslation(['login']);
@@ -39,6 +45,13 @@ export default function SignInSide() {
     const [isResending, setIsResending] = useState(false);
     const [resendMessage, setResendMessage] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
+    const [openForgotPasswordDialog, setOpenForgotPasswordDialog] = useState(false);
+    const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+    const [isSendingReset, setIsSendingReset] = useState(false);
+    const [resetErrorMessage, setResetErrorMessage] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const {login} = useAuth();
     useHideAppBar();
 
@@ -65,6 +78,78 @@ export default function SignInSide() {
         } finally {
             setIsResending(false);
         }
+    };
+
+    const handleOpenForgotPasswordDialog = () => {
+        setOpenForgotPasswordDialog(true);
+        setForgotPasswordEmail('');
+        setResetErrorMessage('');
+    };
+
+    const handleCloseForgotPasswordDialog = () => {
+        setOpenForgotPasswordDialog(false);
+        setForgotPasswordEmail('');
+        setResetErrorMessage('');
+    };
+
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const handleForgotPasswordSubmit = async (event) => {
+        event.preventDefault();
+
+        if (!forgotPasswordEmail) {
+            setResetErrorMessage(t('login:forgotPasswordDialog.emailRequired'));
+            return;
+        }
+
+        if (!isValidEmail(forgotPasswordEmail)) {
+            setResetErrorMessage(t('login:forgotPasswordDialog.invalidEmail'));
+            return;
+        }
+
+        try {
+            setIsSendingReset(true);
+            setResetErrorMessage('');
+
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/password-reset/request`, 
+                { email: forgotPasswordEmail }
+            );
+
+            if (response.data.status === 'success') {
+                setSnackbarMessage(t('login:forgotPasswordDialog.success'));
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
+                setIsSendingReset(false);
+                handleCloseForgotPasswordDialog();
+            }
+        } catch (error) {
+            setIsSendingReset(false);
+            if (error.response) {
+                if (error.response.status === 404) {
+                    setResetErrorMessage(t('login:forgotPasswordDialog.userNotFound'));
+                } else if (error.response.status === 400) {
+                    setResetErrorMessage(t('login:forgotPasswordDialog.emailRequired'));
+                } else {
+                    setResetErrorMessage(t('login:forgotPasswordDialog.error'));
+                }
+            } else {
+                setResetErrorMessage(t('login:forgotPasswordDialog.connectionError'));
+            }
+        }
+    };
+
+    const handleEmailChange = (e) => {
+        setForgotPasswordEmail(e.target.value);
+        if (resetErrorMessage) setResetErrorMessage('');
+    };
+
+    const handleSnackbarClose = (_, reason) => {
+        if (reason === 'clickaway') return;
+        setOpenSnackbar(false);
     };
 
     const handleSubmit = async (event) => {
@@ -185,16 +270,33 @@ export default function SignInSide() {
                                 )
                             }}
                         />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                    color="primary"
-                                />
-                            }
-                            label={t('login:rememberMe')}
-                        />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                        color="primary"
+                                    />
+                                }
+                                label={t('login:rememberMe')}
+                            />
+                            <Link
+                                component="button"
+                                type="button"
+                                variant="body2"
+                                onClick={handleOpenForgotPasswordDialog}
+                                sx={{ 
+                                    cursor: 'pointer',
+                                    textDecoration: 'none',
+                                    '&:hover': {
+                                        textDecoration: 'underline'
+                                    }
+                                }}
+                            >
+                                {t('login:forgotPassword')}
+                            </Link>
+                        </Box>
                         {errorMessage && !isEmailNotVerified && (
                             <Typography sx={{textAlign: 'center', color: 'error.main'}}
                                         variant='body2'>{errorMessage}</Typography>
@@ -206,14 +308,14 @@ export default function SignInSide() {
                                     {errorMessage}
                                 </Alert>
                                 <Button
-                                    disabled={isResending}
+                                    loading={isResending}
                                     onClick={handleResendVerification}
                                     fullWidth
                                     variant="outlined"
                                     color="warning"
                                     sx={{ mb: 2 }}
                                 >
-                                    {isResending ? <CircularProgress size={24} color="inherit"/> : t('login:resend.button')}
+                                    {t('login:resend.button')}
                                 </Button>
                             </Box>
                         )}
@@ -228,13 +330,13 @@ export default function SignInSide() {
                         )}
 
                         <Button
-                            disabled={isLoading}
+                            loading={isLoading}
                             type="submit"
                             fullWidth
                             variant="contained"
                             sx={{mt: 3, mb: 2}}
                         >
-                            {isLoading ? <CircularProgress color="inherit"/> : <>{t('login:loginButton')}</>}
+                            {t('login:loginButton')}
                         </Button>
                         <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
                             {t('login:noAccount')}{' '}
@@ -253,6 +355,81 @@ export default function SignInSide() {
                     <Copyright />
                 </Box>
             </Grid>
+
+                        <Dialog
+                            open={openForgotPasswordDialog}
+                            onClose={handleCloseForgotPasswordDialog}
+                            disableRestoreFocus={true}
+                            PaperProps={{
+                                component: 'form',
+                                onSubmit: handleForgotPasswordSubmit,
+                                sx: { backgroundImage: 'none' },
+                            }}
+                        >
+                            <DialogTitle>{t('login:forgotPasswordDialog.title')}</DialogTitle>
+                            <DialogContent
+                                sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}
+                            >
+                                <DialogContentText sx={{ mb: 1 }}>
+                                    {t('login:forgotPasswordDialog.description')}
+                                </DialogContentText>
+                                {resetErrorMessage && (
+                                    <Alert severity="error" sx={{ mb: 1 }}>
+                                        {resetErrorMessage}
+                                    </Alert>
+                                )}
+                                <OutlinedInput
+                                    autoFocus
+                                    required
+                                    margin="dense"
+                                    id="reset-email"
+                                    name="email"
+                                    placeholder={t('login:forgotPasswordDialog.emailPlaceholder')}
+                                    type="email"
+                                    fullWidth
+                                    value={forgotPasswordEmail}
+                                    onChange={handleEmailChange}
+                                    error={!!resetErrorMessage}
+                                />
+                            </DialogContent>
+                            <DialogActions sx={{ pb: 3, px: 3 }}>
+                                <Button onClick={handleCloseForgotPasswordDialog} disabled={isSendingReset}>
+                                    {t('login:forgotPasswordDialog.cancel')}
+                                </Button>
+                                <Button 
+                                    variant="contained" 
+                                    type="submit"
+                                    loading={isSendingReset}
+                                    color="primary"
+                                >
+                                    {t('login:forgotPasswordDialog.send')}
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+
+                        <Snackbar
+                            open={openSnackbar}
+                            autoHideDuration={5000}
+                            onClose={handleSnackbarClose}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                        >
+                            <Alert 
+                                severity={snackbarSeverity} 
+                                elevation={0}
+                                sx={{
+                                    width: '100%',
+                                    backgroundColor: snackbarSeverity === 'success' ? '#4caf50' : '#f44336',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: 2,
+                                    '& .MuiAlert-icon': {
+                                        color: 'white'
+                                    }
+                                }}
+                            >
+                                {snackbarMessage}
+                            </Alert>
+                        </Snackbar>
         </Grid>
     );
 }

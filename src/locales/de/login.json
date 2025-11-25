@@ -6,6 +6,20 @@
   "loginButton": "Anmelden",
   "noAccount": "Noch kein Konto?",
   "signUp": "Registrieren",
+  "forgotPassword": "Forgot your password?",
+  "forgotPasswordDialog": {
+    "title": "Reset Your Password",
+    "description": "Please enter your email address. We will send you a link to reset your password.",
+    "emailPlaceholder": "Email address",
+    "emailRequired": "Email address is required.",
+    "invalidEmail": "Please enter a valid email address.",
+    "success": "Password reset link has been sent to your email address.",
+    "userNotFound": "No user found with this email address.",
+    "error": "Failed to send password reset email. Please try again later.",
+    "connectionError": "Connection error. Please check your internet connection.",
+    "cancel": "Cancel",
+    "send": "Send"
+  },
   "aria": {
     "togglePassword": "Passwortsichtbarkeit umschalten"
   },

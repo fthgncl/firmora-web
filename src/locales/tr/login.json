@@ -6,6 +6,20 @@
   "loginButton": "Giriş Yap",
   "noAccount": "Hesabınız yok mu?",
   "signUp": "Kayıt Olun",
+  "forgotPassword": "Şifrenizi mi unuttunuz?",
+  "forgotPasswordDialog": {
+    "title": "Şifrenizi Sıfırlayın",
+    "description": "Lütfen hesabınıza ait e-posta adresinizi girin. Şifrenizi sıfırlayabilmeniz için size bir bağlantı göndereceğiz.",
+    "emailPlaceholder": "E-posta adresi",
+    "emailRequired": "E-posta adresi gereklidir.",
+    "invalidEmail": "Geçerli bir e-posta adresi giriniz.",
+    "success": "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.",
+    "userNotFound": "Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.",
+    "error": "Şifre sıfırlama e-postası gönderilemedi. Lütfen daha sonra tekrar deneyiniz.",
+    "connectionError": "Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.",
+    "cancel": "İptal",
+    "send": "Gönder"
+  },
   "aria": {
     "togglePassword": "Şifre görünürlüğünü değiştir"
   },
