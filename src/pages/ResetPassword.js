@@ -413,16 +413,17 @@ export default function ResetPassword() {
     return (
         <>
             <AppBar />
-            <Stack
-                direction="column"
+            <Box
                 component="main"
                 sx={{
-                    justifyContent: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                     minHeight: '100vh',
-                    paddingTop: '90px',
-                    paddingBottom: 2,
+                    paddingTop: '100px',
                     paddingX: 2,
+                    paddingBottom: 2,
                 }}
             >
                 <Card>
@@ -449,7 +450,7 @@ export default function ResetPassword() {
 
                     {renderContent()}
                 </Card>
-            </Stack>
+            </Box>
         </>
     );
 }
