@@ -127,7 +127,8 @@
       "sender": "Absender",
       "receiver": "Empfänger",
       "additionalInfo": "Zusätzliche Informationen",
-      "attachments": "Anhänge"
+      "attachments": "Anhänge",
+      "transactionParties": "Transaktionsparteien"
     },
     "sort":{
       "title": "Sortierung",

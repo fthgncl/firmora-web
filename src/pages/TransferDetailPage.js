@@ -556,7 +556,7 @@ export default function TransferDetailPage() {
                         {/* Katılımcılar */}
                         <Card elevation={0} sx={{mb: 3, borderRadius: 3, p: 3, border: '1px solid', borderColor: 'divider'}}>
                             <Typography variant="subtitle2" color="text.secondary" sx={{mb: 2, textTransform: 'uppercase', letterSpacing: 1}}>
-                                {t('list.detail.participants', 'Participants')}
+                                {t('list.detail.transactionParties')}
                             </Typography>
 
                             <Grid container spacing={2} alignItems="stretch">

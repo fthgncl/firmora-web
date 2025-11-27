@@ -127,7 +127,8 @@
       "sender": "Gönderen",
       "receiver": "Alıcı",
       "additionalInfo": "Ek Bilgi",
-      "attachments": "Ekler"
+      "attachments": "Ekler",
+      "transactionParties": "İşlem Tarafları"
     },
     "sort":{
       "title": "Sıralama",

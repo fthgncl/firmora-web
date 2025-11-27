@@ -127,7 +127,8 @@
       "sender": "Gönderen",
       "receiver": "Alıcı",
       "additionalInfo": "Additional Information",
-      "attachments": "Attachments"
+      "attachments": "Attachments",
+      "transactionParties": "Transaction Parties"
     },
     "sort":{
       "title": "Sorting",
