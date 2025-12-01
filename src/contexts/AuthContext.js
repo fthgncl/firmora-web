@@ -1,4 +1,4 @@
-import {createContext, useState, useContext, useEffect} from "react";
+import {createContext, useState, useContext, useEffect, useRef} from "react";
 import {jwtDecode} from 'jwt-decode';
 import {useTranslation} from 'react-i18next';
 
@@ -12,19 +12,33 @@ export const AuthProvider = ({children}) => {
     const {t} = useTranslation(['auth']); // ✅ namespace belirtildi
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
+    const logoutTimerRef = useRef(null);
 
-    // TODO: Oturum kapatıldığında sign-in sayfasına yönlendirilebilinir. Ancak bu durum doğru olur mu bilemiyorum. Müsait zamanda düşün.
+    const clearLogoutTimer = () => {
+        if (logoutTimerRef.current) {
+            clearTimeout(logoutTimerRef.current);
+            logoutTimerRef.current = null;
+        }
+    };
+
     // TODO: Kullanıcı dil değiştirdiğinde localStrorage'deki metinleri değişmeli. Eski dilde kalmamalı.
     const logout = () => {
+        clearLogoutTimer(); // Mevcut timeout'u temizle
         setUser(null);
         setToken(null);
         localStorage.removeItem(`${process.env.REACT_APP_NAME}-auth`);
+        window.location.href = '/';
     };
 
     // Token'ı decode edip süre kontrolü yapan yardımcı fonksiyon
     const validateAndDecodeToken = (tokenToValidate) => {
         try {
+
+            clearLogoutTimer();
+
+            // Yeni timeout oluştur ve referansa kaydet
             const decodedToken = jwtDecode(tokenToValidate);
+            logoutTimerRef.current = setTimeout(logout, (decodedToken.exp * 1000) - Date.now());
 
             // Token süresini kontrol et
             const currentTime = Date.now() / 1000; // Unix timestamp (saniye)
@@ -51,6 +65,11 @@ export const AuthProvider = ({children}) => {
                 setToken(storedToken);
             }
         }
+
+        // Cleanup: Component unmount olduğunda timeout'u temizle
+        return () => {
+            clearLogoutTimer();
+        };
         // eslint-disable-next-line
     }, []);
 
