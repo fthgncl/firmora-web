@@ -2,7 +2,7 @@ import axios from 'axios';
 import i18n from './i18n';
 
 // Environment variable'lardan cache ayarlarını al
-const CACHE_KEY = process.env.REACT_APP_PERMISSIONS_CACHE_KEY || 'firmora-permissions-cache';
+const CACHE_KEY = process.env.REACT_APP_PERMISSIONS_CACHE_KEY;
 const CACHE_DURATION = parseInt(process.env.REACT_APP_PERMISSIONS_CACHE_DURATION || '86400000', 10); // Varsayılan: 1 gün (milisaniye cinsinden)
 
 // i18n helper

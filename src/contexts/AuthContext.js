@@ -21,7 +21,6 @@ export const AuthProvider = ({children}) => {
         }
     };
 
-    // TODO: Kullanıcı dil değiştirdiğinde localStrorage'deki metinleri değişmeli. Eski dilde kalmamalı.
     const logout = () => {
         clearLogoutTimer(); // Mevcut timeout'u temizle
         setUser(null);

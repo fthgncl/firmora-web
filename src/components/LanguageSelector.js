@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import i18n from '../services/i18n';
 import {useAuth} from "../contexts/AuthContext";
 import {usePermissions} from "../contexts/PermissionsContext";
+import {permissionsService} from '../services/permissionsService';
 import { useTranslation } from 'react-i18next';
 
 export default function LanguageSelector() {
@@ -62,6 +63,7 @@ export default function LanguageSelector() {
     };
 
     const handleSelectFlag = (languageCode) => {
+        permissionsService.clearPermissionsCache();
         i18n.changeLanguage(languageCode);
         handleClose();
     }
