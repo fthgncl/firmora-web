@@ -33,6 +33,13 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
     const { t } = useTranslation(['company']);
     const [submitting, setSubmitting] = useState(false);
 
+    const CURRENCIES = [
+        { value: 'TRY', label: t('company:currencies.try') },
+        { value: 'USD', label: t('company:currencies.usd') },
+        { value: 'EUR', label: t('company:currencies.eur') },
+        { value: 'GBP', label: t('company:currencies.gbp') },
+    ];
+
     const handleSubmit = async (values, { setFieldError }) => {
         try {
             setSubmitting(true);
@@ -54,7 +61,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
 
             if (response.data.status === 'success') {
                 showAlert(
-                    response.data.message || 'Firma bilgileri başarıyla güncellendi.',
+                    response.data.message || t('company:messages.updateSuccess'),
                     'success'
                 );
                 if (onUpdateSuccess) {
@@ -62,17 +69,17 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
                 }
                 onClose();
             } else {
-                showAlert(response.data.message || 'Güncelleme başarısız oldu.', 'error');
+                showAlert(response.data.message || t('company:messages.updateFailed'), 'error');
             }
         } catch (err) {
             console.error('Firma güncelleme hatası:', err);
 
-            const errorMessage = err.response?.data?.message || 'Firma bilgileri güncellenirken bir hata oluştu.';
+            const errorMessage = err.response?.data?.message || t('company:messages.updateError');
 
             if (err.response?.status === 403) {
-                showAlert('Bu firmayı güncelleme yetkiniz yok. Sadece firma sahibi güncelleyebilir.', 'error');
+                showAlert(t('company:messages.noPermission'), 'error');
             } else if (err.response?.status === 404) {
-                showAlert('Firma bulunamadı.', 'error');
+                showAlert(t('company:messages.notFound'), 'error');
             } else if (err.response?.data?.errorMessages) {
                 const errors = err.response.data.errorMessages;
                 Object.keys(errors).forEach(key => {
@@ -109,7 +116,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Business color="primary" />
                     <Typography variant="h6" component="span">
-                        Firma Ayarları
+                        {t('company:settings.title')}
                     </Typography>
                 </Box>
                 <IconButton
@@ -139,7 +146,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                                     <TextField
                                         fullWidth
-                                        label="Firma Adı"
+                                        label={t('company:settings.companyName')}
                                         name="company_name"
                                         value={values.company_name}
                                         onChange={handleChange}
@@ -152,7 +159,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
 
                                     <TextField
                                         fullWidth
-                                        label="Sektör"
+                                        label={t('company:settings.sector')}
                                         name="sector"
                                         value={values.sector}
                                         onChange={handleChange}
@@ -165,7 +172,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
                                     <TextField
                                         fullWidth
                                         select
-                                        label="Para Birimi"
+                                        label={t('company:settings.currency')}
                                         name="currency"
                                         value={values.currency}
                                         onChange={handleChange}

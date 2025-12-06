@@ -31,5 +31,21 @@
   "menu": {
     "moneyTransfer": "Para Transferi",
     "addIncome": "Gelir Ekle"
+  },
+  "settings": {
+    "title": "Firma Ayarları",
+    "companyName": "Firma Adı",
+    "sector": "Sektör",
+    "currency": "Para Birimi",
+    "cancel": "İptal",
+    "update": "Güncelle",
+    "updating": "Güncelleniyor..."
+  },
+  "messages": {
+    "updateSuccess": "Firma bilgileri başarıyla güncellendi.",
+    "updateFailed": "Güncelleme başarısız oldu.",
+    "updateError": "Firma bilgileri güncellenirken bir hata oluştu.",
+    "noPermission": "Bu firmayı güncelleme yetkiniz yok. Sadece firma sahibi güncelleyebilir.",
+    "notFound": "Firma bulunamadı."
   }
 }

@@ -12,7 +12,7 @@
     "settings": "Einstellungen",
     "more": "Weitere Optionen"
   },
-    "goToSettings": "Zu den Einstellungen gehen",
+  "goToSettings": "Zu den Einstellungen gehen",
   "currentBalance": "Aktueller Kontostand",
   "totalBalance": "Gesamtsaldo",
   "inFieldBalance": "Bargeld bei Mitarbeitern",
@@ -31,5 +31,21 @@
   "menu": {
     "moneyTransfer": "Geldüberweisung",
     "addIncome": "Einnahme hinzufügen"
+  },
+  "settings": {
+    "title": "Firmen­einstellungen",
+    "companyName": "Firmenname",
+    "sector": "Sektor",
+    "currency": "Währung",
+    "cancel": "Abbrechen",
+    "update": "Aktualisieren",
+    "updating": "Wird aktualisiert..."
+  },
+  "messages": {
+    "updateSuccess": "Firmendaten wurden erfolgreich aktualisiert.",
+    "updateFailed": "Aktualisierung fehlgeschlagen.",
+    "updateError": "Beim Aktualisieren der Firmendaten ist ein Fehler aufgetreten.",
+    "noPermission": "Sie haben keine Berechtigung, diese Firma zu aktualisieren. Nur der Firmeninhaber kann aktualisieren.",
+    "notFound": "Firma nicht gefunden."
   }
 }

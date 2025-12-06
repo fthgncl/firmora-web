@@ -12,7 +12,7 @@
     "settings": "Settings",
     "more": "More options"
   },
-    "goToSettings": "Go to Settings",
+  "goToSettings": "Go to Settings",
   "currentBalance": "Current Balance",
   "totalBalance": "Total Balance",
   "inFieldBalance": "Cash Held by Staff",
@@ -31,5 +31,21 @@
   "menu": {
     "moneyTransfer": "Money Transfer",
     "addIncome": "Add Income"
+  },
+  "settings": {
+    "title": "Company Settings",
+    "companyName": "Company Name",
+    "sector": "Sector",
+    "currency": "Currency",
+    "cancel": "Cancel",
+    "update": "Update",
+    "updating": "Updating..."
+  },
+  "messages": {
+    "updateSuccess": "Company information updated successfully.",
+    "updateFailed": "Update failed.",
+    "updateError": "An error occurred while updating company information.",
+    "noPermission": "You do not have permission to update this company. Only the owner can update.",
+    "notFound": "Company not found."
   }
 }
