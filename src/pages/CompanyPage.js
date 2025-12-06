@@ -29,6 +29,7 @@ import {useAlert} from '../contexts/AlertContext';
 import UserList from '../components/UsersList';
 import MoneyTransferDialog from '../components/MoneyTransferDialog';
 import ExternalMoneyDialog from '../components/ExternalMoneyDialog';
+import CompanySettingsDialog from '../components/CompanySettingsDialog';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import TransfersTable from "../components/TransfersTable";
@@ -45,6 +46,7 @@ export default function CompanyPage() {
     const [company, setCompany] = useState(null);
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
+    const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
 
     useEffect(() => {
         fetchCompanyDetails();
@@ -221,7 +223,7 @@ export default function CompanyPage() {
                                                     </IconButton>
                                                 </Tooltip>
                                                 <Tooltip title={t('company:goToSettings')}>
-                                                    <IconButton onClick={() => navigate(`/company/${companyId}/settings`)}>
+                                                    <IconButton onClick={() => setSettingsDialogOpen(true)}>
                                                         <Settings />
                                                     </IconButton>
                                                 </Tooltip>
@@ -443,6 +445,12 @@ export default function CompanyPage() {
                 onClose={() => setExternalMoneyDialogOpen(false)}
                 targetAccount={company}
                 targetScope="company"
+            />
+            <CompanySettingsDialog
+                open={settingsDialogOpen}
+                onClose={() => setSettingsDialogOpen(false)}
+                company={company}
+                onUpdateSuccess={fetchCompanyDetails}
             />
         </Container>
     );
