@@ -36,7 +36,7 @@ import TransfersTable from "../components/TransfersTable";
 
 export default function CompanyPage() {
     const {companyId} = useParams();
-    const {token} = useAuth();
+    const {token, user} = useAuth();
     const navigate = useNavigate();
     const {showAlert} = useAlert();
     const { t, i18n } = useTranslation(['company']);
@@ -222,11 +222,13 @@ export default function CompanyPage() {
                                                         <AddCircleOutline />
                                                     </IconButton>
                                                 </Tooltip>
-                                                <Tooltip title={t('company:goToSettings')}>
-                                                    <IconButton onClick={() => setSettingsDialogOpen(true)}>
-                                                        <Settings />
-                                                    </IconButton>
-                                                </Tooltip>
+                                                { company.owner_id === user.id && (
+                                                    <Tooltip title={t('company:goToSettings')}>
+                                                        <IconButton onClick={() => setSettingsDialogOpen(true)}>
+                                                            <Settings />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
                                             </Stack>
 
 
