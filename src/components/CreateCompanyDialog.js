@@ -19,7 +19,7 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import { useAlert } from '../contexts/AlertContext';
 import { createCompanyValidationSchema, createCompanyInitialValues } from '../validations/companyValidation';
-import { CURRENCY_OPTIONS } from '../constants/currency';
+import { CURRENCIES } from '../constants/currency';
 import { useTranslation } from 'react-i18next';
 
 export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, token }) {
@@ -192,7 +192,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                         variant="outlined"
                         sx={{ mb: 1 }}
                     >
-                        {CURRENCY_OPTIONS.map((option) => (
+                        {CURRENCIES.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
                                 {option.label}
                             </MenuItem>

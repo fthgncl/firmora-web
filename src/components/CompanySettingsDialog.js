@@ -19,26 +19,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import { useTranslation } from 'react-i18next';
 import companySettingsSchema from '../schemas/companySettingsSchema';
+import {CURRENCIES} from '../constants/currency';
 
-const CURRENCIES = [
-    { value: 'TRY', label: '₺ Türk Lirası (TRY)' },
-    { value: 'USD', label: '$ Amerikan Doları (USD)' },
-    { value: 'EUR', label: '€ Euro (EUR)' },
-    { value: 'GBP', label: '£ İngiliz Sterlini (GBP)' },
-];
 
 export default function CompanySettingsDialog({ open, onClose, company, onUpdateSuccess }) {
     const { token } = useAuth();
     const { showAlert } = useAlert();
     const { t } = useTranslation(['company']);
     const [submitting, setSubmitting] = useState(false);
-
-    const CURRENCIES = [
-        { value: 'TRY', label: t('company:currencies.try') },
-        { value: 'USD', label: t('company:currencies.usd') },
-        { value: 'EUR', label: t('company:currencies.eur') },
-        { value: 'GBP', label: t('company:currencies.gbp') },
-    ];
 
     const handleSubmit = async (values, { setFieldError }) => {
         try {
