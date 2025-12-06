@@ -136,7 +136,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
                         sector: company.sector || '',
                         currency: company.currency || 'TRY',
                     }}
-                    validationSchema={companySettingsSchema}
+                    validationSchema={companySettingsSchema(t)}
                     onSubmit={handleSubmit}
                     enableReinitialize
                 >
@@ -197,7 +197,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
                                     disabled={submitting}
                                     color="inherit"
                                 >
-                                    İptal
+                                    {t('company:settings.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
@@ -205,7 +205,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
                                     disabled={submitting}
                                     startIcon={submitting ? <CircularProgress size={20} /> : null}
                                 >
-                                    {submitting ? 'Güncelleniyor...' : 'Güncelle'}
+                                    {submitting ? t('company:settings.updating') : t('company:settings.update')}
                                 </Button>
                             </DialogActions>
                         </Form>

@@ -47,5 +47,13 @@
     "updateError": "An error occurred while updating company information.",
     "noPermission": "You do not have permission to update this company. Only the owner can update.",
     "notFound": "Company not found."
+  },
+  "validation": {
+    "companyNameRequired": "Company name is required",
+    "companyNameMin": "Company name must be at least 2 characters",
+    "companyNameMax": "Company name can be at most 100 characters",
+    "sectorMax": "Sector can be at most 50 characters",
+    "currencyInvalid": "Invalid currency",
+    "currencyRequired": "Currency is required"
   }
 }

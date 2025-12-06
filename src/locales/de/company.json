@@ -47,5 +47,13 @@
     "updateError": "Beim Aktualisieren der Firmendaten ist ein Fehler aufgetreten.",
     "noPermission": "Sie haben keine Berechtigung, diese Firma zu aktualisieren. Nur der Firmeninhaber kann aktualisieren.",
     "notFound": "Firma nicht gefunden."
+  },
+  "validation": {
+    "companyNameRequired": "Firmenname ist erforderlich",
+    "companyNameMin": "Der Firmenname muss mindestens 2 Zeichen lang sein",
+    "companyNameMax": "Der Firmenname darf höchstens 100 Zeichen lang sein",
+    "sectorMax": "Der Sektor darf höchstens 50 Zeichen lang sein",
+    "currencyInvalid": "Ungültige Währung",
+    "currencyRequired": "Währung ist erforderlich"
   }
 }
