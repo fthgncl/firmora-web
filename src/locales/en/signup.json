@@ -28,5 +28,28 @@
   },
   "aria": {
     "submit": "Sign up button"
+  },
+  "validation": {
+    "nameRequired": "First name cannot be empty.",
+    "nameMin": "First name must be at least 3 characters long.",
+    "nameMax": "First name can be at most 20 characters long.",
+    "nameLettersOnly": "First name must contain only letters.",
+    "surnameRequired": "Last name cannot be empty.",
+    "surnameMin": "Last name must be at least 3 characters long.",
+    "surnameMax": "Last name can be at most 20 characters long.",
+    "surnameLettersOnly": "Last name must contain only letters.",
+    "usernameRequired": "Username cannot be empty.",
+    "usernameMin": "Username must be at least 6 characters long.",
+    "usernameMax": "Username can be at most 15 characters long.",
+    "usernameFormat": "Username may contain only letters, numbers, and underscores.",
+    "usernameMaxNumbers": "Username can contain at most 4 digits.",
+    "emailRequired": "Email cannot be empty.",
+    "emailInvalid": "A valid email address must be provided.",
+    "passwordRequired": "Password cannot be empty.",
+    "passwordMin": "Password must be at least 8 characters long.",
+    "passwordMax": "Password can be at most 20 characters long.",
+    "passwordFormat": "Password must include uppercase, lowercase, numbers, and special characters.",
+    "confirmPasswordRequired": "Password confirmation cannot be empty.",
+    "passwordMismatch": "Passwords do not match."
   }
 }

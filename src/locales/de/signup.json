@@ -28,5 +28,28 @@
   },
   "aria": {
     "submit": "Registrieren-Schaltfläche"
+  },
+  "validation": {
+    "nameRequired": "Vorname darf nicht leer sein.",
+    "nameMin": "Der Vorname muss mindestens 3 Zeichen lang sein.",
+    "nameMax": "Der Vorname darf höchstens 20 Zeichen lang sein.",
+    "nameLettersOnly": "Der Vorname darf nur Buchstaben enthalten.",
+    "surnameRequired": "Nachname darf nicht leer sein.",
+    "surnameMin": "Der Nachname muss mindestens 3 Zeichen lang sein.",
+    "surnameMax": "Der Nachname darf höchstens 20 Zeichen lang sein.",
+    "surnameLettersOnly": "Der Nachname darf nur Buchstaben enthalten.",
+    "usernameRequired": "Benutzername darf nicht leer sein.",
+    "usernameMin": "Der Benutzername muss mindestens 6 Zeichen lang sein.",
+    "usernameMax": "Der Benutzername darf höchstens 15 Zeichen lang sein.",
+    "usernameFormat": "Der Benutzername darf nur Buchstaben, Zahlen und Unterstriche enthalten.",
+    "usernameMaxNumbers": "Der Benutzername darf höchstens 4 Ziffern enthalten.",
+    "emailRequired": "E-Mail darf nicht leer sein.",
+    "emailInvalid": "Eine gültige E-Mail-Adresse muss angegeben werden.",
+    "passwordRequired": "Passwort darf nicht leer sein.",
+    "passwordMin": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+    "passwordMax": "Das Passwort darf höchstens 20 Zeichen lang sein.",
+    "passwordFormat": "Das Passwort muss Großbuchstaben, Kleinbuchstaben, Zahlen und Sonderzeichen enthalten.",
+    "confirmPasswordRequired": "Passwortbestätigung darf nicht leer sein.",
+    "passwordMismatch": "Passwörter stimmen nicht überein."
   }
 }

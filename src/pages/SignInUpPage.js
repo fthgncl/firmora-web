@@ -95,7 +95,7 @@ export default function SignUp() {
             confirmpassword: ''
         },
         onSubmit,
-        validationSchema: SignUpSchema
+        validationSchema: SignUpSchema(t)
     });
 
     useEffect(() => {
