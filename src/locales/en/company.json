@@ -12,6 +12,7 @@
     "settings": "Settings",
     "more": "More options"
   },
+    "goToSettings": "Go to Settings",
   "currentBalance": "Current Balance",
   "totalBalance": "Total Balance",
   "inFieldBalance": "Cash Held by Staff",

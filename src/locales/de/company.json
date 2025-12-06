@@ -12,6 +12,7 @@
     "settings": "Einstellungen",
     "more": "Weitere Optionen"
   },
+    "goToSettings": "Zu den Einstellungen gehen",
   "currentBalance": "Aktueller Kontostand",
   "totalBalance": "Gesamtsaldo",
   "inFieldBalance": "Bargeld bei Mitarbeitern",

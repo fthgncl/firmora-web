@@ -12,6 +12,7 @@
     "settings": "Ayarlar",
     "more": "Daha fazla seçenek"
   },
+  "goToSettings": "Ayarlar'a git",
   "currentBalance": "Mevcut Bakiye",
   "inFieldBalance": "Sahadaki Bakiye",
   "totalBalance": "Toplam Bakiye",
