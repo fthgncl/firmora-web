@@ -19,8 +19,9 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import { useAlert } from '../contexts/AlertContext';
 import { createCompanyValidationSchema, createCompanyInitialValues } from '../validations/companyValidation';
-import { CURRENCIES } from '../constants/currency';
+import { getCurrencies } from '../constants/currency';
 import { useTranslation } from 'react-i18next';
+import i18n from "../services/i18n";
 
 export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, token }) {
     const { t } = useTranslation(['companies']);
@@ -28,6 +29,11 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const { showSuccess } = useAlert();
     const [formError, setFormError] = useState('');
+    const [currencies, setCurrencies] = useState(getCurrencies(t));
+
+    i18n.on('languageChanged', () => {
+        setCurrencies(getCurrencies(t));
+    });
 
     const formik = useFormik({
         initialValues: createCompanyInitialValues,
@@ -192,7 +198,7 @@ export default function CreateCompanyDialog({ open, onClose, onCompanyCreated, t
                         variant="outlined"
                         sx={{ mb: 1 }}
                     >
-                        {CURRENCIES.map((option) => (
+                        {currencies.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
                                 {option.label}
                             </MenuItem>

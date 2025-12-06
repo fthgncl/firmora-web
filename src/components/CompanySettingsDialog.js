@@ -19,7 +19,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import { useTranslation } from 'react-i18next';
 import companySettingsSchema from '../schemas/companySettingsSchema';
-import {CURRENCIES} from '../constants/currency';
+import {getCurrencies} from '../constants/currency';
+import i18n from "../services/i18n";
 
 
 export default function CompanySettingsDialog({ open, onClose, company, onUpdateSuccess }) {
@@ -27,6 +28,12 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
     const { showAlert } = useAlert();
     const { t } = useTranslation(['company']);
     const [submitting, setSubmitting] = useState(false);
+    const [currencies, setCurrencies] = useState(getCurrencies(t));
+
+
+    i18n.on('languageChanged', () => {
+        setCurrencies(getCurrencies(t));
+    });
 
     const handleSubmit = async (values, { setFieldError }) => {
         try {
@@ -170,7 +177,7 @@ export default function CompanySettingsDialog({ open, onClose, company, onUpdate
                                         required
                                         disabled={submitting}
                                     >
-                                        {CURRENCIES.map((option) => (
+                                        {currencies.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
                                             </MenuItem>
