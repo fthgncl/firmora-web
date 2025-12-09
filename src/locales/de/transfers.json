@@ -197,6 +197,8 @@
     "approving": "Genehmigung läuft...",
     "rejecting": "Ablehnung läuft...",
     "approveDialog": {
+      "confirm": "Genehmigen",
+      "cancel": "Abbrechen",
       "title": "Überweisung Bestätigen",
       "message": "Sind Sie sicher, dass Sie die Überweisung von {{amount}}, die von {{sender}} an das Konto von {{receiver}} gesendet wurde, bestätigen möchten?"
     }

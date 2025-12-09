@@ -197,6 +197,8 @@
     "approving": "Approving...",
     "rejecting": "Rejecting...",
     "approveDialog": {
+      "confirm": "Approve",
+      "cancel": "Cancel",
       "title": "Approve Transfer",
       "message": "Are you sure you want to approve the transfer of {{amount}} sent by {{sender}} to the account of {{receiver}}?"
     }

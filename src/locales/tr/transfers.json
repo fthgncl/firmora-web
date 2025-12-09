@@ -197,6 +197,8 @@
     "approving": "Onaylanıyor...",
     "rejecting": "Reddediliyor...",
     "approveDialog": {
+      "confirm": "Onayla",
+      "cancel": "İptal",
       "title": "Transfer Onaylama",
       "message": "{{sender}} tarafından {{receiver}} hesabına gönderilen {{amount}} tutarındaki transferi onaylamak istediğinizden emin misiniz?"
     }
