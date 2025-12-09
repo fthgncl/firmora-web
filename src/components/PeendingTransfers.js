@@ -31,18 +31,25 @@ import {
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
-
-const currencyGuess = (c) => (c && /^[A-Z]{3}$/.test(c) ? c : 'USD');
+import {getCurrencies} from '../constants/currency';
 
 const formatAmount = (amount, currency) => {
+    const currencies = getCurrencies();
+    const validCurrency = currencies.find(c => c.value === currency);
+
+    // Geçersiz para birimi ise formatlama yapmadan direkt string dön
+    if (!validCurrency) {
+        return `${Number(amount ?? 0).toFixed(2)} ${currency || ''}`.trim();
+    }
+
     try {
         return new Intl.NumberFormat(undefined, {
             style: 'currency',
-            currency: currencyGuess(currency),
+            currency: currency,
             maximumFractionDigits: 2,
         }).format(Number(amount ?? 0));
     } catch {
-        return `${amount} ${currency || ''}`.trim();
+        return `${Number(amount ?? 0).toFixed(2)} ${currency || ''}`.trim();
     }
 };
 
