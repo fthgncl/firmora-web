@@ -195,12 +195,12 @@ const PendingTransfers = ({companyId}) => {
 
     const senderFullName = (r) => {
         const fullName = [r?.sender_name, r?.sender_surname].filter(Boolean).join(' ');
-        return fullName || r?.from_external_name || '-';
+        return fullName || r?.from_external_name;
     };
 
     const receiverFullName = (r) => {
         const fullName = [r?.receiver_name, r?.receiver_surname].filter(Boolean).join(' ');
-        return fullName || r?.to_external_name || '-';
+        return fullName || r?.to_external_name;
     };
 
     // Kolon menüsü
@@ -404,7 +404,7 @@ const PendingTransfers = ({companyId}) => {
                                                     {senderFullName(r)}
                                                 </Typography>
                                                 {r.sender_company_name && (
-                                                    <Typography variant="caption" color="text.secondary">
+                                                    <Typography variant={senderFullName(r)?"caption":"body2"} color={senderFullName(r)?"text.secondary":"text.primary"}>
                                                         {r.sender_company_name}
                                                     </Typography>
                                                 )}
@@ -423,7 +423,7 @@ const PendingTransfers = ({companyId}) => {
                                                     {receiverFullName(r)}
                                                 </Typography>
                                                 {r.receiver_company_name && (
-                                                    <Typography variant="caption" color="text.secondary">
+                                                    <Typography variant={receiverFullName(r)?"caption":"body2"} color={receiverFullName(r)?"text.secondary":"text.primary"}>
                                                         {r.receiver_company_name}
                                                     </Typography>
                                                 )}
@@ -547,7 +547,6 @@ const PendingTransfers = ({companyId}) => {
                                     amount: formatAmount(selectedTransfer.amount, selectedTransfer.currency),
                                     sender: senderFullName(selectedTransfer),
                                     receiver: receiverFullName(selectedTransfer),
-                                    defaultValue: `${formatAmount(selectedTransfer.amount, selectedTransfer.currency)} tutarındaki transferi onaylamak istediğinizden emin misiniz?`
                                 })}
                             </>
                         )}
