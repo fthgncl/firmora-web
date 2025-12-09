@@ -14,6 +14,7 @@ import {
     Tooltip,
     CircularProgress,
     Alert,
+    Chip,
     Divider,
     Typography,
     Button,
@@ -23,15 +24,36 @@ import {
     DialogContentText,
     DialogActions,
     Container,
+    Popover,
+    Checkbox,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Avatar,
 } from '@mui/material';
 import {
     Refresh,
     HourglassEmpty,
     CheckCircle,
+    ViewColumn,
+    AttachFile,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import {getCurrencies} from '../constants/currency';
+import {useNavigate} from 'react-router-dom';
+
+// Kolon tanımları
+const COLUMN_DEFS = [
+    {key: 'created_at', labelKey: 'list.columns.created_at'},
+    {key: 'amount', labelKey: 'list.columns.amount'},
+    {key: 'sender', labelKey: 'list.columns.sender'},
+    {key: 'receiver', labelKey: 'list.columns.receiver'},
+    {key: 'transfer_type', labelKey: 'list.columns.transfer_type'},
+    {key: 'description', labelKey: 'list.columns.description'},
+    {key: 'files_count', labelKey: 'list.columns.files_count'},
+    {key: 'actions', labelKey: 'pending.actions'},
+];
 
 const formatAmount = (amount, currency) => {
     const currencies = getCurrencies();
@@ -56,6 +78,7 @@ const formatAmount = (amount, currency) => {
 const PendingTransfers = ({companyId}) => {
     const {t} = useTranslation(['transfers']);
     const {token} = useAuth();
+    const navigate = useNavigate();
     const API_URL = `${process.env.REACT_APP_API_URL}/transfers/pending`;
     const APPROVE_URL = `${process.env.REACT_APP_API_URL}/transfers/approve`;
 
@@ -68,6 +91,18 @@ const PendingTransfers = ({companyId}) => {
     const [approveDialogOpen, setApproveDialogOpen] = useState(false);
     const [selectedTransfer, setSelectedTransfer] = useState(null);
     const [approving, setApproving] = useState(false);
+
+    // Kolon görünürlüğü
+    const [visibleCols, setVisibleCols] = useState(() =>
+        COLUMN_DEFS.reduce(
+            (acc, c) => ({
+                ...acc,
+                [c.key]: true,
+            }),
+            {}
+        )
+    );
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const fetchPendingTransfers = useCallback(async () => {
         try {
@@ -168,6 +203,20 @@ const PendingTransfers = ({companyId}) => {
         return fullName || r?.to_external_name || '-';
     };
 
+    // Kolon menüsü
+    const openColsMenu = (e) => setAnchorEl(e.currentTarget);
+    const closeColsMenu = () => setAnchorEl(null);
+    const toggleCol = (key) => setVisibleCols((prev) => ({...prev, [key]: !prev[key]}));
+
+    const renderTypeChip = (type) => (
+        <Chip
+            size="small"
+            variant="outlined"
+            label={t(`transfers:list.types.${type}`, type)}
+            sx={{fontWeight: 600}}
+        />
+    );
+
     if (loading) {
         return (
             <Container maxWidth="lg" sx={{mt: 4}}>
@@ -230,13 +279,33 @@ const PendingTransfers = ({companyId}) => {
                         position: 'relative',
                     }}
                 >
-                    <Box sx={{flex: 1, minWidth: 0}}>
+                    <Avatar
+                        sx={{
+                            color: 'white',
+                            bgcolor: 'rgba(255,255,255,0.18)',
+                            width: {xs: 36, sm: 42},
+                            height: {xs: 36, sm: 42},
+                            backdropFilter: 'blur(4px)',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+                            flexShrink: 0,
+                            order: 0,
+                        }}
+                    >
+                        <HourglassEmpty/>
+                    </Avatar>
+
+                    <Box sx={{flex: 1, minWidth: 0, order: 1}}>
+                        <Typography variant="h6" noWrap
+                                    sx={{fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)'}}>
+                            {t('transfers:pending.title', 'Onay Bekleyen Transferler')}
+                        </Typography>
                         <Typography
                             variant="caption"
                             sx={{
                                 opacity: 0.9,
                                 textShadow: '0 1px 2px rgba(0,0,0,0.25)',
                                 display: 'block',
+                                whiteSpace: {xs: 'normal', sm: 'nowrap'}
                             }}
                         >
                             {t('transfers:pending.total', {total, defaultValue: `Toplam ${total} transfer`})}
@@ -248,8 +317,28 @@ const PendingTransfers = ({companyId}) => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 1,
+                            flexWrap: 'wrap',
+                            justifyContent: {xs: 'flex-end', sm: 'flex-end'},
+                            width: {xs: 'auto', sm: 'auto'},
+                            order: 2,
                         }}
                     >
+                        <Tooltip title={t('transfers:list.view.tooltip', 'Sütunları Göster/Gizle')}>
+                            <IconButton
+                                onClick={openColsMenu}
+                                size="small"
+                                sx={{
+                                    color: '#fff',
+                                    bgcolor: 'rgba(255,255,255,0.18)',
+                                    border: '1px solid rgba(255,255,255,0.25)',
+                                    '&:hover': {bgcolor: 'rgba(255,255,255,0.28)'},
+                                    transition: 'all 0.2s ease',
+                                }}
+                            >
+                                <ViewColumn/>
+                            </IconButton>
+                        </Tooltip>
+
                         <Tooltip title={t('transfers:list.refresh', 'Yenile')}>
                             <IconButton
                                 onClick={fetchPendingTransfers}
@@ -286,12 +375,9 @@ const PendingTransfers = ({companyId}) => {
                     }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>{t('transfers:list.columns.created_at', 'Tarih')}</TableCell>
-                                <TableCell>{t('transfers:list.columns.amount', 'Tutar')}</TableCell>
-                                <TableCell>{t('transfers:list.columns.sender', 'Gönderen')}</TableCell>
-                                <TableCell>{t('transfers:list.columns.receiver', 'Alıcı')}</TableCell>
-                                <TableCell>{t('transfers:list.columns.description', 'Açıklama')}</TableCell>
-                                <TableCell>{t('transfers:pending.actions', 'İşlemler')}</TableCell>
+                                {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
+                                    <TableCell key={c.key}>{t(`transfers:${c.labelKey}`)}</TableCell>
+                                ))}
                             </TableRow>
                         </TableHead>
 
@@ -300,61 +386,94 @@ const PendingTransfers = ({companyId}) => {
                                 <TableRow
                                     key={r.id}
                                     hover
+                                    onClick={() => navigate(`/transfer/${r.id}`)}
+                                    sx={{cursor: 'pointer'}}
                                 >
-                                    <TableCell>{formatDateTime(r.created_at)}</TableCell>
-                                    <TableCell sx={{fontWeight: 700}}>{formatAmount(r.amount, r.currency)}</TableCell>
-                                    <TableCell>
-                                        <Box sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: 0.5
-                                        }}>
-                                            <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                {senderFullName(r)}
-                                            </Typography>
-                                            {r.sender_company_name && (
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {r.sender_company_name}
+                                    {visibleCols.created_at && <TableCell>{formatDateTime(r.created_at)}</TableCell>}
+                                    {visibleCols.amount && <TableCell
+                                        sx={{fontWeight: 700}}>{formatAmount(r.amount, r.currency)}</TableCell>}
+                                    {visibleCols.sender && (
+                                        <TableCell>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: 0.5
+                                            }}>
+                                                <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                    {senderFullName(r)}
                                                 </Typography>
-                                            )}
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Box sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: 0.5
-                                        }}>
-                                            <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                {receiverFullName(r)}
-                                            </Typography>
-                                            {r.receiver_company_name && (
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {r.receiver_company_name}
+                                                {r.sender_company_name && (
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {r.sender_company_name}
+                                                    </Typography>
+                                                )}
+                                            </Box>
+                                        </TableCell>
+                                    )}
+                                    {visibleCols.receiver && (
+                                        <TableCell>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: 0.5
+                                            }}>
+                                                <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                    {receiverFullName(r)}
                                                 </Typography>
-                                            )}
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell sx={{
+                                                {r.receiver_company_name && (
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {r.receiver_company_name}
+                                                    </Typography>
+                                                )}
+                                            </Box>
+                                        </TableCell>
+                                    )}
+                                    {visibleCols.transfer_type &&
+                                        <TableCell>{renderTypeChip(r.transfer_type)}</TableCell>}
+                                    {visibleCols.description && <TableCell sx={{
                                         maxWidth: 300,
                                         whiteSpace: 'normal',
                                         wordWrap: 'break-word'
-                                    }}>{r.description || '-'}</TableCell>
-                                    <TableCell>
-                                        <Box sx={{display: 'flex', gap: 1, justifyContent: 'center'}}>
-                                            <Button
-                                                variant="contained"
-                                                size="small"
-                                                color="success"
-                                                startIcon={<CheckCircle/>}
-                                                onClick={() => handleApproveClick(r)}
-                                            >
-                                                {t('transfers:pending.approve', 'Onayla')}
-                                            </Button>
-                                        </Box>
-                                    </TableCell>
+                                    }}>{r.description || '-'}</TableCell>}
+                                    {visibleCols.files_count && (
+                                        <TableCell>
+                                            {r.files_count > 0 ? (
+                                                <Box sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: 0.5
+                                                }}>
+                                                    <AttachFile fontSize="small" sx={{color: 'text.secondary'}}/>
+                                                    <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                        {r.files_count}
+                                                    </Typography>
+                                                </Box>
+                                            ) : (
+                                                '-'
+                                            )}
+                                        </TableCell>
+                                    )}
+                                    {visibleCols.actions && (
+                                        <TableCell>
+                                            <Box sx={{display: 'flex', gap: 1, justifyContent: 'center'}}>
+                                                <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    color="success"
+                                                    startIcon={<CheckCircle/>}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleApproveClick(r);
+                                                    }}
+                                                >
+                                                    {t('transfers:pending.approve', 'Onayla')}
+                                                </Button>
+                                            </Box>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -387,6 +506,30 @@ const PendingTransfers = ({companyId}) => {
                     />
                 </Box>
             </Card>
+
+            {/* Kolon menüsü */}
+            <Popover
+                open={Boolean(anchorEl)}
+                anchorEl={anchorEl}
+                onClose={closeColsMenu}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                transformOrigin={{vertical: 'top', horizontal: 'right'}}
+                PaperProps={{sx: {width: 280, p: 1}}}
+            >
+                <Typography variant="subtitle2" sx={{px: 1, pb: 0.5}}>
+                    {t('transfers:list.view.columnsTitle', 'Görünür Sütunlar')}
+                </Typography>
+                <Divider sx={{mb: 0.5}}/>
+                {COLUMN_DEFS.map(c => (
+                    <ListItemButton key={c.key} dense onClick={() => toggleCol(c.key)}>
+                        <ListItemIcon>
+                            <Checkbox edge="start" size="small" checked={!!visibleCols[c.key]} tabIndex={-1}
+                                      disableRipple/>
+                        </ListItemIcon>
+                        <ListItemText primary={t(`transfers:${c.labelKey}`)}/>
+                    </ListItemButton>
+                ))}
+            </Popover>
 
             {/* Onay Dialog */}
             <Dialog
