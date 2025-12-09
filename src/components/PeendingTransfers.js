@@ -546,7 +546,7 @@ const PendingTransfers = ({companyId}) => {
                                 {t('transfers:pending.approveDialog.message', {
                                     amount: formatAmount(selectedTransfer.amount, selectedTransfer.currency),
                                     sender: senderFullName(selectedTransfer),
-                                    receiver: receiverFullName(selectedTransfer),
+                                    receiver: receiverFullName(selectedTransfer) || selectedTransfer.receiver_company_name
                                 })}
                             </>
                         )}
