@@ -14,16 +14,15 @@ import {
     Tooltip,
     CircularProgress,
     Alert,
-    Chip,
     Divider,
     Typography,
-    Avatar,
     Button,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogContentText,
     DialogActions,
+    Container,
 } from '@mui/material';
 import {
     Refresh,
@@ -32,7 +31,6 @@ import {
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
-import {useNavigate} from 'react-router-dom';
 
 const currencyGuess = (c) => (c && /^[A-Z]{3}$/.test(c) ? c : 'USD');
 
@@ -48,10 +46,9 @@ const formatAmount = (amount, currency) => {
     }
 };
 
-const PendingTransfers = ({companyId, sx}) => {
+const PendingTransfers = ({companyId}) => {
     const {t} = useTranslation(['transfers']);
     const {token} = useAuth();
-    const navigate = useNavigate();
     const API_URL = `${process.env.REACT_APP_API_URL}/transfers/pending`;
     const APPROVE_URL = `${process.env.REACT_APP_API_URL}/transfers/approve`;
 
@@ -59,7 +56,7 @@ const PendingTransfers = ({companyId, sx}) => {
     const [limit, setLimit] = useState(20);
     const [page, setPage] = useState(0);
     const [total, setTotal] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState('');
     const [approveDialogOpen, setApproveDialogOpen] = useState(false);
     const [selectedTransfer, setSelectedTransfer] = useState(null);
@@ -82,8 +79,6 @@ const PendingTransfers = ({companyId, sx}) => {
                     'Content-Type': 'application/json',
                 }
             });
-
-            console.log(data);
 
             if (data?.status === 'success') {
                 const transfers = data?.data?.transfers ?? [];
@@ -129,7 +124,6 @@ const PendingTransfers = ({companyId, sx}) => {
             );
 
             if (data?.status === 'success') {
-                // Başarılı onay - listeyi yenile
                 await fetchPendingTransfers();
                 setApproveDialogOpen(false);
                 setSelectedTransfer(null);
@@ -167,155 +161,135 @@ const PendingTransfers = ({companyId, sx}) => {
         return fullName || r?.to_external_name || '-';
     };
 
-    return (
-        <Card
-            sx={{
-                p: 0,
-                overflow: 'hidden',
-                borderRadius: 3,
-                backdropFilter: 'blur(8px)',
-                bgcolor: (theme) => theme.palette.mode === 'dark'
-                    ? 'rgba(25,28,34,0.65)'
-                    : 'rgba(255,255,255,0.75)',
-                border: (t) => `1px solid ${t.palette.divider}`,
-                ...sx
-            }}
-        >
-            {/* Başlık Şeridi */}
-            <Box
-                sx={{
-                    px: {xs: 1.5, sm: 2.5},
-                    py: {xs: 1.25, sm: 2},
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    rowGap: {xs: 1, sm: 1.5},
-                    columnGap: {xs: 1, sm: 1.5},
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-                    borderBottom: '1px solid rgba(255,255,255,0.15)',
-                    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                    color: 'white',
-                    position: 'relative',
-                }}
-            >
-                <Avatar
-                    sx={{
-                        color: 'white',
-                        bgcolor: 'rgba(255,255,255,0.18)',
-                        width: {xs: 36, sm: 42},
-                        height: {xs: 36, sm: 42},
-                        backdropFilter: 'blur(4px)',
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
-                        flexShrink: 0,
-                        order: 0,
-                    }}
-                >
-                    <HourglassEmpty/>
-                </Avatar>
-
-                <Box sx={{flex: 1, minWidth: 0, order: 1}}>
-                    <Typography variant="h6" noWrap
-                                sx={{fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)'}}>
-                        {t('transfers:pending.title', 'Onay Bekleyen Transferler')}
-                    </Typography>
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            opacity: 0.9,
-                            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
-                            display: 'block',
-                            whiteSpace: {xs: 'normal', sm: 'nowrap'}
-                        }}
-                    >
-                        {t('transfers:pending.total', {total, defaultValue: `Toplam ${total} transfer`})}
-                    </Typography>
+    if (loading) {
+        return (
+            <Container maxWidth="lg" sx={{mt: 4}}>
+                <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px'}}>
+                    <CircularProgress size={60}/>
                 </Box>
+            </Container>
+        );
+    }
 
-                <Box
+    if (rows.length === 0) {
+        return null;
+    }
+
+    return (
+        <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
+            <Box sx={{mb: 4}}>
+                <Typography
+                    variant="h4"
+                    component="h1"
                     sx={{
+                        fontWeight: 700,
+                        color: 'text.primary',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 1,
-                        flexWrap: 'wrap',
-                        justifyContent: {xs: 'flex-end', sm: 'flex-end'},
-                        width: {xs: 'auto', sm: 'auto'},
-                        order: 2,
+                        gap: 1.5
                     }}
                 >
-                    <Tooltip title={t('transfers:list.refresh', 'Yenile')}>
-                        <IconButton
-                            onClick={fetchPendingTransfers}
-                            size="small"
-                            sx={{
-                                color: '#fff',
-                                bgcolor: 'rgba(255,255,255,0.18)',
-                                border: '1px solid rgba(255,255,255,0.25)',
-                                '&:hover': {bgcolor: 'rgba(255,255,255,0.28)'},
-                                transition: 'all 0.2s ease',
-                            }}
-                        >
-                            <Refresh/>
-                        </IconButton>
-                    </Tooltip>
-                </Box>
+                    <HourglassEmpty sx={{fontSize: 40, color: 'primary.main'}}/>
+                    {t('transfers:pending.title', 'Onay Bekleyen Transferler')}
+                </Typography>
             </Box>
 
-            <Divider/>
+            <Card
+                sx={{
+                    p: 0,
+                    overflow: 'hidden',
+                    borderRadius: 3,
+                    backdropFilter: 'blur(8px)',
+                    bgcolor: (theme) => theme.palette.mode === 'dark'
+                        ? 'rgba(25,28,34,0.65)'
+                        : 'rgba(255,255,255,0.75)',
+                    border: (t) => `1px solid ${t.palette.divider}`,
+                }}
+            >
+                {/* Başlık Şeridi */}
+                <Box
+                    sx={{
+                        px: {xs: 1.5, sm: 2.5},
+                        py: {xs: 1.25, sm: 2},
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        rowGap: {xs: 1, sm: 1.5},
+                        columnGap: {xs: 1, sm: 1.5},
+                        boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+                        borderBottom: '1px solid rgba(255,255,255,0.15)',
+                        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        color: 'white',
+                        position: 'relative',
+                    }}
+                >
+                    <Box sx={{flex: 1, minWidth: 0}}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                opacity: 0.9,
+                                textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+                                display: 'block',
+                            }}
+                        >
+                            {t('transfers:pending.total', {total, defaultValue: `Toplam ${total} transfer`})}
+                        </Typography>
+                    </Box>
 
-            {/* Hata */}
-            {errorMsg && <Alert severity="error" sx={{m: 2}}>{errorMsg}</Alert>}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                        }}
+                    >
+                        <Tooltip title={t('transfers:list.refresh', 'Yenile')}>
+                            <IconButton
+                                onClick={fetchPendingTransfers}
+                                size="small"
+                                sx={{
+                                    color: '#fff',
+                                    bgcolor: 'rgba(255,255,255,0.18)',
+                                    border: '1px solid rgba(255,255,255,0.25)',
+                                    '&:hover': {bgcolor: 'rgba(255,255,255,0.28)'},
+                                    transition: 'all 0.2s ease',
+                                }}
+                            >
+                                <Refresh/>
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+                </Box>
 
-            {/* Tablo */}
-            <TableContainer sx={{overflowX: 'auto'}}>
-                <Table size="small" sx={{
-                    minWidth: 900,
-                    'thead th': {fontWeight: 700, whiteSpace: 'nowrap'},
-                    'tbody tr': {
-                        transition: 'background-color 120ms ease, transform 120ms ease',
-                        '&:hover': {bgcolor: 'action.hover'}
-                    },
-                    '& thead th, & tbody td': {textAlign: 'center', verticalAlign: 'middle'}
-                }}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>{t('transfers:list.columns.created_at', 'Tarih')}</TableCell>
-                            <TableCell>{t('transfers:list.columns.amount', 'Tutar')}</TableCell>
-                            <TableCell>{t('transfers:list.columns.sender', 'Gönderen')}</TableCell>
-                            <TableCell>{t('transfers:list.columns.receiver', 'Alıcı')}</TableCell>
-                            <TableCell>{t('transfers:list.columns.description', 'Açıklama')}</TableCell>
-                            <TableCell>{t('transfers:pending.actions', 'İşlemler')}</TableCell>
-                        </TableRow>
-                    </TableHead>
+                <Divider/>
 
-                    <TableBody>
-                        {loading ? (
+                {/* Hata */}
+                {errorMsg && <Alert severity="error" sx={{m: 2}}>{errorMsg}</Alert>}
+
+                {/* Tablo */}
+                <TableContainer sx={{overflowX: 'auto'}}>
+                    <Table size="small" sx={{
+                        minWidth: 900,
+                        'thead th': {fontWeight: 700, whiteSpace: 'nowrap'},
+                        'tbody tr': {
+                            transition: 'background-color 120ms ease, transform 120ms ease',
+                            '&:hover': {bgcolor: 'action.hover'}
+                        },
+                        '& thead th, & tbody td': {textAlign: 'center', verticalAlign: 'middle'}
+                    }}>
+                        <TableHead>
                             <TableRow>
-                                <TableCell colSpan={6}>
-                                    <Box sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        justifyContent: 'center',
-                                        py: 4
-                                    }}>
-                                        <CircularProgress size={20}/>
-                                        <Typography variant="body2"
-                                                    color="text.secondary">{t('transfers:list.loading', 'Yükleniyor...')}</Typography>
-                                    </Box>
-                                </TableCell>
+                                <TableCell>{t('transfers:list.columns.created_at', 'Tarih')}</TableCell>
+                                <TableCell>{t('transfers:list.columns.amount', 'Tutar')}</TableCell>
+                                <TableCell>{t('transfers:list.columns.sender', 'Gönderen')}</TableCell>
+                                <TableCell>{t('transfers:list.columns.receiver', 'Alıcı')}</TableCell>
+                                <TableCell>{t('transfers:list.columns.description', 'Açıklama')}</TableCell>
+                                <TableCell>{t('transfers:pending.actions', 'İşlemler')}</TableCell>
                             </TableRow>
-                        ) : rows.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={6}>
-                                    <Box sx={{py: 6, textAlign: 'center', color: 'text.secondary'}}>
-                                        <Typography variant="subtitle1" sx={{mb: 0.5}}>
-                                            {t('transfers:pending.noRecords', 'Onay bekleyen transfer bulunmamaktadır')}
-                                        </Typography>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            rows.map((r) => (
+                        </TableHead>
+
+                        <TableBody>
+                            {rows.map((r) => (
                                 <TableRow
                                     key={r.id}
                                     hover
@@ -375,32 +349,37 @@ const PendingTransfers = ({companyId, sx}) => {
                                         </Box>
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
-            {/* Alt bar - Sayfalama */}
-            <Box sx={{px: 2, py: 1.5}}>
-                <TablePagination
-                    component="div"
-                    count={total}
-                    page={page}
-                    onPageChange={(_, newPage) => setPage(newPage)}
-                    rowsPerPage={limit}
-                    onRowsPerPageChange={(e) => {
-                        setLimit(parseInt(e.target.value, 10));
-                        setPage(0);
-                    }}
-                    rowsPerPageOptions={[10, 20, 50, 100]}
-                    labelRowsPerPage={t('transfers:list.rowsPerPage', 'Sayfa başına satır')}
-                    labelDisplayedRows={({from, to, count}) => t('transfers:list.displayedRows', {from, to, count, defaultValue: `${from}-${to} / ${count}`})}
-                    sx={{
-                        '.MuiTablePagination-toolbar': {flexWrap: 'wrap', minHeight: {xs: 'auto', sm: 52}},
-                    }}
-                />
-            </Box>
+                {/* Alt bar - Sayfalama */}
+                <Box sx={{px: 2, py: 1.5}}>
+                    <TablePagination
+                        component="div"
+                        count={total}
+                        page={page}
+                        onPageChange={(_, newPage) => setPage(newPage)}
+                        rowsPerPage={limit}
+                        onRowsPerPageChange={(e) => {
+                            setLimit(parseInt(e.target.value, 10));
+                            setPage(0);
+                        }}
+                        rowsPerPageOptions={[10, 20, 50, 100]}
+                        labelRowsPerPage={t('transfers:list.rowsPerPage', 'Sayfa başına satır')}
+                        labelDisplayedRows={({from, to, count}) => t('transfers:list.displayedRows', {
+                            from,
+                            to,
+                            count,
+                            defaultValue: `${from}-${to} / ${count}`
+                        })}
+                        sx={{
+                            '.MuiTablePagination-toolbar': {flexWrap: 'wrap', minHeight: {xs: 'auto', sm: 52}},
+                        }}
+                    />
+                </Box>
+            </Card>
 
             {/* Onay Dialog */}
             <Dialog
@@ -441,7 +420,7 @@ const PendingTransfers = ({companyId, sx}) => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Card>
+        </Container>
     );
 };
 

@@ -81,6 +81,7 @@ export default function CompanyList() {
                 borderRadius: 3,
                 p: { xs: 2, sm: 3 },
                 mt: { xs: 2, sm: 3 },
+                mb: 4,
                 bgcolor: theme.palette.background.default
             }}
         >
