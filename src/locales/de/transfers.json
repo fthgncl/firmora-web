@@ -106,17 +106,26 @@
     "loading": "Wird geladen...",
     "noRecords": "Keine Einträge",
     "noResultsForSearch": "Keine Ergebnisse für Ihre Suche",
-    "search": { "placeholder": "ID, Beschreibung, externer Empfänger..." },
-    "view": { "tooltip": "Spalten auswählen", "columnsTitle": "Spaltensichtbarkeit" },
+    "search": {
+      "placeholder": "ID, Beschreibung, externer Empfänger..."
+    },
+    "view": {
+      "tooltip": "Spalten auswählen",
+      "columnsTitle": "Spaltensichtbarkeit"
+    },
     "refresh": "Aktualisieren",
     "filters": {
       "title": "Filter",
       "status": "Status",
       "transferType": "Überweisungsart",
       "fromScope": "Von Bereich",
-        "toScope": "An Bereich",
+      "toScope": "An Bereich",
       "any": "Alle",
-      "scope": { "user": "Benutzer", "company": "Firma", "external": "Extern" },
+      "scope": {
+        "user": "Benutzer",
+        "company": "Firma",
+        "external": "Extern"
+      },
       "startDate": "Start Datum",
       "endDate": "Ende Datum",
       "currency": "Währung (z. B. USD)"
@@ -130,7 +139,7 @@
       "attachments": "Anhänge",
       "transactionParties": "Transaktionsparteien"
     },
-    "sort":{
+    "sort": {
       "title": "Sortierung",
       "sortBy": "Sortieren nach",
       "order": "Reihenfolge"
@@ -176,6 +185,20 @@
       "company_to_external": "Firma → Extern",
       "external_to_user": "Extern → Nutzer",
       "external_to_company": "Extern → Firma"
+    }
+  },
+  "pending": {
+    "actions": "Aktionen",
+    "title": "Ausstehende Überweisungen",
+    "total": "Gesamt {{total}} Einträge",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "cancel": "Abbrechen",
+    "approving": "Genehmigung läuft...",
+    "rejecting": "Ablehnung läuft...",
+    "approveDialog": {
+      "title": "Überweisung Bestätigen",
+      "message": "Sind Sie sicher, dass Sie die Überweisung von {{amount}}, die von {{sender}} an das Konto von {{receiver}} gesendet wurde, bestätigen möchten?"
     }
   }
 }

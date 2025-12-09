@@ -106,17 +106,26 @@
     "loading": "Loading...",
     "noRecords": "No records",
     "noResultsForSearch": "No results match your search",
-    "search": { "placeholder": "ID, description, external recipient..." },
-    "view": { "tooltip": "Choose columns", "columnsTitle": "Column Visibility" },
+    "search": {
+      "placeholder": "ID, description, external recipient..."
+    },
+    "view": {
+      "tooltip": "Choose columns",
+      "columnsTitle": "Column Visibility"
+    },
     "refresh": "Refresh",
     "filters": {
       "title": "Filters",
       "status": "Status",
       "transferType": "Transfer Type",
       "fromScope": "From Scope",
-        "toScope": "To Scope",
+      "toScope": "To Scope",
       "any": "All",
-      "scope": { "user": "User", "company": "Company", "external": "External" },
+      "scope": {
+        "user": "User",
+        "company": "Company",
+        "external": "External"
+      },
       "startDate": "Start Date",
       "endDate": "End Date",
       "currency": "Currency (e.g. USD)"
@@ -130,7 +139,7 @@
       "attachments": "Attachments",
       "transactionParties": "Transaction Parties"
     },
-    "sort":{
+    "sort": {
       "title": "Sorting",
       "sortBy": "Sort by",
       "order": "Order"
@@ -176,6 +185,20 @@
       "company_to_external": "Company → External",
       "external_to_user": "External → User",
       "external_to_company": "External → Company"
+    }
+  },
+  "pending": {
+    "actions": "Actions",
+    "title": "Pending Transfers",
+    "total": "{{total}} records",
+    "approve": "Approve",
+    "reject": "Reject",
+    "cancel": "Cancel",
+    "approving": "Approving...",
+    "rejecting": "Rejecting...",
+    "approveDialog": {
+      "title": "Approve Transfer",
+      "message": "Are you sure you want to approve the transfer of {{amount}} sent by {{sender}} to the account of {{receiver}}?"
     }
   }
 }

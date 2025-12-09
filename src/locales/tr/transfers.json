@@ -106,8 +106,13 @@
     "loading": "Yükleniyor...",
     "noRecords": "Kayıt yok",
     "noResultsForSearch": "Aramanıza uygun kayıt bulunamadı",
-    "search": { "placeholder": "ID, açıklama, dış alıcı..." },
-    "view": { "tooltip": "Kolonları seç", "columnsTitle": "Kolon Görünümü" },
+    "search": {
+      "placeholder": "ID, açıklama, dış alıcı..."
+    },
+    "view": {
+      "tooltip": "Kolonları seç",
+      "columnsTitle": "Kolon Görünümü"
+    },
     "refresh": "Yenile",
     "filters": {
       "title": "Filtreler",
@@ -116,7 +121,11 @@
       "toScope": "Alıcı",
       "fromScope": "Gönderen",
       "any": "Tümü",
-      "scope": { "user": "Kullanıcı", "company": "Firma", "external": "Harici" },
+      "scope": {
+        "user": "Kullanıcı",
+        "company": "Firma",
+        "external": "Harici"
+      },
       "startDate": "Başlangıç Tarihi",
       "endDate": "Bitiş Tarihi",
       "currency": "Para birimi (örn. USD)"
@@ -130,7 +139,7 @@
       "attachments": "Ekler",
       "transactionParties": "İşlem Tarafları"
     },
-    "sort":{
+    "sort": {
       "title": "Sıralama",
       "sortBy": "Sırala",
       "order": "Yön"
@@ -176,6 +185,20 @@
       "company_to_external": "Firma → Harici",
       "external_to_user": "Harici → Kullanıcı",
       "external_to_company": "Harici → Firma"
+    }
+  },
+  "pending": {
+    "actions": "Eylemler",
+    "title": "Bekleyen Transferler",
+    "total": "Toplam {{total}} transfer",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "cancel": "İptal",
+    "approving": "Onaylanıyor...",
+    "rejecting": "Reddediliyor...",
+    "approveDialog": {
+      "title": "Transfer Onaylama",
+      "message": "{{sender}} tarafından {{receiver}} hesabına gönderilen {{amount}} tutarındaki transferi onaylamak istediğinizden emin misiniz?"
     }
   }
 }

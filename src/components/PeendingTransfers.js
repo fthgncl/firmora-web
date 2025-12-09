@@ -246,7 +246,7 @@ const PendingTransfers = ({companyId}) => {
                     }}
                 >
                     <HourglassEmpty sx={{fontSize: 40, color: 'primary.main'}}/>
-                    {t('transfers:pending.title', 'Onay Bekleyen Transferler')}
+                    {t('transfers:pending.title')}
                 </Typography>
             </Box>
 
@@ -274,7 +274,7 @@ const PendingTransfers = ({companyId}) => {
                         columnGap: {xs: 1, sm: 1.5},
                         boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
                         borderBottom: '1px solid rgba(255,255,255,0.15)',
-                        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        background: 'linear-gradient(90deg, rgba(99,102,241,0.8), rgba(236,72,153,0.8))',
                         color: 'white',
                         position: 'relative',
                     }}
@@ -297,7 +297,7 @@ const PendingTransfers = ({companyId}) => {
                     <Box sx={{flex: 1, minWidth: 0, order: 1}}>
                         <Typography variant="h6" noWrap
                                     sx={{fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)'}}>
-                            {t('transfers:pending.title', 'Onay Bekleyen Transferler')}
+                            {t('transfers:pending.title')}
                         </Typography>
                         <Typography
                             variant="caption"
@@ -308,7 +308,7 @@ const PendingTransfers = ({companyId}) => {
                                 whiteSpace: {xs: 'normal', sm: 'nowrap'}
                             }}
                         >
-                            {t('transfers:pending.total', {total, defaultValue: `Toplam ${total} transfer`})}
+                            {t('transfers:pending.total', {total})}
                         </Typography>
                     </Box>
 
@@ -323,7 +323,7 @@ const PendingTransfers = ({companyId}) => {
                             order: 2,
                         }}
                     >
-                        <Tooltip title={t('transfers:list.view.tooltip', 'Sütunları Göster/Gizle')}>
+                        <Tooltip title={t('transfers:list.view.tooltip')}>
                             <IconButton
                                 onClick={openColsMenu}
                                 size="small"
@@ -339,7 +339,7 @@ const PendingTransfers = ({companyId}) => {
                             </IconButton>
                         </Tooltip>
 
-                        <Tooltip title={t('transfers:list.refresh', 'Yenile')}>
+                        <Tooltip title={t('transfers:list.refresh')}>
                             <IconButton
                                 onClick={fetchPendingTransfers}
                                 size="small"
@@ -469,7 +469,7 @@ const PendingTransfers = ({companyId}) => {
                                                         handleApproveClick(r);
                                                     }}
                                                 >
-                                                    {t('transfers:pending.approve', 'Onayla')}
+                                                    {t('transfers:pending.approve')}
                                                 </Button>
                                             </Box>
                                         </TableCell>
@@ -493,7 +493,7 @@ const PendingTransfers = ({companyId}) => {
                             setPage(0);
                         }}
                         rowsPerPageOptions={[10, 20, 50, 100]}
-                        labelRowsPerPage={t('transfers:list.rowsPerPage', 'Sayfa başına satır')}
+                        labelRowsPerPage={t('transfers:list.rowsPerPage')}
                         labelDisplayedRows={({from, to, count}) => t('transfers:list.displayedRows', {
                             from,
                             to,
@@ -517,7 +517,7 @@ const PendingTransfers = ({companyId}) => {
                 PaperProps={{sx: {width: 280, p: 1}}}
             >
                 <Typography variant="subtitle2" sx={{px: 1, pb: 0.5}}>
-                    {t('transfers:list.view.columnsTitle', 'Görünür Sütunlar')}
+                    {t('transfers:list.view.columnsTitle')}
                 </Typography>
                 <Divider sx={{mb: 0.5}}/>
                 {COLUMN_DEFS.map(c => (
@@ -537,7 +537,7 @@ const PendingTransfers = ({companyId}) => {
                 onClose={handleApproveCancel}
             >
                 <DialogTitle>
-                    {t('transfers:pending.approveDialog.title', 'Transfer Onaylama')}
+                    {t('transfers:pending.approveDialog.title')}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -555,7 +555,7 @@ const PendingTransfers = ({companyId}) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleApproveCancel} disabled={approving}>
-                        {t('transfers:pending.approveDialog.cancel', 'İptal')}
+                        {t('transfers:pending.approveDialog.cancel')}
                     </Button>
                     <Button
                         onClick={handleApproveConfirm}
@@ -565,8 +565,8 @@ const PendingTransfers = ({companyId}) => {
                         startIcon={approving ? <CircularProgress size={16}/> : <CheckCircle/>}
                     >
                         {approving
-                            ? t('transfers:pending.approveDialog.approving', 'Onaylanıyor...')
-                            : t('transfers:pending.approveDialog.confirm', 'Onayla')}
+                            ? t('transfers:pending.approveDialog.approving')
+                            : t('transfers:pending.approveDialog.confirm')}
                     </Button>
                 </DialogActions>
             </Dialog>
