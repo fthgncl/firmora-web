@@ -558,6 +558,7 @@ export default function TransferDetailPage() {
                                 onClick={handleApproveClick}
                                 fullWidth={isMobile}
                                 sx={{
+                                    color: 'white',
                                     borderRadius: 2,
                                     textTransform: 'none',
                                     fontWeight: 600,

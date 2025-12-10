@@ -36,7 +36,7 @@ import {
     Search,
     Clear,
     ReceiptLong,
-    AttachFile,
+    AttachFile, CheckCircle, Schedule, Error as ErrorIcon,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
@@ -76,15 +76,13 @@ const SORT_ORDERS = [
 const statusChipProps = (status) => {
     switch ((status || '').toLowerCase()) {
         case 'completed':
-            return {color: 'success', label: 'Completed'};
+            return {color: 'success', label: 'Completed', icon: <CheckCircle sx={{fontSize: 18}} />};
         case 'pending':
-            return {color: 'warning', label: 'Pending'};
-        case 'failed':
-            return {color: 'error', label: 'Failed'};
-        case 'reversed':
-            return {color: 'default', label: 'Reversed'};
+            return {color: 'warning', label: 'Pending', icon: <Schedule sx={{fontSize: 18}} />};
+        case 'reject':
+            return {color: 'error', label: 'rejected', icon: <ErrorIcon sx={{fontSize: 18}} />};
         default:
-            return {color: 'default', label: status || '-'};
+            return {color: 'default', label: status || '-', icon: null};
     }
 };
 
@@ -316,7 +314,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
 
     const renderStatusChip = (s) => {
         const {color, label} = statusChipProps(s);
-        return <Chip size="small" color={color} label={t(`transfers:list.status.${label.toLowerCase()}`, label)}/>;
+        return <Chip size="small" sx={{color:'white'}} color={color} label={t(`transfers:list.status.${label.toLowerCase()}`, label)}/>;
     };
 
     const senderFullName = (r) => {
