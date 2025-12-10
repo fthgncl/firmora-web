@@ -508,6 +508,7 @@ const PendingTransfers = ({companyId}) => {
                                                     size="small"
                                                     color="success"
                                                     startIcon={<CheckCircle/>}
+                                                    sx={{color: 'white'}}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleApproveClick(r);

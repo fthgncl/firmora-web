@@ -37,6 +37,7 @@ import {
     CheckCircle,
     Schedule,
     Error as ErrorIcon,
+    Cancel,
 } from '@mui/icons-material';
 
 import {useTranslation} from 'react-i18next';
@@ -44,6 +45,13 @@ import {useAuth} from '../contexts/AuthContext';
 import {useAlert} from '../contexts/AlertContext';
 import axios from 'axios';
 import PDFViewer from '../components/PDFViewer';
+import {
+    Dialog as ConfirmDialog,
+    DialogTitle as ConfirmDialogTitle,
+    DialogContent as ConfirmDialogContent,
+    DialogContentText,
+    DialogActions,
+} from '@mui/material';
 
 const statusChipProps = (status) => {
     switch ((status || '').toLowerCase()) {
@@ -238,6 +246,10 @@ export default function TransferDetailPage() {
     const [attachments, setAttachments] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [error, setError] = useState(null);
+    const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [approving, setApproving] = useState(false);
+    const [rejecting, setRejecting] = useState(false);
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -350,6 +362,82 @@ export default function TransferDetailPage() {
         return <AttachFile sx={{fontSize: 28}}/>;
     };
 
+    const handleApproveClick = () => {
+        setApproveDialogOpen(true);
+    };
+
+    const handleApproveConfirm = async () => {
+        if (!transfer) return;
+
+        try {
+            setApproving(true);
+            const {data} = await axios.post(
+                `${process.env.REACT_APP_API_URL}/transfers/approve`,
+                {transferId: transfer.id},
+                {
+                    headers: {
+                        'x-access-token': token,
+                        'Content-Type': 'application/json',
+                    }
+                }
+            );
+
+            if (data?.status === 'success') {
+                setApproveDialogOpen(false);
+                // Sayfayı yenile
+                window.location.reload();
+            } else {
+                showError(data?.message || 'Transfer onaylanamadı');
+            }
+        } catch (err) {
+            showError(err?.response?.data?.message || err.message || 'Transfer onaylanırken hata oluştu');
+        } finally {
+            setApproving(false);
+        }
+    };
+
+    const handleApproveCancel = () => {
+        setApproveDialogOpen(false);
+    };
+
+    const handleRejectClick = () => {
+        setRejectDialogOpen(true);
+    };
+
+    const handleRejectConfirm = async () => {
+        if (!transfer) return;
+
+        try {
+            setRejecting(true);
+            const {data} = await axios.post(
+                `${process.env.REACT_APP_API_URL}/transfers/reject`,
+                {transferId: transfer.id},
+                {
+                    headers: {
+                        'x-access-token': token,
+                        'Content-Type': 'application/json',
+                    }
+                }
+            );
+
+            if (data?.status === 'success') {
+                setRejectDialogOpen(false);
+                // Sayfayı yenile
+                window.location.reload();
+            } else {
+                showError(data?.message || 'Transfer reddedilemedi');
+            }
+        } catch (err) {
+            showError(err?.response?.data?.message || err.message || 'Transfer reddedilirken hata oluştu');
+        } finally {
+            setRejecting(false);
+        }
+    };
+
+    const handleRejectCancel = () => {
+        setRejectDialogOpen(false);
+    };
+
     if (loading) {
         return (
             <Container maxWidth="lg" sx={{py: 4}}>
@@ -454,9 +542,47 @@ export default function TransferDetailPage() {
                                 },
                             }}
                         />
-
-
                     </Stack>
+
+                    {/* Onaylama/Reddetme Düğmeleri */}
+                    {transfer?.status === 'pending' && (
+                        <Stack
+                            direction={{xs: 'column', sm: 'row'}}
+                            spacing={2}
+                            sx={{mt: 2}}
+                        >
+                            <Button
+                                variant="contained"
+                                color="success"
+                                startIcon={<CheckCircle/>}
+                                onClick={handleApproveClick}
+                                fullWidth={isMobile}
+                                sx={{
+                                    borderRadius: 2,
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 3,
+                                }}
+                            >
+                                {t('pending.approve')}
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                startIcon={<Cancel/>}
+                                onClick={handleRejectClick}
+                                fullWidth={isMobile}
+                                sx={{
+                                    borderRadius: 2,
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 3,
+                                }}
+                            >
+                                {t('pending.reject')}
+                            </Button>
+                        </Stack>
+                    )}
                 </Box>
 
                 {/* Hero özet kartı (Tutar + Tarih + Transfer Türü) */}
@@ -860,6 +986,88 @@ export default function TransferDetailPage() {
                         )}
                     </DialogContent>
                 </Dialog>
+
+                {/* Onay Dialog */}
+                <ConfirmDialog
+                    open={approveDialogOpen}
+                    onClose={handleApproveCancel}
+                    maxWidth="sm"
+                    fullWidth
+                >
+                    <ConfirmDialogTitle>
+                        {t('pending.approveDialog.title')}
+                    </ConfirmDialogTitle>
+                    <ConfirmDialogContent>
+                        <DialogContentText>
+                            {transfer && (
+                                <>
+                                    {t('pending.approveDialog.message', {
+                                        amount: formatAmount(transfer.amount, transfer.currency),
+                                        sender: senderFullName,
+                                        receiver: receiverFullName || transfer.receiver_company_name
+                                    })}
+                                </>
+                            )}
+                        </DialogContentText>
+                    </ConfirmDialogContent>
+                    <DialogActions>
+                        <Button onClick={handleApproveCancel} disabled={approving}>
+                            {t('pending.approveDialog.cancel')}
+                        </Button>
+                        <Button
+                            onClick={handleApproveConfirm}
+                            color="success"
+                            variant="contained"
+                            disabled={approving}
+                            startIcon={approving ? <CircularProgress size={16}/> : <CheckCircle/>}
+                        >
+                            {approving
+                                ? t('pending.approveDialog.approving')
+                                : t('pending.approveDialog.confirm')}
+                        </Button>
+                    </DialogActions>
+                </ConfirmDialog>
+
+                {/* Reddetme Dialog */}
+                <ConfirmDialog
+                    open={rejectDialogOpen}
+                    onClose={handleRejectCancel}
+                    maxWidth="sm"
+                    fullWidth
+                >
+                    <ConfirmDialogTitle>
+                        {t('pending.rejectDialog.title')}
+                    </ConfirmDialogTitle>
+                    <ConfirmDialogContent>
+                        <DialogContentText>
+                            {transfer && (
+                                <>
+                                    {t('pending.rejectDialog.message', {
+                                        amount: formatAmount(transfer.amount, transfer.currency),
+                                        sender: senderFullName,
+                                        receiver: receiverFullName || transfer.receiver_company_name
+                                    })}
+                                </>
+                            )}
+                        </DialogContentText>
+                    </ConfirmDialogContent>
+                    <DialogActions>
+                        <Button onClick={handleRejectCancel} disabled={rejecting}>
+                            {t('pending.rejectDialog.cancel')}
+                        </Button>
+                        <Button
+                            onClick={handleRejectConfirm}
+                            color="error"
+                            variant="contained"
+                            disabled={rejecting}
+                            startIcon={rejecting ? <CircularProgress size={16}/> : <Cancel/>}
+                        >
+                            {rejecting
+                                ? t('pending.rejectDialog.rejecting')
+                                : t('pending.rejectDialog.confirm')}
+                        </Button>
+                    </DialogActions>
+                </ConfirmDialog>
             </Container>
         </Box>
     );
