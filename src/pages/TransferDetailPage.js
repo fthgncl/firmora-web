@@ -37,7 +37,6 @@ import {
     CheckCircle,
     Schedule,
     Error as ErrorIcon,
-    Cancel,
 } from '@mui/icons-material';
 
 import {useTranslation} from 'react-i18next';
@@ -52,10 +51,8 @@ const statusChipProps = (status) => {
             return {color: 'success', label: 'Completed', icon: <CheckCircle sx={{fontSize: 18}} />};
         case 'pending':
             return {color: 'warning', label: 'Pending', icon: <Schedule sx={{fontSize: 18}} />};
-        case 'failed':
-            return {color: 'error', label: 'Failed', icon: <ErrorIcon sx={{fontSize: 18}} />};
-        case 'reversed':
-            return {color: 'default', label: 'Reversed', icon: <Cancel sx={{fontSize: 18}} />};
+        case 'reject':
+            return {color: 'error', label: 'rejected', icon: <ErrorIcon sx={{fontSize: 18}} />};
         default:
             return {color: 'default', label: status || '-', icon: null};
     }

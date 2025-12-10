@@ -37,6 +37,7 @@ import {
     CheckCircle,
     ViewColumn,
     AttachFile,
+    Cancel,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
@@ -81,6 +82,7 @@ const PendingTransfers = ({companyId}) => {
     const navigate = useNavigate();
     const API_URL = `${process.env.REACT_APP_API_URL}/transfers/pending`;
     const APPROVE_URL = `${process.env.REACT_APP_API_URL}/transfers/approve`;
+    const REJECT_URL = `${process.env.REACT_APP_API_URL}/transfers/reject`;
 
     const [rows, setRows] = useState([]);
     const [limit, setLimit] = useState(20);
@@ -89,8 +91,10 @@ const PendingTransfers = ({companyId}) => {
     const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState('');
     const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
     const [selectedTransfer, setSelectedTransfer] = useState(null);
     const [approving, setApproving] = useState(false);
+    const [rejecting, setRejecting] = useState(false);
 
     // Kolon görünürlüğü
     const [visibleCols, setVisibleCols] = useState(() =>
@@ -181,6 +185,46 @@ const PendingTransfers = ({companyId}) => {
 
     const handleApproveCancel = () => {
         setApproveDialogOpen(false);
+        setSelectedTransfer(null);
+    };
+
+    const handleRejectClick = (transfer) => {
+        setSelectedTransfer(transfer);
+        setRejectDialogOpen(true);
+    };
+
+    const handleRejectConfirm = async () => {
+        if (!selectedTransfer) return;
+
+        try {
+            setRejecting(true);
+            const {data} = await axios.post(
+                REJECT_URL,
+                {transferId: selectedTransfer.id},
+                {
+                    headers: {
+                        'x-access-token': token,
+                        'Content-Type': 'application/json',
+                    }
+                }
+            );
+
+            if (data?.status === 'success') {
+                await fetchPendingTransfers();
+                setRejectDialogOpen(false);
+                setSelectedTransfer(null);
+            } else {
+                setErrorMsg(data?.message || 'Transfer reddedilemedi');
+            }
+        } catch (err) {
+            setErrorMsg(err?.response?.data?.message || err.message || 'Transfer reddedilirken hata oluştu');
+        } finally {
+            setRejecting(false);
+        }
+    };
+
+    const handleRejectCancel = () => {
+        setRejectDialogOpen(false);
         setSelectedTransfer(null);
     };
 
@@ -471,6 +515,18 @@ const PendingTransfers = ({companyId}) => {
                                                 >
                                                     {t('transfers:pending.approve')}
                                                 </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    color="error"
+                                                    startIcon={<Cancel/>}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRejectClick(r);
+                                                    }}
+                                                >
+                                                    {t('transfers:pending.reject')}
+                                                </Button>
                                             </Box>
                                         </TableCell>
                                     )}
@@ -566,6 +622,45 @@ const PendingTransfers = ({companyId}) => {
                         {approving
                             ? t('transfers:pending.approveDialog.approving')
                             : t('transfers:pending.approveDialog.confirm')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Reddetme Dialog */}
+            <Dialog
+                open={rejectDialogOpen}
+                onClose={handleRejectCancel}
+            >
+                <DialogTitle>
+                    {t('transfers:pending.rejectDialog.title')}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {selectedTransfer && (
+                            <>
+                                {t('transfers:pending.rejectDialog.message', {
+                                    amount: formatAmount(selectedTransfer.amount, selectedTransfer.currency),
+                                    sender: senderFullName(selectedTransfer),
+                                    receiver: receiverFullName(selectedTransfer) || selectedTransfer.receiver_company_name
+                                })}
+                            </>
+                        )}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleRejectCancel} disabled={rejecting}>
+                        {t('transfers:pending.rejectDialog.cancel')}
+                    </Button>
+                    <Button
+                        onClick={handleRejectConfirm}
+                        color="error"
+                        variant="contained"
+                        disabled={rejecting}
+                        startIcon={rejecting ? <CircularProgress size={16}/> : <Cancel/>}
+                    >
+                        {rejecting
+                            ? t('transfers:pending.rejectDialog.rejecting')
+                            : t('transfers:pending.rejectDialog.confirm')}
                     </Button>
                 </DialogActions>
             </Dialog>

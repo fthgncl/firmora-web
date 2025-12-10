@@ -147,8 +147,7 @@
     "status": {
       "completed": "Tamamlandı",
       "pending": "Beklemede",
-      "failed": "Başarısız",
-      "reversed": "Ters çevrildi"
+      "rejected": "Reddedildi"
     },
     "columns": {
       "created_at": "Tarih",
@@ -197,10 +196,18 @@
     "approving": "Onaylanıyor...",
     "rejecting": "Reddediliyor...",
     "approveDialog": {
+      "title": "Transfer Onaylama",
+      "message": "{{sender}} tarafından {{receiver}} hesabına gönderilen {{amount}} tutarındaki transferi onaylamak istediğinizden emin misiniz?",
       "confirm": "Onayla",
       "cancel": "İptal",
-      "title": "Transfer Onaylama",
-      "message": "{{sender}} tarafından {{receiver}} hesabına gönderilen {{amount}} tutarındaki transferi onaylamak istediğinizden emin misiniz?"
+      "approving": "Onaylanıyor..."
+    },
+    "rejectDialog": {
+      "title": "Transfer Reddetme",
+      "message": "{{sender}} tarafından {{receiver}} hesabına gönderilen {{amount}} tutarındaki transferi reddetmek istediğinizden emin misiniz?",
+      "confirm": "Reddet",
+      "cancel": "İptal",
+      "rejecting": "Reddediliyor..."
     }
   }
 }

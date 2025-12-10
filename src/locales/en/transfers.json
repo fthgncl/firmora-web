@@ -147,8 +147,7 @@
     "status": {
       "completed": "Completed",
       "pending": "Pending",
-      "failed": "Failed",
-      "reversed": "Reversed"
+      "rejected": "Rejected"
     },
     "columns": {
       "created_at": "Date",
@@ -201,6 +200,13 @@
       "cancel": "Cancel",
       "title": "Approve Transfer",
       "message": "Are you sure you want to approve the transfer of {{amount}} sent by {{sender}} to the account of {{receiver}}?"
+    },
+    "rejectDialog": {
+      "title": "Reject Transfer",
+      "message": "Are you sure you want to reject the transfer of {{amount}} sent by {{sender}} to the account of {{receiver}}?",
+      "confirm": "Reject",
+      "cancel": "Cancel",
+      "rejecting": "Rejecting..."
     }
   }
 }

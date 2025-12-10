@@ -147,8 +147,7 @@
     "status": {
       "completed": "Abgeschlossen",
       "pending": "Ausstehend",
-      "failed": "Fehlgeschlagen",
-      "reversed": "Storniert"
+      "rejected": "Abgelehnt"
     },
     "columns": {
       "created_at": "Datum",
@@ -201,6 +200,13 @@
       "cancel": "Abbrechen",
       "title": "Überweisung Bestätigen",
       "message": "Sind Sie sicher, dass Sie die Überweisung von {{amount}}, die von {{sender}} an das Konto von {{receiver}} gesendet wurde, bestätigen möchten?"
+    },
+    "rejectDialog": {
+      "title": "Überweisung Ablehnen",
+      "message": "Sind Sie sicher, dass Sie die Überweisung über {{amount}}, die von {{sender}} an das Konto von {{receiver}} gesendet wurde, ablehnen möchten?",
+      "confirm": "Ablehnen",
+      "cancel": "Abbrechen",
+      "rejecting": "Wird abgelehnt..."
     }
   }
 }
