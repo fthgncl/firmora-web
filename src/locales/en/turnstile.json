@@ -1,0 +1,12 @@
+{
+  "turnstileMode": "Switch to Turnstile Mode",
+  "turnstileModeDescription": "When turnstile mode is enabled, the device displays a QR code to allow employees to check in and check out.",
+  "authSuccess": "Turnstile mode enabled",
+  "authFailed": "Failed to enable turnstile mode",
+  "authError": "Error switching to turnstile mode",
+  "errors": {
+    "missingCompanyId": "Company information missing",
+    "noPermission": "No permission for turnstile mode",
+    "unauthorized": "Unauthorized access"
+  }
+}

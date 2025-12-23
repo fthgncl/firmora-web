@@ -1,0 +1,12 @@
+{
+  "turnstileMode": "Turnike Moduna Geç",
+  "turnstileModeDescription": "Turnike modu aktif edildiğinde cihaz, QR kod göstererek çalışanların giriş ve çıkış yapmasını sağlar.",
+  "authSuccess": "Turnike modu etkinleştirildi",
+  "authFailed": "Turnike modu etkinleştirilemedi",
+  "authError": "Turnike moduna geçerken bir hata oluştu",
+  "errors": {
+    "missingCompanyId": "Firma bilgisi eksik",
+    "noPermission": "Turnike yetkisi yok",
+    "unauthorized": "Yetkilendirme hatası"
+  }
+}

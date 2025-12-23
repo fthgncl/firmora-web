@@ -21,12 +21,15 @@ export const AuthProvider = ({children}) => {
         }
     };
 
-    const logout = () => {
+    const logout = (gotoHomePage = true) => {
         clearLogoutTimer(); // Mevcut timeout'u temizle
         setUser(null);
         setToken(null);
         localStorage.removeItem(`${process.env.REACT_APP_NAME}-auth`);
-        window.location.href = '/';
+
+        if ( gotoHomePage )
+            window.location.href = '/';
+
     };
 
     // Token'ı decode edip süre kontrolü yapan yardımcı fonksiyon

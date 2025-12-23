@@ -9,6 +9,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import CompanyPage from "./pages/CompanyPage";
 import TransferDetailPage from "./pages/TransferDetailPage";
+import TurnstilePage from "./pages/TurnstilePage";
 import ResetPassword from "./pages/ResetPassword";
 import React from "react";
 import AppBar from "./components/AppBar";
@@ -25,6 +26,8 @@ function App() {
             <CssBaseline/>
             <AppBar/>
             <Routes>
+
+                <Route path="/turnstile" element=<TurnstilePage/>/>
 
                 {/* Giriş yapmamış kullanıcıların girebileği sayfalar */}
                 <Route path="/sign-in" element={
@@ -45,6 +48,7 @@ function App() {
                         <VerifyEmail/>
                     </AuthRoute>
                 }/>
+
 
                 {/* Giriş yapmış kullanıcıların girebileği sayfalar */}
                 <Route path="/" element={

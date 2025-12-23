@@ -1,0 +1,12 @@
+{
+  "turnstileMode": "Zum Drehkreuzmodus wechseln",
+  "turnstileModeDescription": "Wenn der Drehkreuzmodus aktiviert ist, zeigt das Gerät einen QR-Code an, über den Mitarbeitende ein- und auschecken können.",
+  "authSuccess": "Drehkreuzmodus aktiviert",
+  "authFailed": "Drehkreuzmodus konnte nicht aktiviert werden",
+  "authError": "Fehler beim Wechsel zum Drehkreuzmodus",
+  "errors": {
+    "missingCompanyId": "Fehlende Firmeninformationen",
+    "noPermission": "Keine Berechtigung für den Drehkreuzmodus",
+    "unauthorized": "Unbefugter Zugriff"
+  }
+}

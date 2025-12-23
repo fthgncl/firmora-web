@@ -13,15 +13,16 @@ import {
     Avatar,
     Stack,
     Tooltip,
+    Button, Paper,
 } from '@mui/material';
 import {
     ArrowBack,
     Business,
     AccountBalance,
-    CalendarToday,
     Settings,
     SwapHoriz,
     AddCircleOutline,
+    Sensors,
 } from '@mui/icons-material';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
@@ -39,7 +40,7 @@ export default function CompanyPage() {
     const {token, user} = useAuth();
     const navigate = useNavigate();
     const {showAlert} = useAlert();
-    const { t, i18n } = useTranslation(['company']);
+    const { t, i18n } = useTranslation(['company', 'turnstile']);
 
     const userListRef = useRef();
     const [loading, setLoading] = useState(true);
@@ -47,6 +48,7 @@ export default function CompanyPage() {
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
     const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
+    const [turnstileLoading, setTurnstileLoading] = useState(false);
 
     useEffect(() => {
         fetchCompanyDetails();
@@ -75,29 +77,20 @@ export default function CompanyPage() {
                 }
             );
 
-            if (response.data.success) {
-                setCompany(response.data.data);
+            if (response.data?.success) {
+                setCompany(response.data?.data);
             } else {
-                showAlert(response.data.message || t('company:errors.loadFailed'), 'error');
+                showAlert(response.data?.message || t('company:errors.loadFailed'), 'error');
                 navigate('/');
             }
         } catch (err) {
 
-            console.error(err.response.data.message || t('company:errors.consoleLoadError'), err);
-            showAlert(err.response.data.message || t('company:errors.loadErrorGeneric'), 'error');
+            console.error(err.response?.data?.message || t('company:errors.consoleLoadError'), err);
+            showAlert(err.response?.data?.message || t('company:errors.loadErrorGeneric'), 'error');
             navigate('/');
         } finally {
             setLoading(false);
         }
-    };
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString(mapLngToLocale(i18n.language), {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
     };
 
     const formatBalance = (balance, currency) => {
@@ -106,6 +99,53 @@ export default function CompanyPage() {
             currency: currency,
             minimumFractionDigits: 2,
         }).format(balance);
+    };
+
+    const handleTurnstileMode = async () => {
+        setTurnstileLoading(true);
+        try {
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/turnstile/auth`,
+                { companyId },
+                {
+                    headers: {
+                        'x-access-token': token,
+                    }
+                }
+            );
+            if (response.data.status === 'success') {
+                // Token'ı sessionStorage'a kaydet (sekme kapatılınca otomatik silinir)
+                sessionStorage.setItem('turnstile_token', response.data.token);
+                showAlert(response.data.message || t('turnstile:authSuccess'), 'success');
+                navigate('/turnstile');
+            } else {
+                showAlert(response.data.message || t('turnstile:authFailed'), 'error');
+                setTurnstileLoading(false);
+            }
+        } catch (err) {
+            console.error('Turnstile auth error:', err);
+
+            let errorMessage = t('turnstile:authError');
+
+            if (err.response) {
+                switch (err.response.status) {
+                    case 400:
+                        errorMessage = err.response.data.message || t('turnstile:errors.missingCompanyId');
+                        break;
+                    case 403:
+                        errorMessage = err.response.data.message || t('turnstile:errors.noPermission');
+                        break;
+                    case 401:
+                        errorMessage = err.response.data.message || t('turnstile:errors.unauthorized');
+                        break;
+                    default:
+                        errorMessage = err.response.data.message || errorMessage;
+                }
+            }
+
+            showAlert(errorMessage, 'error');
+            setTurnstileLoading(false);
+        }
     };
 
     if (loading) {
@@ -376,49 +416,72 @@ export default function CompanyPage() {
 
                                 {/* Sağ: Firma Bilgileri */}
                                 <Grid item xs={12} md={7}>
-                                    <Stack spacing={1.5} sx={{height: '100%'}}>
-                                        <Stack direction="row" alignItems="center" spacing={1.5}>
-                                            <Avatar sx={{bgcolor: 'primary.main'}}><Business/></Avatar>
-                                            <Typography variant="h6" sx={{fontWeight: 700}}>
-                                                {t('company:companyInfo')}
+                                    <Paper
+                                        elevation={0}
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 3,
+                                            border: "1px solid",
+                                            borderColor: "divider",
+                                            height: "100%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <Stack spacing={2.5} alignItems="center" sx={{ maxWidth: 420, width: "100%" }}>
+                                            {/* Icon */}
+                                            <Avatar
+                                                sx={{
+                                                    bgcolor: "secondary.main",
+                                                    width: 56,
+                                                    height: 56,
+                                                }}
+                                            >
+                                                <Sensors fontSize="large" />
+                                            </Avatar>
+
+                                            {/* Title */}
+                                            <Typography
+                                                variant="h6"
+                                                sx={{ fontWeight: 800, textAlign: "center" }}
+                                            >
+                                                {t("turnstile:turnstileMode")}
                                             </Typography>
+
+                                            {/* Description */}
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                sx={{ textAlign: "center", lineHeight: 1.6 }}
+                                            >
+                                                {t("turnstile:turnstileModeDescription")}
+                                            </Typography>
+
+                                            {/* Action Button */}
+                                            <Button
+                                                variant="contained"
+                                                color="secondary"
+                                                        startIcon={turnstileLoading ? <CircularProgress size={20} color="inherit" /> : <Sensors />}
+                                                        fullWidth
+                                                        onClick={handleTurnstileMode}
+                                                        disabled={turnstileLoading}
+                                                sx={{
+                                                    mt: 1,
+                                                    py: 1.5,
+                                                    fontWeight: 700,
+                                                    textTransform: "none",
+                                                    fontSize: "1rem",
+                                                    borderRadius: 2,
+                                                }}
+                                            >
+                                                {t("turnstile:turnstileMode")}
+                                            </Button>
                                         </Stack>
-
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography variant="overline" color="text.secondary">
-                                                    {t('company:companyName')}
-                                                </Typography>
-                                                <Typography variant="body1" sx={{fontWeight: 600}}>
-                                                    {company.company_name}
-                                                </Typography>
-                                            </Grid>
-
-                                            {hasSector && (
-                                                <Grid item xs={12} sm={6}>
-                                                    <Typography variant="overline" color="text.secondary">
-                                                        {t('company:sector')}
-                                                    </Typography>
-                                                    <Typography variant="body1" sx={{fontWeight: 600}}>
-                                                        {company.sector}
-                                                    </Typography>
-                                                </Grid>
-                                            )}
-
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography variant="overline" color="text.secondary">
-                                                    {t('company:creationDate')}
-                                                </Typography>
-                                                <Stack direction="row" alignItems="center" spacing={1}>
-                                                    <CalendarToday fontSize="small" color="success"/>
-                                                    <Typography variant="body1" sx={{fontWeight: 600}}>
-                                                        {formatDate(company.created_at)}
-                                                    </Typography>
-                                                </Stack>
-                                            </Grid>
-                                        </Grid>
-                                    </Stack>
+                                    </Paper>
                                 </Grid>
+
+
                             </Grid>
                         </CardContent>
                     </Card>
