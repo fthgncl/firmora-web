@@ -32,7 +32,7 @@ import MoneyTransferDialog from '../components/MoneyTransferDialog';
 import ExternalMoneyDialog from '../components/ExternalMoneyDialog';
 import CompanySettingsDialog from '../components/CompanySettingsDialog';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import TransfersTable from "../components/TransfersTable";
 import {permissionsService} from "../services/permissionsService";
 
@@ -41,7 +41,7 @@ export default function CompanyPage() {
     const {token, user} = useAuth();
     const navigate = useNavigate();
     const {showAlert} = useAlert();
-    const { t, i18n } = useTranslation(['company', 'turnstile']);
+    const {t, i18n} = useTranslation(['company', 'turnstile']);
 
     const userListRef = useRef();
     const [loading, setLoading] = useState(true);
@@ -75,9 +75,12 @@ export default function CompanyPage() {
 
     const mapLngToLocale = (lng) => {
         switch (lng) {
-            case 'tr': return 'tr-TR';
-            case 'de': return 'de-DE';
-            default: return 'en-US';
+            case 'tr':
+                return 'tr-TR';
+            case 'de':
+                return 'de-DE';
+            default:
+                return 'en-US';
         }
     };
 
@@ -124,7 +127,7 @@ export default function CompanyPage() {
         try {
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/turnstile/auth`,
-                { companyId },
+                {companyId},
                 {
                     headers: {
                         'x-access-token': token,
@@ -210,303 +213,320 @@ export default function CompanyPage() {
                             {company.company_name}
                         </Typography>
                         {hasSector && (
-                            <Chip label={company.sector} size="small" color="primary" variant="outlined" />
+                            <Chip label={company.sector} size="small" color="primary" variant="outlined"/>
                         )}
                     </Box>
                 </Box>
             </Box>
 
             {/* Firma Özeti Kartı */}
-            <Grid container spacing={3} sx={{mb: 4}}>
-                <Grid item xs={12}>
-                    <Card sx={{overflow: 'hidden', position: 'relative'}}>
-                        <CardContent>
-                            <Grid container spacing={3}>
-                                {/* Sol: Bakiye ve butonlar */}
-                                {company?.balance !== undefined && company?.balance !== null && (
-                                    <Grid item xs={12} md={canActAsTurnstile ? 5 : 12}>
-                                        <Box
-                                            sx={{
-                                                p: 3,
-                                                borderRadius: 2,
-                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                                color: 'white',
-                                                position: 'relative',
-
-                                                /* 🔸 Container Query için gerekli */
-                                                containerType: 'inline-size',
-                                                containerName: 'balanceCard',
-                                            }}
-                                        >
-                                            {/* Sağ üstte üç profesyonel buton */}
-                                            <Stack
-                                                direction={{ xs: 'column', sm: 'row', md: canActAsTurnstile ? 'column' : 'row' }}
-                                                spacing={1}
+            {((company?.balance !== undefined && company?.balance !== null) || canActAsTurnstile) && (
+                <Grid container spacing={3} sx={{mb: 4}}>
+                    <Grid item xs={12}>
+                        <Card sx={{overflow: 'hidden', position: 'relative'}}>
+                            <CardContent>
+                                <Grid container spacing={3}>
+                                    {/* Sol: Bakiye ve butonlar */}
+                                    {company?.balance !== undefined && company?.balance !== null && (
+                                        <Grid item xs={12} md={canActAsTurnstile ? 5 : 12}>
+                                            <Box
                                                 sx={{
-                                                    position: 'absolute',           // ⬅️ her zaman absolute (boşluk bırakmaz)
-                                                    top: 12,
-                                                    right: 12,
-                                                    alignItems: 'flex-end',
-                                                    '& .MuiIconButton-root': {
-                                                        width: 40,
-                                                        height: 40,
-                                                        color: 'white',
-                                                        backgroundColor: 'rgba(255,255,255,0.15)',
-                                                        '&:hover': { backgroundColor: 'rgba(255,255,255,0.25)' },
-                                                        transition: 'all 0.2s ease',
-                                                    },
-                                                    '& .MuiSvgIcon-root': { fontSize: 20 },
+                                                    p: 3,
+                                                    borderRadius: 2,
+                                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                    color: 'white',
+                                                    position: 'relative',
 
-                                                    /* Kartın kendi genişliği daraldığında: dikey kalsın, absolute kalsın, butonları ufalt */
-                                                    '@container balanceCard (max-width: 420px)': {
-                                                        flexDirection: 'column',
-                                                        alignItems: 'flex-end',
-                                                        right: 8,
-                                                        top: 8,
-                                                        '& .MuiIconButton-root': {
-                                                            width: 36,
-                                                            height: 36,
-                                                        },
-                                                    },
+                                                    /* 🔸 Container Query için gerekli */
+                                                    containerType: 'inline-size',
+                                                    containerName: 'balanceCard',
                                                 }}
                                             >
-                                                <Tooltip title={t('company:menu.moneyTransfer')}>
-                                                    <IconButton onClick={() => setTransferDialogOpen(true)}>
-                                                        <SwapHoriz />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title={t('company:menu.addIncome')}>
-                                                    <IconButton onClick={() => setExternalMoneyDialogOpen(true)}>
-                                                        <AddCircleOutline />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                { company.owner_id === user.id && (
-                                                    <Tooltip title={t('company:goToSettings')}>
-                                                        <IconButton onClick={() => setSettingsDialogOpen(true)}>
-                                                            <Settings />
+                                                {/* Sağ üstte üç profesyonel buton */}
+                                                <Stack
+                                                    direction={{
+                                                        xs: 'column',
+                                                        sm: 'row',
+                                                        md: canActAsTurnstile ? 'column' : 'row'
+                                                    }}
+                                                    spacing={1}
+                                                    sx={{
+                                                        position: 'absolute',           // ⬅️ her zaman absolute (boşluk bırakmaz)
+                                                        top: 12,
+                                                        right: 12,
+                                                        alignItems: 'flex-end',
+                                                        '& .MuiIconButton-root': {
+                                                            width: 40,
+                                                            height: 40,
+                                                            color: 'white',
+                                                            backgroundColor: 'rgba(255,255,255,0.15)',
+                                                            '&:hover': {backgroundColor: 'rgba(255,255,255,0.25)'},
+                                                            transition: 'all 0.2s ease',
+                                                        },
+                                                        '& .MuiSvgIcon-root': {fontSize: 20},
+
+                                                        /* Kartın kendi genişliği daraldığında: dikey kalsın, absolute kalsın, butonları ufalt */
+                                                        '@container balanceCard (max-width: 420px)': {
+                                                            flexDirection: 'column',
+                                                            alignItems: 'flex-end',
+                                                            right: 8,
+                                                            top: 8,
+                                                            '& .MuiIconButton-root': {
+                                                                width: 36,
+                                                                height: 36,
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    <Tooltip title={t('company:menu.moneyTransfer')}>
+                                                        <IconButton onClick={() => setTransferDialogOpen(true)}>
+                                                            <SwapHoriz/>
                                                         </IconButton>
                                                     </Tooltip>
-                                                )}
-                                            </Stack>
+                                                    <Tooltip title={t('company:menu.addIncome')}>
+                                                        <IconButton onClick={() => setExternalMoneyDialogOpen(true)}>
+                                                            <AddCircleOutline/>
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                    {company.owner_id === user.id && (
+                                                        <Tooltip title={t('company:goToSettings')}>
+                                                            <IconButton onClick={() => setSettingsDialogOpen(true)}>
+                                                                <Settings/>
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    )}
+                                                </Stack>
 
 
-                                            {/* Başlık */}
-                                            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1, mt: 1 }}>
-                                                <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}>
-                                                    <AccountBalance />
-                                                </Avatar>
-                                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                                    {t('company:currentBalance')}
-                                                </Typography>
-                                            </Stack>
+                                                {/* Başlık */}
+                                                <Stack direction="row" alignItems="center" spacing={1.5}
+                                                       sx={{mb: 1, mt: 1}}>
+                                                    <Avatar sx={{bgcolor: 'rgba(255,255,255,0.2)', color: 'white'}}>
+                                                        <AccountBalance/>
+                                                    </Avatar>
+                                                    <Typography variant="h6" sx={{fontWeight: 600}}>
+                                                        {t('company:currentBalance')}
+                                                    </Typography>
+                                                </Stack>
 
-                                            {/* Bakiye + Sağ tarafta Toplam & Sahadaki */}
-                                            {(() => {
-                                                const total = company?.totalBalance;
-                                                const balance = company.balance ?? 0;
-                                                const inField = (typeof total === 'number') ? (total - balance) : undefined;
+                                                {/* Bakiye + Sağ tarafta Toplam & Sahadaki */}
+                                                {(() => {
+                                                    const total = company?.totalBalance;
+                                                    const balance = company.balance ?? 0;
+                                                    const inField = (typeof total === 'number') ? (total - balance) : undefined;
 
-                                                return (
-                                                    <Stack
-                                                        direction="row"
-                                                        alignItems="flex-start"
-                                                        justifyContent="space-between"
-                                                        sx={{
-                                                            mb: 0.5,
-                                                            gap: 1.5,
-                                                            flexWrap: 'wrap',
-
-                                                            /* 🔸 Kart genişliği daralınca otomatik kolon yerleşimi */
-                                                            '@container balanceCard (max-width: 560px)': {
-                                                                flexDirection: 'column',
-                                                                alignItems: 'flex-start',
-                                                            },
-                                                        }}
-                                                    >
-                                                        {/* Mevcut Bakiye (sol, büyük) */}
-                                                        <Typography
-                                                            variant="h3"
+                                                    return (
+                                                        <Stack
+                                                            direction="row"
+                                                            alignItems="flex-start"
+                                                            justifyContent="space-between"
                                                             sx={{
-                                                                fontWeight: 800,
-                                                                lineHeight: 1.1,
-                                                                fontVariantNumeric: 'tabular-nums',
-                                                                fontSize: { xs: 'clamp(24px, 7vw, 34px)', sm: 'clamp(28px, 4vw, 42px)' },
-                                                                whiteSpace: 'nowrap',
-                                                                overflow: 'hidden',
-                                                                textOverflow: 'ellipsis',
-                                                                flexShrink: 0,
+                                                                mb: 0.5,
+                                                                gap: 1.5,
+                                                                flexWrap: 'wrap',
+
+                                                                /* 🔸 Kart genişliği daralınca otomatik kolon yerleşimi */
+                                                                '@container balanceCard (max-width: 560px)': {
+                                                                    flexDirection: 'column',
+                                                                    alignItems: 'flex-start',
+                                                                },
                                                             }}
                                                         >
-                                                            {formatBalance(balance, company.currency)}
-                                                        </Typography>
-
-                                                        {/* Sağ sütun: Toplam Bakiye + Sahadaki Bakiye */}
-                                                        {typeof total === 'number' && (
-                                                            <Box
+                                                            {/* Mevcut Bakiye (sol, büyük) */}
+                                                            <Typography
+                                                                variant="h3"
                                                                 sx={{
-                                                                    ml: 2,
-                                                                    textAlign: 'right',
-                                                                    color: 'rgba(255,255,255,0.9)',
-                                                                    borderLeft: '1px solid rgba(255,255,255,0.2)',
-                                                                    pl: 1.5,
-                                                                    minWidth: 0,
-                                                                    flex: '0 1 46%',
-
-                                                                    /* 🔸 Dar alanda sağ blok alta insin ve sola hizalansın */
-                                                                    '@container balanceCard (max-width: 560px)': {
-                                                                        ml: 0,
-                                                                        pl: 0,
-                                                                        borderLeft: 'none',
-                                                                        textAlign: 'left',
-                                                                        flex: '1 1 100%',
+                                                                    fontWeight: 800,
+                                                                    lineHeight: 1.1,
+                                                                    fontVariantNumeric: 'tabular-nums',
+                                                                    fontSize: {
+                                                                        xs: 'clamp(24px, 7vw, 34px)',
+                                                                        sm: 'clamp(28px, 4vw, 42px)'
                                                                     },
+                                                                    whiteSpace: 'nowrap',
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    flexShrink: 0,
                                                                 }}
                                                             >
-                                                                <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
-                                                                    {t('company:totalBalance')}
-                                                                </Typography>
-                                                                <Typography
-                                                                    variant="subtitle2"
+                                                                {formatBalance(balance, company.currency)}
+                                                            </Typography>
+
+                                                            {/* Sağ sütun: Toplam Bakiye + Sahadaki Bakiye */}
+                                                            {typeof total === 'number' && (
+                                                                <Box
                                                                     sx={{
-                                                                        opacity: 0.9,
-                                                                        fontWeight: 600,
-                                                                        fontVariantNumeric: 'tabular-nums',
-                                                                        whiteSpace: 'nowrap',
-                                                                        overflow: 'hidden',
-                                                                        textOverflow: 'ellipsis',
+                                                                        ml: 2,
+                                                                        textAlign: 'right',
+                                                                        color: 'rgba(255,255,255,0.9)',
+                                                                        borderLeft: '1px solid rgba(255,255,255,0.2)',
+                                                                        pl: 1.5,
+                                                                        minWidth: 0,
+                                                                        flex: '0 1 46%',
+
+                                                                        /* 🔸 Dar alanda sağ blok alta insin ve sola hizalansın */
+                                                                        '@container balanceCard (max-width: 560px)': {
+                                                                            ml: 0,
+                                                                            pl: 0,
+                                                                            borderLeft: 'none',
+                                                                            textAlign: 'left',
+                                                                            flex: '1 1 100%',
+                                                                        },
                                                                     }}
                                                                 >
-                                                                    {formatBalance(total, company.currency)}
-                                                                </Typography>
+                                                                    <Typography variant="body2"
+                                                                                sx={{fontWeight: 600, lineHeight: 1.1}}>
+                                                                        {t('company:totalBalance')}
+                                                                    </Typography>
+                                                                    <Typography
+                                                                        variant="subtitle2"
+                                                                        sx={{
+                                                                            opacity: 0.9,
+                                                                            fontWeight: 600,
+                                                                            fontVariantNumeric: 'tabular-nums',
+                                                                            whiteSpace: 'nowrap',
+                                                                            overflow: 'hidden',
+                                                                            textOverflow: 'ellipsis',
+                                                                        }}
+                                                                    >
+                                                                        {formatBalance(total, company.currency)}
+                                                                    </Typography>
 
-                                                                {typeof inField === 'number' && (
-                                                                    <Box sx={{ mt: 1 }}>
-                                                                        <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.1 }}>
-                                                                            {t('company:inFieldBalance')}
-                                                                        </Typography>
-                                                                        <Typography
-                                                                            variant="subtitle2"
-                                                                            sx={{
-                                                                                opacity: 0.9,
+                                                                    {typeof inField === 'number' && (
+                                                                        <Box sx={{mt: 1}}>
+                                                                            <Typography variant="body2" sx={{
                                                                                 fontWeight: 600,
-                                                                                fontVariantNumeric: 'tabular-nums',
-                                                                                whiteSpace: 'nowrap',
-                                                                                overflow: 'hidden',
-                                                                                textOverflow: 'ellipsis',
-                                                                            }}
-                                                                        >
-                                                                            {formatBalance(inField, company.currency)}
-                                                                        </Typography>
-                                                                    </Box>
-                                                                )}
-                                                            </Box>
-                                                        )}
-                                                    </Stack>
-                                                );
-                                            })()}
+                                                                                lineHeight: 1.1
+                                                                            }}>
+                                                                                {t('company:inFieldBalance')}
+                                                                            </Typography>
+                                                                            <Typography
+                                                                                variant="subtitle2"
+                                                                                sx={{
+                                                                                    opacity: 0.9,
+                                                                                    fontWeight: 600,
+                                                                                    fontVariantNumeric: 'tabular-nums',
+                                                                                    whiteSpace: 'nowrap',
+                                                                                    overflow: 'hidden',
+                                                                                    textOverflow: 'ellipsis',
+                                                                                }}
+                                                                            >
+                                                                                {formatBalance(inField, company.currency)}
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    )}
+                                                                </Box>
+                                                            )}
+                                                        </Stack>
+                                                    );
+                                                })()}
 
-                                            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                                                {t('company:currencyStatus', { currency: company.currency })}
-                                            </Typography>
-
-                                            {/* Chipler */}
-                                            <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap' }}>
-                                                <Chip
-                                                    size="small"
-                                                    color={company.balance >= 0 ? 'success' : 'error'}
-                                                    label={company.balance >= 0 ? t('company:positive') : t('company:negative')}
-                                                    variant="filled"
-                                                    sx={{ color: 'white' }}
-                                                />
-                                                <Chip
-                                                    size="small"
-                                                    variant="outlined"
-                                                    sx={{ borderColor: 'rgba(255,255,255,0.5)', color: 'white' }}
-                                                    label={company.currency}
-                                                />
-                                            </Stack>
-                                        </Box>
-                                    </Grid>
-
-
-                                )}
-
-
-                                {/* Sağ: Turnike Modu */}
-                                {canActAsTurnstile && (
-                                    <Grid item xs={12} md={7}>
-                                        <Paper
-                                            elevation={0}
-                                            sx={{
-                                                p: 3,
-                                                borderRadius: 3,
-                                                border: "1px solid",
-                                                borderColor: "divider",
-                                                height: "100%",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                        >
-                                            <Stack spacing={2.5} alignItems="center" sx={{ maxWidth: 420, width: "100%" }}>
-                                                {/* Icon */}
-                                                <Avatar
-                                                    sx={{
-                                                        bgcolor: "secondary.main",
-                                                        width: 56,
-                                                        height: 56,
-                                                    }}
-                                                >
-                                                    <Sensors fontSize="large" />
-                                                </Avatar>
-
-                                                {/* Title */}
-                                                <Typography
-                                                    variant="h6"
-                                                    sx={{ fontWeight: 800, textAlign: "center" }}
-                                                >
-                                                    {t("turnstile:turnstileMode")}
+                                                <Typography variant="body2" sx={{opacity: 0.9}}>
+                                                    {t('company:currencyStatus', {currency: company.currency})}
                                                 </Typography>
 
-                                                {/* Description */}
-                                                <Typography
-                                                    variant="body2"
-                                                    color="text.secondary"
-                                                    sx={{ textAlign: "center", lineHeight: 1.6 }}
-                                                >
-                                                    {t("turnstile:turnstileModeDescription")}
-                                                </Typography>
-
-                                                {/* Action Button */}
-                                                <Button
-                                                    variant="contained"
-                                                    color="secondary"
-                                                            startIcon={turnstileLoading ? <CircularProgress size={20} color="inherit" /> : <Sensors />}
-                                                            fullWidth
-                                                            onClick={handleTurnstileMode}
-                                                            disabled={turnstileLoading}
-                                                    sx={{
-                                                        mt: 1,
-                                                        py: 1.5,
-                                                        fontWeight: 700,
-                                                        textTransform: "none",
-                                                        fontSize: "1rem",
-                                                        borderRadius: 2,
-                                                    }}
-                                                >
-                                                    {t("turnstile:turnstileMode")}
-                                                </Button>
-                                            </Stack>
-                                        </Paper>
-                                    </Grid>
-                                )}
+                                                {/* Chipler */}
+                                                <Stack direction="row" spacing={1} sx={{mt: 2, flexWrap: 'wrap'}}>
+                                                    <Chip
+                                                        size="small"
+                                                        color={company.balance >= 0 ? 'success' : 'error'}
+                                                        label={company.balance >= 0 ? t('company:positive') : t('company:negative')}
+                                                        variant="filled"
+                                                        sx={{color: 'white'}}
+                                                    />
+                                                    <Chip
+                                                        size="small"
+                                                        variant="outlined"
+                                                        sx={{borderColor: 'rgba(255,255,255,0.5)', color: 'white'}}
+                                                        label={company.currency}
+                                                    />
+                                                </Stack>
+                                            </Box>
+                                        </Grid>
 
 
-                            </Grid>
-                        </CardContent>
-                    </Card>
+                                    )}
+
+
+                                    {/* Sağ: Turnike Modu */}
+                                    {canActAsTurnstile && (
+                                        <Grid item xs={12}
+                                              md={(company?.balance !== undefined && company?.balance !== null) ? 7 : 12}>
+                                            <Paper
+                                                elevation={0}
+                                                sx={{
+                                                    p: 3,
+                                                    borderRadius: 3,
+                                                    border: "1px solid",
+                                                    borderColor: "divider",
+                                                    height: "100%",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                }}
+                                            >
+                                                <Stack spacing={2.5} alignItems="center"
+                                                       sx={{maxWidth: 420, width: "100%"}}>
+                                                    {/* Icon */}
+                                                    <Avatar
+                                                        sx={{
+                                                            bgcolor: "secondary.main",
+                                                            width: 56,
+                                                            height: 56,
+                                                        }}
+                                                    >
+                                                        <Sensors fontSize="large"/>
+                                                    </Avatar>
+
+                                                    {/* Title */}
+                                                    <Typography
+                                                        variant="h6"
+                                                        sx={{fontWeight: 800, textAlign: "center"}}
+                                                    >
+                                                        {t("turnstile:turnstileMode")}
+                                                    </Typography>
+
+                                                    {/* Description */}
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="text.secondary"
+                                                        sx={{textAlign: "center", lineHeight: 1.6}}
+                                                    >
+                                                        {t("turnstile:turnstileModeDescription")}
+                                                    </Typography>
+
+                                                    {/* Action Button */}
+                                                    <Button
+                                                        variant="contained"
+                                                        color="secondary"
+                                                        startIcon={turnstileLoading ?
+                                                            <CircularProgress size={20} color="inherit"/> : <Sensors/>}
+                                                        fullWidth
+                                                        onClick={handleTurnstileMode}
+                                                        disabled={turnstileLoading}
+                                                        sx={{
+                                                            mt: 1,
+                                                            py: 1.5,
+                                                            fontWeight: 700,
+                                                            textTransform: "none",
+                                                            fontSize: "1rem",
+                                                            borderRadius: 2,
+                                                        }}
+                                                    >
+                                                        {t("turnstile:turnstileMode")}
+                                                    </Button>
+                                                </Stack>
+                                            </Paper>
+                                        </Grid>
+                                    )}
+
+
+                                </Grid>
+                            </CardContent>
+                        </Card>
+                    </Grid>
                 </Grid>
-            </Grid>
+            )}
 
             {/* Kullanıcı Listesi */}
             <Grid sx={{mt: 4}}>
