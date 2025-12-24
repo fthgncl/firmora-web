@@ -6,5 +6,5 @@ export default function TurnstileScanPage(){
         console.log("Scanned data:", data);
     }
 
-    return <QrScan onScan={handleScan} />;
+    return <QrScan onScan={handleScan} autoStart={true} />;
 }

@@ -37,12 +37,13 @@
     "cameraOffMessage": "The camera is off. Click \"Open Camera\" below to start.",
     "openCamera": "Open Camera",
     "stop": "Stop",
-    "permission": "Permission",
-    "cameraCount": "Camera count",
     "cameraPermissionDenied": "Camera permission was denied. Please allow camera access in your browser settings.",
     "httpsRequired": "HTTPS is required to access the camera. Please use a secure connection.",
     "cameraNotAccessible": "Camera not accessible. Your device camera cannot be accessed.",
     "cameraNotFound": "No camera found. Please try a different device.",
-    "cameraStartFailed": "Failed to start the camera. Please check browser permissions and refresh the page."
+    "cameraStartFailed": "Failed to start the camera. Please check browser permissions and refresh the page.",
+    "switchCamera": "Switch Camera",
+    "frontCamera": "Front Camera",
+    "backCamera": "Back Camera"
   }
 }

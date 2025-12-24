@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Html5Qrcode } from "html5-qrcode";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {Html5Qrcode} from "html5-qrcode";
 import {
     Alert,
     Box,
@@ -9,41 +9,60 @@ import {
     Chip,
     CircularProgress,
     Divider,
+    FormControl,
+    MenuItem,
+    Select,
     Stack,
     Typography,
 } from "@mui/material";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
-import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import CameraswitchIcon from "@mui/icons-material/Cameraswitch";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import StopIcon from "@mui/icons-material/Stop";
 import {useTranslation} from "react-i18next";
 
-const REGION_ID = "qr-region";
+const REGION_ID = "turnstile-qr-region";
 
-function pickBestCameraId(devices = []) {
-    // Arka kamera için yaygın isimler
-    const preferred = devices.find(d =>
-        /back|rear|environment/i.test(d.label || "")
-    );
-    return (preferred || devices[0])?.id || null;
+function isMobileDevice() {
+    // Desktop’ta kamera seçimi, mobile’da ön/arka toggle mantığı için pratik ayrım
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-export default function TurnstileScanUI({ onScan }) {
+function pickBackCameraId(devices = []) {
+    // Permission alındıktan sonra label dolabilir. Arka kamerayı etiketlerden yakalamaya çalışırız.
+    const back = devices.find((d) => /back|rear|environment/i.test(d.label || ""));
+    return (back || devices[0])?.id || null;
+}
+
+export default function TurnstileScanUI({onScan}) {
+    const {t} = useTranslation();
     const qrRef = useRef(null);
-    const { t } = useTranslation(['turnstile']);
+
     const [status, setStatus] = useState("idle"); // idle | requesting | running | stopped | error
     const [message, setMessage] = useState("");
     const [permission, setPermission] = useState("unknown"); // unknown | granted | denied | prompt
-    const [deviceCount, setDeviceCount] = useState(0);
 
+    const [cameras, setCameras] = useState([]);
+    const [selectedCameraId, setSelectedCameraId] = useState("");
+    const [mobileFacingMode, setMobileFacingMode] = useState("environment"); // environment (back) | user (front)
+
+    const mobile = useMemo(() => isMobileDevice(), []);
     const isRunning = status === "running";
     const isBusy = status === "requesting";
+
+    const safeCatch = async (maybePromise) => {
+        if (maybePromise && typeof maybePromise.catch === "function") {
+            await maybePromise.catch(() => {
+            });
+        }
+    };
 
     const stopScanner = useCallback(async () => {
         try {
             if (qrRef.current) {
-                // stop() only if started
-                await qrRef.current.stop().catch(() => {});
-                await qrRef.current.clear().catch(() => {});
+                await safeCatch(qrRef.current.stop?.());
+                await safeCatch(qrRef.current.clear?.());
             }
         } finally {
             setStatus("stopped");
@@ -51,149 +70,238 @@ export default function TurnstileScanUI({ onScan }) {
     }, []);
 
     const requestCameraPermission = useCallback(async () => {
-        // 1) Permission API ile durum oku (her tarayıcı desteklemeyebilir)
+        // Permission API (varsa) sadece durumu okumaya yarar
         try {
             if (navigator.permissions?.query) {
-                const p = await navigator.permissions.query({ name: "camera" });
-                setPermission(p.state); // granted/denied/prompt
+                const p = await navigator.permissions.query({name: "camera"});
+                setPermission(p.state);
                 p.onchange = () => setPermission(p.state);
             }
         } catch {
-            // yoksa sorun değil
+            // ignore
         }
 
-        // 2) İzni gerçekten tetikleyen çağrı (popup açtırır)
+        // Asıl izin penceresini açan şey:
         setStatus("requesting");
         setMessage("");
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "environment" },
+                video: {facingMode: "environment"},
                 audio: false,
             });
-            // hemen kapat (sadece izin almak için açtık)
-            stream.getTracks().forEach(t => t.stop());
+            stream.getTracks().forEach((t) => t.stop());
+
             setPermission("granted");
             setStatus("idle");
             return true;
-        } catch (e) {
+        } catch {
             setPermission("denied");
             setStatus("error");
-            setMessage(
-                t('turnstile:scan.cameraPermissionDenied')
-            );
+            setMessage(t("turnstile:scan.cameraPermissionDenied"));
             return false;
         }
-        // eslint-disable-next-line
-    }, []);
+    }, [t]);
 
-    const startScanner = useCallback(async () => {
-        setMessage("");
-
-        // HTTPS / localhost kontrolü (kamera çoğu tarayıcıda secure context ister)
-        if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
-            setStatus("error");
-            setMessage(t('turnstile:scan.httpsRequired'));
-            return;
-        }
-
-        // İzin yoksa iste
-        if (permission !== "granted") {
-            const ok = await requestCameraPermission();
-            if (!ok) return;
-        }
-
-        // Cihazları listele
-        let devices = [];
+    const loadCameras = useCallback(async () => {
         try {
-            devices = await Html5Qrcode.getCameras();
-            setDeviceCount(devices.length);
+            const list = await Html5Qrcode.getCameras();
+            setCameras(list || []);
+
+            // Desktop: bir kere seçili kamera yoksa default ata (arka tercih)
+            if (!mobile && !selectedCameraId) {
+                const preferred = pickBackCameraId(list);
+                if (preferred) setSelectedCameraId(preferred);
+            }
+
+            return list || [];
         } catch {
             setStatus("error");
-            setMessage(t('turnstile:scan.cameraNotAccessible'));
-            return;
+            setMessage(t("turnstile:scan.cameraNotAccessible"));
+            return [];
         }
+    }, [mobile, selectedCameraId, t]);
 
-        if (!devices.length) {
-            setStatus("error");
-            setMessage(t('turnstile:scan.cameraNotFound'));
-            return;
-        }
+    const startScanner = useCallback(
+        async (opts = {}) => {
+            const {forceRestart = false, facingModeOverride} = opts;
 
-        const cameraId = pickBestCameraId(devices);
+            setMessage("");
 
-        // Scanner init
-        if (!qrRef.current) {
-            qrRef.current = new Html5Qrcode(REGION_ID);
-        }
+            // HTTPS şartı (localhost hariç)
+            if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
+                setStatus("error");
+                setMessage(t("turnstile:scan.httpsRequired"));
+                return;
+            }
 
-        setStatus("requesting");
-        try {
-            await qrRef.current.start(
-                { deviceId: { exact: cameraId } },
-                {
-                    fps: 10,
-                    qrbox: { width: 260, height: 260 },
-                    aspectRatio: 1.0,
-                    disableFlip: true,
-                },
-                async (decodedText) => {
-                    // başarılı okutma
-                    try {
+            // Çalışıyorsa restart istenmediyse çık
+            if (isRunning && !forceRestart) return;
+
+            // Restart ise önce durdur
+            if (isRunning && forceRestart) {
+                await stopScanner();
+            }
+
+            // İzin yoksa iste
+            if (permission !== "granted") {
+                const ok = await requestCameraPermission();
+                if (!ok) return;
+            }
+
+            // Kameraları yükle
+            const list = await loadCameras();
+            if (!list.length) {
+                setStatus("error");
+                setMessage(t("turnstile:scan.cameraNotFound"));
+                return;
+            }
+
+            // Scanner init
+            if (!qrRef.current) {
+                qrRef.current = new Html5Qrcode(REGION_ID);
+            }
+
+            setStatus("requesting");
+
+            try {
+                // Mobil: ön/arka geçiş facingMode ile (environment/user)
+                // Desktop: seçili deviceId ile
+
+                const facingToUse = facingModeOverride ?? mobileFacingMode;
+                const cameraConfig = mobile
+                    ? {facingMode: facingToUse}
+                    : {deviceId: {exact: selectedCameraId || pickBackCameraId(list)}};
+
+                await qrRef.current.start(
+                    cameraConfig,
+                    {
+                        fps: 10,
+                        qrbox: {width: 260, height: 260},
+                        aspectRatio: 1.0,
+                        disableFlip: true,
+                    },
+                    async (decodedText) => {
+                        // okundu -> durdur ve dışarı ver
                         await stopScanner();
-                    } catch {}
-                    onScan?.(decodedText);
-                },
-                () => {
-                    // her frame hatasında log basmayalım
-                }
-            );
+                        onScan?.(decodedText);
+                    },
+                    () => {
+                        // frame hatalarını spamlamıyoruz
+                    }
+                );
 
-            setStatus("running");
-            setPermission("granted");
-        } catch (e) {
-            setStatus("error");
-            setMessage(
-                t('turnstile:scan.cameraStartFailed')
-            );
-        }
-        // eslint-disable-next-line
-    }, [onScan, permission, requestCameraPermission, stopScanner]);
+                setStatus("running");
+            } catch {
+                setStatus("error");
+                setMessage(t("turnstile:scan.cameraStartFailed"));
+            }
+        },
+        [
+            isRunning,
+            loadCameras,
+            mobile,
+            mobileFacingMode,
+            onScan,
+            permission,
+            requestCameraPermission,
+            selectedCameraId,
+            stopScanner,
+            t,
+        ]
+    );
 
-    // sayfa kapanırken temizle
+    // Component unmount cleanup
     useEffect(() => {
         return () => {
             if (qrRef.current) {
-                qrRef.current.stop().catch(() => {});
-                qrRef.current.clear().catch(() => {});
+                safeCatch(qrRef.current.stop?.());
+                safeCatch(qrRef.current.clear?.());
             }
         };
     }, []);
 
+    // Desktop’ta select değişince (kamera açıksa) otomatik restart
+    useEffect(() => {
+        if (!mobile && isRunning && selectedCameraId) {
+            startScanner({forceRestart: true});
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCameraId]);
+
+    const handleSwitchMobileCamera = async () => {
+        const next = mobileFacingMode === "environment" ? "user" : "environment";
+        setMobileFacingMode(next);
+
+        if (isRunning) {
+            await startScanner({ forceRestart: true, facingModeOverride: next });
+        }
+    };
+
     const statusChip = useMemo(() => {
-        if (isRunning) return <Chip label={t('turnstile:scan.statusCameraOpen')} color="success" size="small" />;
-        if (isBusy) return <Chip label={t('turnstile:scan.statusStarting')} color="warning" size="small" />;
-        if (status === "error") return <Chip label={t('turnstile:scan.statusError')} color="error" size="small" />;
-        return <Chip label={t('turnstile:scan.statusReady')} color="default" size="small" />;
-    }, [isRunning, isBusy, status, t]);
+        if (status === "running") return <Chip label={t("turnstile:scan.statusCameraOpen")} color="success"
+                                               size="small"/>;
+        if (status === "requesting") return <Chip label={t("turnstile:scan.statusStarting")} color="warning"
+                                                  size="small"/>;
+        if (status === "error") return <Chip label={t("turnstile:scan.statusError")} color="error" size="small"/>;
+        return <Chip label={t("turnstile:scan.statusReady")} size="small"/>;
+    }, [status, t]);
+
+    const showDesktopDeviceSelect = !mobile && cameras.length > 1;
+
+    const nextFacingMode = mobileFacingMode === "environment" ? "user" : "environment";
+    const nextCameraText =
+        nextFacingMode === "environment"
+            ? t("turnstile:scan.backCamera")
+            : t("turnstile:scan.frontCamera");
 
     return (
-        <Box sx={{ maxWidth: 520, mx: "auto", px: 2, py: 3 }}>
-            <Card sx={{ borderRadius: 3 }}>
+        <Box sx={{maxWidth: 560, mx: "auto", px: 2, py: 3}}>
+            <Card sx={{borderRadius: 3}}>
                 <CardContent>
                     <Stack direction="row" spacing={1.5} alignItems="center">
-                        <QrCodeScannerIcon />
-                        <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" fontWeight={700}>
-                                {t('turnstile:scan.title')}
+                        <QrCodeScannerIcon/>
+                        <Box sx={{flex: 1}}>
+                            <Typography variant="h6" fontWeight={800}>
+                                {t("turnstile:scan.title")}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {t('turnstile:scan.description')}
+                                {t("turnstile:scan.description")}
                             </Typography>
                         </Box>
                         {statusChip}
                     </Stack>
 
-                    <Divider sx={{ my: 2 }} />
+                    <Divider sx={{my: 2}}/>
+
+                    {/* Desktop: Kamera seçimi */}
+                    {showDesktopDeviceSelect && (
+                        <Stack direction={{xs: "column", sm: "row"}} spacing={1.5} sx={{mb: 2}} alignItems="center">
+                            <FormControl fullWidth size="small">
+                                <Select
+                                    value={selectedCameraId}
+                                    label={t("turnstile:scan.cameraCount")}
+                                    onChange={(e) => setSelectedCameraId(e.target.value)}
+                                >
+                                    {cameras.map((c) => (
+                                        <MenuItem key={c.id} value={c.id}>
+                                            {c.label || c.id}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <Button
+                                variant="outlined"
+                                startIcon={<CameraAltIcon/>}
+                                onClick={() => startScanner({forceRestart: true})}
+                                disabled={isBusy}
+                                sx={{whiteSpace: "nowrap"}}
+                            >
+                                {t("turnstile:scan.openCamera")}
+                            </Button>
+                        </Stack>
+                    )}
 
                     {/* Kamera alanı */}
                     <Box
@@ -203,13 +311,12 @@ export default function TurnstileScanUI({ onScan }) {
                             overflow: "hidden",
                             border: "1px solid",
                             borderColor: "divider",
-                            minHeight: 320,
+                            minHeight: 340,
                             bgcolor: "background.default",
                         }}
                     >
-                        <Box id={REGION_ID} sx={{ width: "100%", "& video": { width: "100%" } }} />
+                        <Box id={REGION_ID} sx={{width: "100%", "& video": {width: "100%"}}}/>
 
-                        {/* Overlay states */}
                         {!isRunning && (
                             <Box
                                 sx={{
@@ -223,20 +330,21 @@ export default function TurnstileScanUI({ onScan }) {
                                     p: 2,
                                     bgcolor: "rgba(0,0,0,0.04)",
                                     backdropFilter: "blur(3px)",
+                                    textAlign: "center",
                                 }}
                             >
                                 {isBusy ? (
                                     <>
-                                        <CircularProgress size={28} />
+                                        <CircularProgress size={28}/>
                                         <Typography variant="body2" color="text.secondary">
-                                            Kamera başlatılıyor...
+                                            {t("turnstile:scan.cameraStarting")}
                                         </Typography>
                                     </>
                                 ) : (
                                     <>
-                                        <VideocamOffIcon color="action" />
-                                        <Typography variant="body2" color="text.secondary" align="center">
-                                            Kamera kapalı. Başlatmak için aşağıdan “Kamerayı Aç”a basın.
+                                        <VideocamOffIcon color="action"/>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {t("turnstile:scan.cameraOffMessage")}
                                         </Typography>
                                     </>
                                 )}
@@ -244,38 +352,51 @@ export default function TurnstileScanUI({ onScan }) {
                         )}
                     </Box>
 
-                    {/* Mesajlar */}
                     {!!message && (
-                        <Alert severity="error" sx={{ mt: 2 }}>
+                        <Alert severity="error" sx={{mt: 2}}>
                             {message}
                         </Alert>
                     )}
 
-                    <Stack direction="row" spacing={1.5} sx={{ mt: 2 }}>
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            startIcon={<CameraAltIcon />}
-                            onClick={startScanner}
-                            disabled={isBusy || isRunning}
-                        >
-                            {t('turnstile:scan.openCamera')}
-                        </Button>
+                    {/* Alt aksiyonlar */}
+                    <Stack direction={{xs: "column", sm: "row"}} spacing={1.5} sx={{mt: 2}}>
+                        {!showDesktopDeviceSelect && (
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<CameraAltIcon/>}
+                                onClick={() => startScanner()}
+                                disabled={isBusy || isRunning}
+                            >
+                                {t("turnstile:scan.openCamera")}
+                            </Button>
+                        )}
 
                         <Button
                             fullWidth
                             variant="outlined"
                             color="inherit"
+                            startIcon={<StopIcon/>}
                             onClick={stopScanner}
                             disabled={isBusy || !isRunning}
                         >
-                            {t('turnstile:scan.stop')}
+                            {t("turnstile:scan.stop")}
                         </Button>
+
+                        {/* Mobil: ön/arka değiştir */}
+                        {mobile && (
+                            <Button
+                                fullWidth
+                                variant="outlined"
+                                startIcon={<CameraswitchIcon />}
+                                onClick={handleSwitchMobileCamera}
+                                disabled={isBusy}
+                            >
+                                {t("turnstile:scan.switchCamera")} • {nextCameraText}
+                            </Button>
+                        )}
                     </Stack>
 
-                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
-                        {t('turnstile:scan.permission')}: {permission} • {t('turnstile:scan.cameraCount')}: {deviceCount || "-"}
-                    </Typography>
                 </CardContent>
             </Card>
         </Box>

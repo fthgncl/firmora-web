@@ -37,12 +37,13 @@
     "cameraOffMessage": "Kamera kapalı. Başlatmak için aşağıdan \"Kamerayı Aç\"a basın.",
     "openCamera": "Kamerayı Aç",
     "stop": "Durdur",
-    "permission": "İzin",
-    "cameraCount": "Kamera sayısı",
     "cameraPermissionDenied": "Kamera izni verilmedi. Lütfen tarayıcı ayarlarından kameraya izin verin.",
     "httpsRequired": "Kamera için HTTPS gereklidir. Lütfen güvenli bağlantı kullanın.",
     "cameraNotAccessible": "Kamera bulunamadı. Cihazınızın kamerası erişilebilir değil.",
     "cameraNotFound": "Kamera bulunamadı. Lütfen farklı bir cihaz deneyin.",
-    "cameraStartFailed": "Kamera başlatılamadı. Tarayıcı izinlerini kontrol edin ve sayfayı yenileyin."
+    "cameraStartFailed": "Kamera başlatılamadı. Tarayıcı izinlerini kontrol edin ve sayfayı yenileyin.",
+    "switchCamera": "Kamerayı Değiştir",
+    "frontCamera": "Ön Kamera",
+    "backCamera": "Arka Kamera"
   }
 }

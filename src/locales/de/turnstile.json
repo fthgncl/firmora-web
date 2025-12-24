@@ -37,12 +37,13 @@
     "cameraOffMessage": "Die Kamera ist ausgeschaltet. Klicken Sie unten auf \"Kamera öffnen\", um zu starten.",
     "openCamera": "Kamera öffnen",
     "stop": "Stoppen",
-    "permission": "Berechtigung",
-    "cameraCount": "Anzahl der Kameras",
     "cameraPermissionDenied": "Die Kameraberechtigung wurde verweigert. Bitte erlauben Sie den Kamerazugriff in den Browser-Einstellungen.",
     "httpsRequired": "Für den Kamerazugriff ist HTTPS erforderlich. Bitte verwenden Sie eine sichere Verbindung.",
     "cameraNotAccessible": "Kamera nicht zugänglich. Die Kamera Ihres Geräts kann nicht verwendet werden.",
     "cameraNotFound": "Keine Kamera gefunden. Bitte versuchen Sie ein anderes Gerät.",
-    "cameraStartFailed": "Die Kamera konnte nicht gestartet werden. Bitte überprüfen Sie die Browser-Berechtigungen und laden Sie die Seite neu."
+    "cameraStartFailed": "Die Kamera konnte nicht gestartet werden. Bitte überprüfen Sie die Browser-Berechtigungen und laden Sie die Seite neu.",
+    "switchCamera": "Kamera wechseln",
+    "frontCamera": "Frontkamera",
+    "backCamera": "Rückkamera"
   }
 }
