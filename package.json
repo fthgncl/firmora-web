@@ -15,6 +15,7 @@
     "axios": "^1.12.2",
     "env-cmd": "^11.0.0",
     "formik": "^2.4.6",
+    "html5-qrcode": "^2.3.8",
     "i18next": "^23.16.8",
     "i18next-browser-languagedetector": "^8.2.0",
     "jwt-decode": "^4.0.0",

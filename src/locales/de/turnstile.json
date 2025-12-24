@@ -21,9 +21,28 @@
     "unauthorized": "Unbefugter Zugriff",
     "tokenError": "Ungültiges Token"
   },
-    "qrInfoBanner": {
-        "title": "Drehkreuz Ein-/Ausgang",
-        "description": "Sie müssen den QR-Code scannen, wenn Sie das Unternehmen betreten oder verlassen.",
-        "buttonText": "QR-Code scannen"
-    }
+  "qrInfoBanner": {
+    "title": "Drehkreuz Ein-/Ausgang",
+    "description": "Sie müssen den QR-Code scannen, wenn Sie das Unternehmen betreten oder verlassen.",
+    "buttonText": "QR-Code scannen"
+  },
+  "scan": {
+    "title": "QR-Code scannen",
+    "description": "Halten Sie den QR-Code für den Ein- oder Ausgang vor die Kamera.",
+    "statusCameraOpen": "Kamera aktiv",
+    "statusStarting": "Wird gestartet",
+    "statusError": "Fehler",
+    "statusReady": "Bereit",
+    "cameraStarting": "Kamera wird gestartet...",
+    "cameraOffMessage": "Die Kamera ist ausgeschaltet. Klicken Sie unten auf \"Kamera öffnen\", um zu starten.",
+    "openCamera": "Kamera öffnen",
+    "stop": "Stoppen",
+    "permission": "Berechtigung",
+    "cameraCount": "Anzahl der Kameras",
+    "cameraPermissionDenied": "Die Kameraberechtigung wurde verweigert. Bitte erlauben Sie den Kamerazugriff in den Browser-Einstellungen.",
+    "httpsRequired": "Für den Kamerazugriff ist HTTPS erforderlich. Bitte verwenden Sie eine sichere Verbindung.",
+    "cameraNotAccessible": "Kamera nicht zugänglich. Die Kamera Ihres Geräts kann nicht verwendet werden.",
+    "cameraNotFound": "Keine Kamera gefunden. Bitte versuchen Sie ein anderes Gerät.",
+    "cameraStartFailed": "Die Kamera konnte nicht gestartet werden. Bitte überprüfen Sie die Browser-Berechtigungen und laden Sie die Seite neu."
+  }
 }
