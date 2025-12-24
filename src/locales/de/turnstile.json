@@ -45,5 +45,15 @@
     "switchCamera": "Kamera wechseln",
     "frontCamera": "Frontkamera",
     "backCamera": "Rückkamera"
-  }
+  },
+    "scanPage": {
+        "title": "Drehkreuzvorgang",
+        "description": "Wählen Sie die Art des Vorgangs. Nach der Auswahl werden Sie zum QR-Scan-Bereich weitergeleitet.",
+        "waitingSelection": "Warten auf Auswahl",
+        "entry": "Eingang",
+        "exit": "Ausgang",
+        "noteLabel": "Falls erforderlich, kann hier eine Notiz geschrieben werden...",
+        "scanForEntry": "Scannen Sie den QR-Code für den Eingangsprozess.",
+        "scanForExit": "Scannen Sie den QR-Code für den Ausgangsprozess."
+    }
 }

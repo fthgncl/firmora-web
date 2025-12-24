@@ -45,5 +45,15 @@
     "switchCamera": "Kamerayı Değiştir",
     "frontCamera": "Ön Kamera",
     "backCamera": "Arka Kamera"
+  },
+  "scanPage": {
+    "title": "Turnike İşlemi",
+    "description": "İşlem türünü seçin. Seçimden sonra QR okutma alanına yönlendirileceksiniz.",
+    "waitingSelection": "Seçim bekleniyor",
+    "entry": "Giriş",
+    "exit": "Çıkış",
+    "noteLabel": "Açıklama gerekirse buraya yazılabilir...",
+    "scanForEntry": "Giriş işlemi için QR kodu okutun.",
+    "scanForExit": "Çıkış işlemi için QR kodu okutun."
   }
 }
