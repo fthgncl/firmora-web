@@ -20,5 +20,10 @@
     "noPermission": "Keine Berechtigung für den Drehkreuzmodus",
     "unauthorized": "Unbefugter Zugriff",
     "tokenError": "Ungültiges Token"
-  }
+  },
+    "qrInfoBanner": {
+        "title": "Drehkreuz Ein-/Ausgang",
+        "description": "Sie müssen den QR-Code scannen, wenn Sie das Unternehmen betreten oder verlassen.",
+        "buttonText": "QR-Code scannen"
+    }
 }

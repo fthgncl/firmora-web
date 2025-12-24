@@ -20,5 +20,10 @@
     "noPermission": "No permission for turnstile mode",
     "unauthorized": "Unauthorized access",
     "tokenError": "Invalid token"
+  },
+  "qrInfoBanner": {
+    "title": "Turnstile Entry / Exit",
+    "description": "You need to scan the QR code when entering or exiting the company.",
+    "buttonText": "Scan QR Code"
   }
 }

@@ -20,5 +20,10 @@
     "noPermission": "Turnike yetkisi yok",
     "unauthorized": "Yetkilendirme hatası",
     "tokenError": "Geçersiz token"
+  },
+  "qrInfoBanner": {
+    "title": "Turnike Giriş / Çıkış",
+    "description": "Firmaya giriş veya çıkış yaparken QR kodu okutmanız gerekmektedir.",
+    "buttonText": "QR Kodu Okut"
   }
 }

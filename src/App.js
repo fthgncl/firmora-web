@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import CompanyPage from "./pages/CompanyPage";
 import TransferDetailPage from "./pages/TransferDetailPage";
 import TurnstileDisplayPage from "./pages/TurnstileDisplayPage";
+import TurnstileScanPage from "./pages/TurnstileScanPage";
 import ResetPassword from "./pages/ResetPassword";
 import React from "react";
 import AppBar from "./components/AppBar";
@@ -28,6 +29,11 @@ function App() {
             <Routes>
 
                 <Route path="/turnstile/display" element=<TurnstileDisplayPage/>/>
+                <Route path="/turnstile/scan" element={
+                    <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                        <TurnstileScanPage/>
+                    </AuthRoute>
+                }/>
 
                 {/* Giriş yapmamış kullanıcıların girebileği sayfalar */}
                 <Route path="/sign-in" element={
