@@ -117,7 +117,7 @@ export default function CompanyPage() {
                 // Token'ı sessionStorage'a kaydet (sekme kapatılınca otomatik silinir)
                 sessionStorage.setItem('turnstile_token', response.data.token);
                 showAlert(response.data.message || t('turnstile:authSuccess'), 'success');
-                navigate('/turnstile');
+                navigate('/turnstile/display');
             } else {
                 showAlert(response.data.message || t('turnstile:authFailed'), 'error');
                 setTurnstileLoading(false);

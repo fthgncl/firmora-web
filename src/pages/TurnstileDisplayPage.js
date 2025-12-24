@@ -24,7 +24,7 @@ import {
     QrCode2 as QrCodeIcon
 } from '@mui/icons-material';
 
-const TurnstilePage = () => {
+export default function TurnstilePage() {
 
     const { logout } = useAuth();
     const {t} = useTranslation(['common', 'turnstile']);
@@ -51,7 +51,7 @@ const TurnstilePage = () => {
             setTokenError(true);
         }
 
-       // eslint-disable-next-line
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -227,8 +227,8 @@ const TurnstilePage = () => {
                                                 {Math.round(progress)}%
                                             </Typography>
                                         </Stack>
-                                        <LinearProgress 
-                                            variant="determinate" 
+                                        <LinearProgress
+                                            variant="determinate"
                                             value={progress}
                                             sx={{
                                                 height: 8,
@@ -294,6 +294,4 @@ const TurnstilePage = () => {
             </Container>
         </Box>
     );
-};
-
-export default TurnstilePage;
+}
