@@ -27,7 +27,7 @@ import {
 const TurnstilePage = () => {
 
     const { logout } = useAuth();
-    const {t} = useTranslation(['turnstile']);
+    const {t} = useTranslation(['common', 'turnstile']);
     const theme = useTheme();
     const [tokenInfo, setTokenInfo] = useState(null);
     const [tokenError, setTokenError] = useState(false);
@@ -108,10 +108,10 @@ const TurnstilePage = () => {
                     }}
                 >
                     <Typography variant="h5" color="error" gutterBottom>
-                        {t('turnstile:tokenError', 'Token Hatası')}
+                        {t('turnstile:errors.tokenError')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Geçersiz veya eksik turnstile token
+                        {t('turnstile:invalidOrMissingToken')}
                     </Typography>
                 </Paper>
             </Box>
@@ -137,7 +137,7 @@ const TurnstilePage = () => {
                             color: 'white'
                         }}
                     >
-                        <Stack direction="row" spacing={2} alignItems="center">
+                        <Stack direction="row" spacing={2} alignItems="center" >
                             <Avatar
                                 sx={{
                                     bgcolor: 'white',
@@ -148,12 +148,16 @@ const TurnstilePage = () => {
                             >
                                 <BusinessIcon fontSize="large" />
                             </Avatar>
-                            <Box sx={{ flex: 1 }}>
-                                <Typography variant="h4" fontWeight="bold" gutterBottom>
-                                    {tokenInfo?.company?.company_name || 'Yükleniyor...'}
+                            <Box>
+                                <Typography
+                                    variant="h4"
+                                    fontWeight="bold"
+                                    lineHeight={1}
+                                >
+                                    {tokenInfo?.company?.company_name || t('common:loading')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                                    Turnike Giriş/Çıkış Sistemi
+                                <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
+                                    {t('turnstile:accessControlSystem')}
                                 </Typography>
                             </Box>
                         </Stack>
@@ -178,10 +182,10 @@ const TurnstilePage = () => {
                                         }}
                                     />
                                     <Typography variant="h5" fontWeight="600" gutterBottom>
-                                        QR Kodu Okutun
+                                        {t('turnstile:scanQRCode')}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Giriş veya çıkış yapmak için QR kodu okutun
+                                        {t('turnstile:scanQRCodeDescription')}
                                     </Typography>
                                 </Box>
 
@@ -217,7 +221,7 @@ const TurnstilePage = () => {
                                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                 <ScheduleIcon fontSize="small" />
-                                                QR Kod Yenileniyor
+                                                {t('turnstile:qrCodeRefreshing')}
                                             </Typography>
                                             <Typography variant="caption" fontWeight="600" color="primary">
                                                 {Math.round(progress)}%
@@ -237,7 +241,9 @@ const TurnstilePage = () => {
                                             }}
                                         />
                                         <Typography variant="caption" color="text.secondary" textAlign="center">
-                                            Sonraki yenileme: {Math.ceil((100 - progress) / 100 * (parseInt(process.env.REACT_APP_TURNSTILE_QR_REFRESH_INTERVAL_MS || 60000) / 1000))} saniye
+                                            {t('turnstile:nextRefresh', {
+                                                seconds: Math.ceil((100 - progress) / 100 * (parseInt(process.env.REACT_APP_TURNSTILE_QR_REFRESH_INTERVAL_MS || 60000) / 1000))
+                                            })}
                                         </Typography>
                                     </Stack>
                                 </Box>
@@ -253,13 +259,13 @@ const TurnstilePage = () => {
                                 gutterBottom
                                 sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                             >
-                                <PersonIcon /> Oturum Bilgileri
+                                <PersonIcon /> {t('turnstile:sessionInfo')}
                             </Typography>
                             <Divider sx={{ my: 2 }} />
                             <Stack direction="row" spacing={3} flexWrap="wrap">
                                 <Box sx={{ flex: 1, minWidth: 200, textAlign: 'center' }}>
                                     <Typography variant="caption" color="text.secondary" display="block">
-                                        Yetkili
+                                        {t('turnstile:authorizedPerson')}
                                     </Typography>
                                     <Typography variant="body1" fontWeight="500">
                                         {tokenInfo.createdBy?.name} {tokenInfo.createdBy?.surname}
@@ -267,7 +273,7 @@ const TurnstilePage = () => {
                                 </Box>
                                 <Box sx={{ flex: 1, minWidth: 200, textAlign: 'center' }}>
                                     <Typography variant="caption" color="text.secondary" display="block">
-                                        Oluşturulma
+                                        {t('turnstile:createdAt')}
                                     </Typography>
                                     <Typography variant="body2">
                                         {formatDate(tokenInfo.iat)}
@@ -275,7 +281,7 @@ const TurnstilePage = () => {
                                 </Box>
                                 <Box sx={{ flex: 1, minWidth: 200, textAlign: 'center' }}>
                                     <Typography variant="caption" color="text.secondary" display="block">
-                                        Geçerlilik Süresi
+                                        {t('turnstile:expiresAt')}
                                     </Typography>
                                     <Typography variant="body2">
                                         {formatDate(tokenInfo.exp)}

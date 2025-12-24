@@ -24,10 +24,10 @@ function TurnstileQR({turnstileToken, handleUpdateQr , ...props}) {
                     setQrValue(res.data.token);
                     handleUpdateQr();
                 } else {
-                    showAlert(res.data.message || t('turnstile:tokenError'), "error");
+                    showAlert(res.data.message || t('turnstile:errors.tokenError'), "error");
                 }
             } catch (error) {
-                showAlert(error.response?.data?.message || t('turnstile:tokenError'), "error");
+                showAlert(error.response?.data?.message || t('turnstile:errors.tokenError'), "error");
             }
         };
 
