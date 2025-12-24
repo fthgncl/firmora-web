@@ -34,6 +34,7 @@ import CompanySettingsDialog from '../components/CompanySettingsDialog';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import TransfersTable from "../components/TransfersTable";
+import {permissionsService} from "../services/permissionsService";
 
 export default function CompanyPage() {
     const {companyId} = useParams();
@@ -49,11 +50,28 @@ export default function CompanyPage() {
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
     const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
     const [turnstileLoading, setTurnstileLoading] = useState(false);
+    const [canActAsTurnstile, setCanActAsTurnstile] = useState(false);
 
     useEffect(() => {
         fetchCompanyDetails();
         // eslint-disable-next-line
     }, [companyId, token]);
+
+    useEffect(() => {
+        const checkPermission = async () => {
+            if (token && user) {
+                const hasPermission = await permissionsService.checkUserRoles(
+                    token,
+                    user,
+                    companyId,
+                    ['can_act_as_turnstile']
+                );
+                setCanActAsTurnstile(hasPermission);
+            }
+        };
+        checkPermission();
+        // eslint-disable-next-line
+    }, [token, user]);
 
     const mapLngToLocale = (lng) => {
         switch (lng) {
@@ -206,7 +224,7 @@ export default function CompanyPage() {
                             <Grid container spacing={3}>
                                 {/* Sol: Bakiye ve butonlar */}
                                 {company?.balance !== undefined && company?.balance !== null && (
-                                    <Grid item xs={12} md={5}>
+                                    <Grid item xs={12} md={canActAsTurnstile ? 5 : 12}>
                                         <Box
                                             sx={{
                                                 p: 3,
@@ -222,7 +240,7 @@ export default function CompanyPage() {
                                         >
                                             {/* Sağ üstte üç profesyonel buton */}
                                             <Stack
-                                                direction={{ xs: 'column', sm: 'row', md:'column' }} // xs’te dikey, sm+ yatay
+                                                direction={{ xs: 'column', sm: 'row', md: canActAsTurnstile ? 'column' : 'row' }}
                                                 spacing={1}
                                                 sx={{
                                                     position: 'absolute',           // ⬅️ her zaman absolute (boşluk bırakmaz)
@@ -414,72 +432,74 @@ export default function CompanyPage() {
                                 )}
 
 
-                                {/* Sağ: Firma Bilgileri */}
-                                <Grid item xs={12} md={7}>
-                                    <Paper
-                                        elevation={0}
-                                        sx={{
-                                            p: 3,
-                                            borderRadius: 3,
-                                            border: "1px solid",
-                                            borderColor: "divider",
-                                            height: "100%",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                        }}
-                                    >
-                                        <Stack spacing={2.5} alignItems="center" sx={{ maxWidth: 420, width: "100%" }}>
-                                            {/* Icon */}
-                                            <Avatar
-                                                sx={{
-                                                    bgcolor: "secondary.main",
-                                                    width: 56,
-                                                    height: 56,
-                                                }}
-                                            >
-                                                <Sensors fontSize="large" />
-                                            </Avatar>
+                                {/* Sağ: Turnike Modu */}
+                                {canActAsTurnstile && (
+                                    <Grid item xs={12} md={7}>
+                                        <Paper
+                                            elevation={0}
+                                            sx={{
+                                                p: 3,
+                                                borderRadius: 3,
+                                                border: "1px solid",
+                                                borderColor: "divider",
+                                                height: "100%",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                            }}
+                                        >
+                                            <Stack spacing={2.5} alignItems="center" sx={{ maxWidth: 420, width: "100%" }}>
+                                                {/* Icon */}
+                                                <Avatar
+                                                    sx={{
+                                                        bgcolor: "secondary.main",
+                                                        width: 56,
+                                                        height: 56,
+                                                    }}
+                                                >
+                                                    <Sensors fontSize="large" />
+                                                </Avatar>
 
-                                            {/* Title */}
-                                            <Typography
-                                                variant="h6"
-                                                sx={{ fontWeight: 800, textAlign: "center" }}
-                                            >
-                                                {t("turnstile:turnstileMode")}
-                                            </Typography>
+                                                {/* Title */}
+                                                <Typography
+                                                    variant="h6"
+                                                    sx={{ fontWeight: 800, textAlign: "center" }}
+                                                >
+                                                    {t("turnstile:turnstileMode")}
+                                                </Typography>
 
-                                            {/* Description */}
-                                            <Typography
-                                                variant="body2"
-                                                color="text.secondary"
-                                                sx={{ textAlign: "center", lineHeight: 1.6 }}
-                                            >
-                                                {t("turnstile:turnstileModeDescription")}
-                                            </Typography>
+                                                {/* Description */}
+                                                <Typography
+                                                    variant="body2"
+                                                    color="text.secondary"
+                                                    sx={{ textAlign: "center", lineHeight: 1.6 }}
+                                                >
+                                                    {t("turnstile:turnstileModeDescription")}
+                                                </Typography>
 
-                                            {/* Action Button */}
-                                            <Button
-                                                variant="contained"
-                                                color="secondary"
-                                                        startIcon={turnstileLoading ? <CircularProgress size={20} color="inherit" /> : <Sensors />}
-                                                        fullWidth
-                                                        onClick={handleTurnstileMode}
-                                                        disabled={turnstileLoading}
-                                                sx={{
-                                                    mt: 1,
-                                                    py: 1.5,
-                                                    fontWeight: 700,
-                                                    textTransform: "none",
-                                                    fontSize: "1rem",
-                                                    borderRadius: 2,
-                                                }}
-                                            >
-                                                {t("turnstile:turnstileMode")}
-                                            </Button>
-                                        </Stack>
-                                    </Paper>
-                                </Grid>
+                                                {/* Action Button */}
+                                                <Button
+                                                    variant="contained"
+                                                    color="secondary"
+                                                            startIcon={turnstileLoading ? <CircularProgress size={20} color="inherit" /> : <Sensors />}
+                                                            fullWidth
+                                                            onClick={handleTurnstileMode}
+                                                            disabled={turnstileLoading}
+                                                    sx={{
+                                                        mt: 1,
+                                                        py: 1.5,
+                                                        fontWeight: 700,
+                                                        textTransform: "none",
+                                                        fontSize: "1rem",
+                                                        borderRadius: 2,
+                                                    }}
+                                                >
+                                                    {t("turnstile:turnstileMode")}
+                                                </Button>
+                                            </Stack>
+                                        </Paper>
+                                    </Grid>
+                                )}
 
 
                             </Grid>
