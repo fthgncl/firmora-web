@@ -28,7 +28,7 @@ function App() {
             <AppBar/>
             <Routes>
 
-                <Route path="/turnstile/display" element=<TurnstileDisplayPage/>/>
+                <Route path="/turnstile/display" element={<TurnstileDisplayPage/>}/>
                 <Route path="/turnstile/scan" element={
                     <AuthRoute requireAuth={true} redirectTo="/sign-in">
                         <TurnstileScanPage/>

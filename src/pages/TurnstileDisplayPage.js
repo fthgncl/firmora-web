@@ -24,7 +24,7 @@ import {
     QrCode2 as QrCodeIcon
 } from '@mui/icons-material';
 
-export default function TurnstilePage() {
+export default function TurnstileDisplayPage() {
 
     const { logout } = useAuth();
     const {t} = useTranslation(['common', 'turnstile']);
