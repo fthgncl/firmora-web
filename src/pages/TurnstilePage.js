@@ -42,7 +42,6 @@ const TurnstilePage = () => {
             const token = getTurnstileToken();
             if (token) {
                 const decodedToken = jwtDecode(token);
-                console.log('Decoded Turnstile Token:', decodedToken);
                 setTokenInfo(decodedToken);
             } else {
                 setTokenError(true);
@@ -52,10 +51,11 @@ const TurnstilePage = () => {
             setTokenError(true);
         }
 
+       // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
-        const refreshInterval = parseInt(process.env.REACT_APP_TURNSTILE_QR_REFRESH_INTERVAL_MS || 60000);
+        const refreshInterval = parseInt(process.env.REACT_APP_TURNSTILE_QR_REFRESH_INTERVAL_MS);
         const updateInterval = 150; // Progress güncelleme sıklığı (ms)
 
         setProgress(0);
