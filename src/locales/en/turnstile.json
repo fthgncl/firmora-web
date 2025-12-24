@@ -7,6 +7,7 @@
   "errors": {
     "missingCompanyId": "Company information missing",
     "noPermission": "No permission for turnstile mode",
-    "unauthorized": "Unauthorized access"
+    "unauthorized": "Unauthorized access",
+    "tokenError": "Invalid token"
   }
 }
