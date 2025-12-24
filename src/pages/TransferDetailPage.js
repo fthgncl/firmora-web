@@ -238,7 +238,7 @@ export default function TransferDetailPage() {
     const {transferId} = useParams();
     const navigate = useNavigate();
     const {t} = useTranslation(['transfers','common']);
-    const {token} = useAuth();
+    const {token, user} = useAuth();
     const {showError} = useAlert();
 
     const [loading, setLoading] = useState(true);
@@ -250,6 +250,7 @@ export default function TransferDetailPage() {
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
     const [approving, setApproving] = useState(false);
     const [rejecting, setRejecting] = useState(false);
+    const [canApprove, setCanApprove] = useState(false);
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -277,6 +278,7 @@ export default function TransferDetailPage() {
                     const senderData = response.data.data.sender;
                     const receiverData = response.data.data.receiver;
 
+
                     const enrichedTransfer = {
                         ...transferData,
                         sender_name: senderData?.name,
@@ -286,6 +288,7 @@ export default function TransferDetailPage() {
                     };
 
                     setTransfer(enrichedTransfer);
+                    setCanApprove(transferData.status === 'pending' && enrichedTransfer.to_user_id === user.id);
 
                     try {
                         const filesResponse = await axios.post(
@@ -545,7 +548,7 @@ export default function TransferDetailPage() {
                     </Stack>
 
                     {/* Onaylama/Reddetme Düğmeleri */}
-                    {transfer?.status === 'pending' && (
+                    { canApprove && (
                         <Stack
                             direction={{xs: 'column', sm: 'row'}}
                             spacing={2}
