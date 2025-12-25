@@ -54,6 +54,9 @@
     "exit": "Exit",
     "noteLabel": "If needed, a note can be written here...",
     "scanForEntry": "Scan the QR code for entry operation.",
-    "scanForExit": "Scan the QR code for exit operation."
+    "scanForExit": "Scan the QR code for exit operation.",
+    "successMessage": "Operation recorded successfully.",
+    "errorMessage": "An error occurred while recording the operation.",
+    "selectModeFirst": "Please select the type of operation."
   }
 }

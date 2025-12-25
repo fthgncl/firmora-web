@@ -54,6 +54,9 @@
     "exit": "Çıkış",
     "noteLabel": "Açıklama gerekirse buraya yazılabilir...",
     "scanForEntry": "Giriş işlemi için QR kodu okutun.",
-    "scanForExit": "Çıkış işlemi için QR kodu okutun."
+    "scanForExit": "Çıkış işlemi için QR kodu okutun.",
+    "successMessage": "İşlem başarıyla kaydedildi.",
+    "errorMessage": "İşlem kaydedilirken hata oluştu.",
+    "selectModeFirst": "İşlem türünü seçin."
   }
 }

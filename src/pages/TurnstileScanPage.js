@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {
     Box,
     Button,
@@ -9,12 +9,15 @@ import {
     TextField,
     Typography,
     Chip,
+    Alert,
+    CircularProgress,
 } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
-
+import axios from "axios";
 import QrScan from "../components/qrScan";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "../contexts/AuthContext";
 
 const MODE = {
     ENTRY: "entry",
@@ -23,8 +26,11 @@ const MODE = {
 
 export default function TurnstileScanPage() {
     const {t} = useTranslation();
+    const {token} = useAuth();
     const [mode, setMode] = useState(null);
     const [note, setNote] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [feedback, setFeedback] = useState(null); // { type: 'success' | 'error', message: string }
 
     // 🔽 QR alanı için ref
     const qrSectionRef = useRef(null);
@@ -41,12 +47,51 @@ export default function TurnstileScanPage() {
         return "default";
     }, [mode]);
 
-    const handleScan = (decodedText) => {
-        console.log("Turnstile scan:", {
-            mode,
-            note: note?.trim() || null,
-            data: decodedText,
-        });
+    const handleScan = async (decodedText) => {
+        if (!mode) {
+            setFeedback({type: 'error', message: t("turnstile:scanPage.selectModeFirst")});
+            return;
+        }
+
+        setLoading(true);
+        setFeedback(null);
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/turnstile/scan`, {
+                    turnstileToken: decodedText,
+                    entryType: mode,
+                    note: note?.trim() || undefined,
+                },
+                {
+                    headers: {
+                        'x-access-token': token,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            console.log(response.data);
+
+            if (response.data?.status === 'success') {
+                setFeedback({
+                    type: 'success',
+                    message: response.data?.data?.message || t("turnstile:scanPage.successMessage")
+                });
+                // Başarılı işlemden sonra formu sıfırla
+                setNote("");
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message
+                || error.response?.data?.error
+                || t("turnstile:scanPage.errorMessage");
+
+            setFeedback({
+                type: 'error',
+                message: errorMessage
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     // 🔽 Seçim yapıldığında QR alanına scroll + focus
@@ -65,14 +110,14 @@ export default function TurnstileScanPage() {
     }, [mode]);
 
     return (
-        <Box sx={{ maxWidth: 560, mx: "auto", px: 2, py: 3 }}>
+        <Box sx={{maxWidth: 560, mx: "auto", px: 2, py: 3}}>
             <Stack spacing={2}>
                 {/* ÜST KART */}
-                <Card sx={{ borderRadius: 3 }}>
+                <Card sx={{borderRadius: 3}}>
                     <CardContent>
                         <Stack spacing={1.5}>
                             <Stack direction="row" spacing={1.5} alignItems="center">
-                                <Box sx={{ flex: 1 }}>
+                                <Box sx={{flex: 1}}>
                                     <Typography variant="h6" fontWeight={800}>
                                         {t("turnstile:scanPage.title")}
                                     </Typography>
@@ -82,23 +127,23 @@ export default function TurnstileScanPage() {
                                 </Box>
 
                                 {mode ? (
-                                    <Chip size="small" label={modeLabel} color={modeColor} />
+                                    <Chip size="small" label={modeLabel} color={modeColor}/>
                                 ) : (
-                                    <Chip size="small" label={t("turnstile:scanPage.waitingSelection")} />
+                                    <Chip size="small" label={t("turnstile:scanPage.waitingSelection")}/>
                                 )}
                             </Stack>
 
-                            <Divider />
+                            <Divider/>
 
                             <Stack direction="row" spacing={1.5}>
                                 <Button
                                     fullWidth
                                     size="large"
-                                    startIcon={<LoginIcon />}
+                                    startIcon={<LoginIcon/>}
                                     variant={mode === MODE.ENTRY ? "contained" : "outlined"}
                                     color="success"
                                     onClick={() => setMode(MODE.ENTRY)}
-                                    sx={{ py: 1.25, fontWeight: 800, borderRadius: 2 }}
+                                    sx={{py: 1.25, fontWeight: 800, borderRadius: 2}}
                                 >
                                     {t("turnstile:scanPage.entry")}
                                 </Button>
@@ -106,11 +151,11 @@ export default function TurnstileScanPage() {
                                 <Button
                                     fullWidth
                                     size="large"
-                                    startIcon={<LogoutIcon />}
+                                    startIcon={<LogoutIcon/>}
                                     variant={mode === MODE.EXIT ? "contained" : "outlined"}
                                     color="error"
                                     onClick={() => setMode(MODE.EXIT)}
-                                    sx={{ py: 1.25, fontWeight: 800, borderRadius: 2 }}
+                                    sx={{py: 1.25, fontWeight: 800, borderRadius: 2}}
                                 >
                                     {t("turnstile:scanPage.exit")}
                                 </Button>
@@ -127,20 +172,38 @@ export default function TurnstileScanPage() {
                     </CardContent>
                 </Card>
 
+                {/* 🔽 FEEDBACK MESAJI */}
+                {feedback && (
+                    <Alert
+                        severity={feedback.type}
+                        onClose={() => setFeedback(null)}
+                        sx={{borderRadius: 2}}
+                    >
+                        {feedback.message}
+                    </Alert>
+                )}
+
+                {/* 🔽 YÜKLENİYOR DURUMU */}
+                {loading && (
+                    <Box sx={{display: 'flex', justifyContent: 'center', py: 2}}>
+                        <CircularProgress/>
+                    </Box>
+                )}
+
                 {/* 🔽 QR SCAN BÖLÜMÜ */}
-                {mode && (
+                {mode && !loading && (
                     <Box
                         ref={qrSectionRef}
                         tabIndex={-1} // focus alabilmesi için
-                        sx={{ outline: "none" }}
+                        sx={{outline: "none"}}
                     >
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <Typography variant="body2" color="text.secondary" sx={{mb: 1}}>
                             {mode === MODE.ENTRY
                                 ? t("turnstile:scanPage.scanForEntry")
                                 : t("turnstile:scanPage.scanForExit")}
                         </Typography>
 
-                        <QrScan onScan={handleScan} />
+                        <QrScan onScan={handleScan}/>
                     </Box>
                 )}
             </Stack>

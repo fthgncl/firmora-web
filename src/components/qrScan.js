@@ -60,8 +60,10 @@ export default function TurnstileScanUI({onScan}) {
 
     const stopScanner = useCallback(async () => {
         try {
-            if (qrRef.current) {
+            if (qrRef.current?.getState?.() === 2) { // 2 = SCANNING state
                 await safeCatch(qrRef.current.stop?.());
+            }
+            if (qrRef.current) {
                 await safeCatch(qrRef.current.clear?.());
             }
         } finally {
@@ -215,7 +217,10 @@ export default function TurnstileScanUI({onScan}) {
     useEffect(() => {
         return () => {
             if (qrRef.current) {
-                safeCatch(qrRef.current.stop?.());
+                // Sadece scanner çalışıyorsa durdur
+                if (qrRef.current.getState?.() === 2) { // 2 = SCANNING state
+                    safeCatch(qrRef.current.stop?.());
+                }
                 safeCatch(qrRef.current.clear?.());
             }
         };
