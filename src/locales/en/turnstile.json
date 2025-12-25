@@ -57,6 +57,10 @@
     "scanForExit": "Scan the QR code for exit operation.",
     "successMessage": "Operation recorded successfully.",
     "errorMessage": "An error occurred while recording the operation.",
-    "selectModeFirst": "Please select the type of operation."
+    "selectModeFirst": "Please select the type of operation.",
+    "successTitle": "Operation Successful",
+    "entrySuccess": "Entry operation recorded successfully.",
+    "exitSuccess": "Exit operation recorded successfully.",
+    "okButton": "OK"
   }
 }

@@ -57,6 +57,10 @@
     "scanForExit": "Çıkış işlemi için QR kodu okutun.",
     "successMessage": "İşlem başarıyla kaydedildi.",
     "errorMessage": "İşlem kaydedilirken hata oluştu.",
-    "selectModeFirst": "İşlem türünü seçin."
+    "selectModeFirst": "İşlem türünü seçin.",
+    "successTitle": "İşlem Başarılı",
+    "entrySuccess": "Giriş işlemi başarıyla kaydedildi.",
+    "exitSuccess": "Çıkış işlemi başarıyla kaydedildi.",
+    "okButton": "Tamam"
   }
 }

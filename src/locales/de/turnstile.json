@@ -57,6 +57,10 @@
     "scanForExit": "Scannen Sie den QR-Code für den Ausgangsprozess.",
     "successMessage": "Vorgang erfolgreich aufgezeichnet.",
     "errorMessage": "Beim Aufzeichnen des Vorgangs ist ein Fehler aufgetreten.",
-    "selectModeFirst": "Bitte wählen Sie die Art des Vorgangs aus."
+    "selectModeFirst": "Bitte wählen Sie die Art des Vorgangs aus.",
+    "successTitle": "Vorgang erfolgreich",
+    "entrySuccess": "Eingangsprozess erfolgreich aufgezeichnet.",
+    "exitSuccess": "Ausgangsprozess erfolgreich aufgezeichnet.",
+    "okButton": "OK"
   }
 }

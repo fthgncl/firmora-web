@@ -11,12 +11,16 @@ import {
     Chip,
     Alert,
     CircularProgress,
+    Fade,
+    Grow,
 } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import axios from "axios";
 import QrScan from "../components/qrScan";
 import {useTranslation} from "react-i18next";
+import {useNavigate} from "react-router-dom";
 import {useAuth} from "../contexts/AuthContext";
 
 const MODE = {
@@ -26,11 +30,13 @@ const MODE = {
 
 export default function TurnstileScanPage() {
     const {t} = useTranslation();
+    const navigate = useNavigate();
     const {token} = useAuth();
     const [mode, setMode] = useState(null);
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
     const [feedback, setFeedback] = useState(null); // { type: 'success' | 'error', message: string }
+    const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
 
     // 🔽 QR alanı için ref
     const qrSectionRef = useRef(null);
@@ -73,11 +79,8 @@ export default function TurnstileScanPage() {
             console.log(response.data);
 
             if (response.data?.status === 'success') {
-                setFeedback({
-                    type: 'success',
-                    message: response.data?.data?.message || t("turnstile:scanPage.successMessage")
-                });
-                // Başarılı işlemden sonra formu sıfırla
+                // Başarı overlay'ini göster
+                setShowSuccessOverlay(true);
                 setNote("");
             }
         } catch (error) {
@@ -110,8 +113,87 @@ export default function TurnstileScanPage() {
     }, [mode]);
 
     return (
-        <Box sx={{maxWidth: 560, mx: "auto", px: 2, py: 3}}>
-            <Stack spacing={2}>
+        <>
+            {/* 🎉 SUCCESS OVERLAY */}
+            <Fade in={showSuccessOverlay} timeout={500}>
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        bgcolor: 'rgba(0, 0, 0, 0.95)',
+                        zIndex: 9999,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backdropFilter: 'blur(8px)',
+                    }}
+                >
+                    <Grow in={showSuccessOverlay} timeout={600}>
+                        <Stack spacing={3} alignItems="center" sx={{ px: 3 }}>
+                            <Box
+                                sx={{
+                                    width: 120,
+                                    height: 120,
+                                    borderRadius: '50%',
+                                    bgcolor: 'success.main',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: '0 0 40px rgba(76, 175, 80, 0.5)',
+                                }}
+                            >
+                                <CheckCircleIcon sx={{ fontSize: 80, color: 'white' }} />
+                            </Box>
+
+                            <Stack spacing={1} alignItems="center">
+                                <Typography
+                                    variant="h4"
+                                    fontWeight={700}
+                                    color="white"
+                                    textAlign="center"
+                                >
+                                    {t("turnstile:scanPage.successTitle")}
+                                </Typography>
+                                <Typography
+                                    variant="body1"
+                                    color="rgba(255, 255, 255, 0.7)"
+                                    textAlign="center"
+                                >
+                                    {mode === MODE.ENTRY
+                                        ? t("turnstile:scanPage.entrySuccess")
+                                        : t("turnstile:scanPage.exitSuccess")}
+                                </Typography>
+                            </Stack>
+
+                            <Button
+                                variant="contained"
+                                size="large"
+                                onClick={() => navigate('/')}
+                                sx={{
+                                    mt: 2,
+                                    bgcolor: 'white',
+                                    color: 'success.main',
+                                    fontWeight: 700,
+                                    px: 6,
+                                    py: 1.5,
+                                    borderRadius: 2,
+                                    '&:hover': {
+                                        bgcolor: 'rgba(255, 255, 255, 0.9)',
+                                    }
+                                }}
+                            >
+                                {t("turnstile:scanPage.okButton")}
+                            </Button>
+                        </Stack>
+                    </Grow>
+                </Box>
+            </Fade>
+
+            <Box sx={{maxWidth: 560, mx: "auto", px: 2, py: 3}}>
+                <Stack spacing={2}>
                 {/* ÜST KART */}
                 <Card sx={{borderRadius: 3}}>
                     <CardContent>
@@ -208,5 +290,6 @@ export default function TurnstileScanPage() {
                 )}
             </Stack>
         </Box>
+        </>
     );
 }
