@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {
     Container,
     Box,
@@ -52,6 +52,36 @@ export default function CompanyPage() {
     const [turnstileLoading, setTurnstileLoading] = useState(false);
     const [canActAsTurnstile, setCanActAsTurnstile] = useState(false);
 
+    const fetchCompanyDetails = useCallback(async () => {
+        try {
+            setLoading(true);
+
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/companies/get`,
+                {companyId},
+                {
+                    headers: {
+                        'x-access-token': token,
+                    },
+                }
+            );
+
+            if (response.data?.success) {
+                setCompany(response.data?.data);
+            } else {
+                showAlert(response.data?.message || t('company:errors.loadFailed'), 'error');
+                navigate('/');
+            }
+        } catch (err) {
+
+            console.error(err.response?.data?.message || t('company:errors.consoleLoadError'), err);
+            showAlert(err.response?.data?.message || t('company:errors.loadErrorGeneric'), 'error');
+            navigate('/');
+        } finally {
+            setLoading(false);
+        }
+    }, [companyId, token, t, showAlert, navigate]);
+
     useEffect(() => {
         fetchCompanyDetails();
         // eslint-disable-next-line
@@ -81,36 +111,6 @@ export default function CompanyPage() {
                 return 'de-DE';
             default:
                 return 'en-US';
-        }
-    };
-
-    const fetchCompanyDetails = async () => {
-        try {
-            setLoading(true);
-
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_URL}/companies/get`,
-                {companyId},
-                {
-                    headers: {
-                        'x-access-token': token,
-                    },
-                }
-            );
-
-            if (response.data?.success) {
-                setCompany(response.data?.data);
-            } else {
-                showAlert(response.data?.message || t('company:errors.loadFailed'), 'error');
-                navigate('/');
-            }
-        } catch (err) {
-
-            console.error(err.response?.data?.message || t('company:errors.consoleLoadError'), err);
-            showAlert(err.response?.data?.message || t('company:errors.loadErrorGeneric'), 'error');
-            navigate('/');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -544,12 +544,14 @@ export default function CompanyPage() {
                 onClose={() => setTransferDialogOpen(false)}
                 sourceAccount={company}
                 fromScope="company"
+                handleSuccess={fetchCompanyDetails}
             />
             <ExternalMoneyDialog
                 open={externalMoneyDialogOpen}
                 onClose={() => setExternalMoneyDialogOpen(false)}
                 targetAccount={company}
                 targetScope="company"
+                handleSuccess={fetchCompanyDetails}
             />
             <CompanySettingsDialog
                 open={settingsDialogOpen}

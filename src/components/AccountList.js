@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
     Container,
     Box,
@@ -52,36 +52,37 @@ export default function AccountList() {
         }
     };
 
-    useEffect(() => {
-        const fetchAccounts = async () => {
-            try {
-                setLoading(true);
-                setError('');
+    const fetchAccounts = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError('');
 
-                const response = await axios.get(
-                    `${process.env.REACT_APP_API_URL}/accounts`,
-                    {
-                        headers: { 'x-access-token': token }
-                    }
-                );
+            const response = await axios.get(
+                `${process.env.REACT_APP_API_URL}/accounts`,
+                {
+                    headers: { 'x-access-token': token }
+                }
+            );
 
-                if (response.data.status === 'success') {
-                    setAccounts(response.data.accounts);
-                }
-            } catch (err) {
-                console.error(t('accounts:errors.consoleLoadError'), err);
-                if (err.response) {
-                    setError(err.response.data.message || t('accounts:errors.loadFailed'));
-                } else if (err.request) {
-                    setError(t('accounts:errors.serverUnreachable'));
-                } else {
-                    setError(t('accounts:errors.unexpected'));
-                }
-            } finally {
-                setLoading(false);
+            if (response.data.status === 'success') {
+                setAccounts(response.data.accounts);
             }
-        };
+        } catch (err) {
+            console.error(t('accounts:errors.consoleLoadError'), err);
+            if (err.response) {
+                setError(err.response.data.message || t('accounts:errors.loadFailed'));
+            } else if (err.request) {
+                setError(t('accounts:errors.serverUnreachable'));
+            } else {
+                setError(t('accounts:errors.unexpected'));
+            }
+        } finally {
+            setLoading(false);
+        }
+        // eslint-disable-next-line
+    }, [token]);
 
+    useEffect(() => {
         if (token) {
             fetchAccounts();
         }
@@ -388,6 +389,7 @@ export default function AccountList() {
                 onClose={handleTransferDialogClose}
                 sourceAccount={selectedAccount}
                 fromScope="user"
+                handleSuccess={fetchAccounts}
             />
 
             <ExternalMoneyDialog
@@ -395,6 +397,7 @@ export default function AccountList() {
                 onClose={handleExternalMoneyDialogClose}
                 targetAccount={selectedAccount}
                 targetScope="user"
+                handleSuccess={fetchAccounts}
             />
 
             <TransfersDialog

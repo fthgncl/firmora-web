@@ -34,7 +34,7 @@ import Paper from "@mui/material/Paper";
 // -----------------------------
 // helpers
 // -----------------------------
-const currencySymbol = (code) => {
+const currencySymbol = (code) => { // TODO: Burası src/constants/currencies.js içinden alınabilir
     switch (code) {
         case 'USD':
             return '$';
@@ -188,7 +188,7 @@ const ALL_TYPES = [
 // -----------------------------
 // component
 // -----------------------------
-export default function MoneyTransferDialog({open, onClose, sourceAccount = null, fromScope}) {
+export default function MoneyTransferDialog({open, onClose, sourceAccount = null, fromScope, handleSuccess}) {
     const {t} = useTranslation(['transfers', 'common']);
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -367,7 +367,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
         }
 
         // dosyaları ekle
-        attachedFiles.forEach((file, index) => {
+        attachedFiles.forEach((file) => {
             formData.append('attachments', file);
         });
 
@@ -401,6 +401,11 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
                 setToExternalName('');
                 setAttachedFiles([]);
                 onClose?.(res.data);
+
+                if (typeof handleSuccess === 'function') {
+                    handleSuccess();
+                }
+
             } else {
                 showError(res?.data?.message || t('transfers:create.failed'));
             }

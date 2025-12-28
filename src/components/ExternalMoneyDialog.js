@@ -33,7 +33,7 @@ import { useAlert } from '../contexts/AlertContext';
 import { permissionsService } from '../services/permissionsService';
 import { useTranslation } from 'react-i18next';
 
-export default function ExternalMoneyDialog({ open, onClose, targetAccount = null, targetScope = 'user' }) {
+export default function ExternalMoneyDialog({ open, onClose, targetAccount = null, targetScope = 'user', handleSuccess }) {
     const { t } = useTranslation(['externalMoney']);
     const { token, user } = useAuth();
     const { showAlert } = useAlert();
@@ -171,6 +171,11 @@ export default function ExternalMoneyDialog({ open, onClose, targetAccount = nul
                 formik.resetForm();
                 setAttachedFiles([]);
                 onClose();
+
+                if (typeof handleSuccess === 'function') {
+                    handleSuccess();
+                }
+
             } else {
                 showAlert(response.data.message || t('errors.addFailed'), 'error');
             }
