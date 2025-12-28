@@ -10,11 +10,11 @@ export default function HomePage() {
         <>
             <QRInfoBanner />
             <Divider/>
+            <PeendingTransfers />
+            <Divider/>
             <CompanyList />
             <Divider/>
             <AccountList />
-            <Divider/>
-            <PeendingTransfers />
         </>
     );
 }
