@@ -23,7 +23,7 @@
   },
   "qrInfoBanner": {
     "title": "Turnstile Entry / Exit",
-    "description": "You need to scan the QR code when entering or exiting the company.",
+    "description": "You need to scan the QR code when entering and exiting the company.",
     "buttonText": "Scan QR Code"
   },
   "scan": {

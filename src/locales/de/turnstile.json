@@ -23,7 +23,7 @@
   },
   "qrInfoBanner": {
     "title": "Drehkreuz Ein-/Ausgang",
-    "description": "Sie müssen den QR-Code scannen, wenn Sie das Unternehmen betreten oder verlassen.",
+    "description": "Beim Ein- und Ausgang im Unternehmen müssen Sie den QR-Code scannen.",
     "buttonText": "QR-Code scannen"
   },
   "scan": {

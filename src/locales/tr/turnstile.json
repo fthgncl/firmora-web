@@ -23,7 +23,7 @@
   },
   "qrInfoBanner": {
     "title": "Turnike Giriş / Çıkış",
-    "description": "Firmaya giriş veya çıkış yaparken QR kodu okutmanız gerekmektedir.",
+    "description": "Firmaya giriş ve çıkış yaparken QR kodu okutmanız gerekmektedir.",
     "buttonText": "QR Kodu Okut"
   },
   "scan": {
