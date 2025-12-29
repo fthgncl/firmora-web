@@ -18,7 +18,6 @@ import {
     AccountBalance,
     Business,
     CalendarToday,
-    TrendingUp,
     Person,
     MoreVert,
     History,
@@ -285,51 +284,21 @@ export default function AccountList() {
                                     sx={{fontWeight: 600}}
                                 />
 
-                                {account.is_working === 1 ? (
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.5,
-                                            px: 1.5,
-                                            py: 0.5,
-                                            borderRadius: 2,
-                                            backgroundColor: 'success.light',
-                                            border: '1px solid',
-                                            borderColor: 'success.main',
-                                        }}
-                                    >
-                                        <WorkOutline sx={{fontSize: 18, color: 'white'}}/>
-                                        <Typography
-                                            variant="caption"
-                                            sx={{fontWeight: 700, color: 'white', letterSpacing: '0.3px'}}
-                                        >
-                                            {t('accounts:working')}
-                                        </Typography>
-                                    </Box>
-                                ) : (
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.5,
-                                            px: 1.5,
-                                            py: 0.5,
-                                            borderRadius: 2,
-                                            backgroundColor: 'action.hover',
-                                            border: '1px solid',
-                                            borderColor: 'divider',
-                                        }}
-                                    >
-                                        <WorkOff sx={{fontSize: 18, color: 'text.secondary'}}/>
-                                        <Typography
-                                            variant="caption"
-                                            sx={{fontWeight: 700, color: 'text.secondary', letterSpacing: '0.3px'}}
-                                        >
-                                            {t('accounts:notWorking')}
-                                        </Typography>
-                                    </Box>
-                                )}
+                                <Chip
+                                    icon={account.is_working === 1 ? <WorkOutline /> : <WorkOff />}
+                                    label={account.is_working === 1 ? t('accounts:working') : t('accounts:notWorking')}
+                                    color={account.is_working === 1 ? "success" : "default"}
+                                    size="small"
+                                    variant={account.is_working === 1 ? "filled" : "outlined"}
+                                    sx={{
+                                        fontWeight: 600,
+                                        ...(account.is_working === 1 && {
+                                            '& .MuiChip-icon': {
+                                                color: 'inherit',
+                                            },
+                                        }),
+                                    }}
+                                />
                             </Box>
 
                             {/* Bakiye */}
