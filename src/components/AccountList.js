@@ -23,17 +23,19 @@ import {
     MoreVert,
     History,
     SwapHoriz,
-    AddCircle
+    AddCircle,
+    WorkOutline,
+    WorkOff
 } from '@mui/icons-material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
 import MoneyTransferDialog from './MoneyTransferDialog';
 import ExternalMoneyDialog from './ExternalMoneyDialog';
 import TransfersDialog from './TransfersDialog';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
 export default function AccountList() {
-    const { t, i18n } = useTranslation(['accounts']);
+    const {t, i18n} = useTranslation(['accounts']);
     const {token, user} = useAuth();
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -46,9 +48,12 @@ export default function AccountList() {
 
     const mapLngToLocale = (lng) => {
         switch (lng) {
-            case 'tr': return 'tr-TR';
-            case 'de': return 'de-DE';
-            default: return 'en-US';
+            case 'tr':
+                return 'tr-TR';
+            case 'de':
+                return 'de-DE';
+            default:
+                return 'en-US';
         }
     };
 
@@ -60,10 +65,11 @@ export default function AccountList() {
             const response = await axios.get(
                 `${process.env.REACT_APP_API_URL}/accounts`,
                 {
-                    headers: { 'x-access-token': token }
+                    headers: {'x-access-token': token}
                 }
             );
 
+            console.log('Accounts fetched:', response.data);
             if (response.data.status === 'success') {
                 setAccounts(response.data.accounts);
             }
@@ -212,20 +218,19 @@ export default function AccountList() {
                             overflow: 'hidden',
                             position: 'relative',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': { transform: 'translateY(-6px)', boxShadow: 6 },
+                            '&:hover': {transform: 'translateY(-6px)', boxShadow: 6},
                             '&::before': {
                                 content: '""',
                                 position: 'absolute',
                                 inset: 0,
                                 height: 4,
-                                background:
-                                    'linear-gradient(90deg, rgba(99,102,241,0.8), rgba(236,72,153,0.8))',
-                            },
+                                background :'linear-gradient(90deg, rgba(99,102,241,0.8), rgba(236,72,153,0.8))',
+                        },
                         }}
                     >
-                        <CardContent sx={{ pt: 3.5, pb: 2, px: 3 }}>
+                        <CardContent sx={{pt: 3.5, pb: 2, px: 3}}>
                             {/* Başlık: avatar yerine ikon + title/subheader */}
-                            <Box sx={{ position: 'relative' }}>
+                            <Box sx={{position: 'relative'}}>
                                 <IconButton
                                     onClick={(e) => handleMenuOpen(e, account)}
                                     size="small"
@@ -234,20 +239,21 @@ export default function AccountList() {
                                         top: -4,
                                         right: -4,
                                         color: 'text.secondary',
-                                        '&:hover': { color: 'primary.main', backgroundColor: 'action.hover' },
+                                        '&:hover': {color: 'primary.main', backgroundColor: 'action.hover'},
                                     }}
                                     aria-label={t('accounts:aria.more')}
                                 >
-                                    <MoreVert />
+                                    <MoreVert/>
                                 </IconButton>
 
                                 <Stack direction="row" spacing={1.5} alignItems="center">
-                                    <Person sx={{ fontSize: 28, color: 'primary.main' }} />
+                                    <Person sx={{fontSize: 28, color: 'primary.main'}}/>
 
                                     <Box>
                                         {/* Kullanıcı adı */}
                                         <Typography
-                                                variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.1 }}
+                                            variant="subtitle1"
+                                            sx={{fontWeight: 700, color: 'text.primary', lineHeight: 1.1}}
                                         >
                                             {account.name}
                                         </Typography>
@@ -255,7 +261,7 @@ export default function AccountList() {
                                         {/* Firma adı (accountName altı) */}
                                         <Typography
                                             variant="body2"
-                                            sx={{ color: 'text.secondary', mt: 0.35 }}
+                                            sx={{color: 'text.secondary', mt: 0.35}}
                                         >
                                             {account.company?.company_name}
                                         </Typography>
@@ -276,30 +282,74 @@ export default function AccountList() {
                                     label={account.currency}
                                     size="small"
                                     color="primary"
-                                    sx={{ fontWeight: 600 }}
+                                    sx={{fontWeight: 600}}
                                 />
 
-                                <TrendingUp sx={{ color: 'success.main', fontSize: 26 }} />
+                                {account.is_working === 1 ? (
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                            px: 1.5,
+                                            py: 0.5,
+                                            borderRadius: 2,
+                                            backgroundColor: 'success.light',
+                                            border: '1px solid',
+                                            borderColor: 'success.main',
+                                        }}
+                                    >
+                                        <WorkOutline sx={{fontSize: 18, color: 'white'}}/>
+                                        <Typography
+                                            variant="caption"
+                                            sx={{fontWeight: 700, color: 'white', letterSpacing: '0.3px'}}
+                                        >
+                                            {t('accounts:working')}
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                            px: 1.5,
+                                            py: 0.5,
+                                            borderRadius: 2,
+                                            backgroundColor: 'action.hover',
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                        }}
+                                    >
+                                        <WorkOff sx={{fontSize: 18, color: 'text.secondary'}}/>
+                                        <Typography
+                                            variant="caption"
+                                            sx={{fontWeight: 700, color: 'text.secondary', letterSpacing: '0.3px'}}
+                                        >
+                                            {t('accounts:notWorking')}
+                                        </Typography>
+                                    </Box>
+                                )}
                             </Box>
 
                             {/* Bakiye */}
-                            <Box sx={{ mt: 1.5 }}>
+                            <Box sx={{mt: 1.5}}>
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"
-                                    sx={{ mb: 0.5, fontWeight: 500 }}
+                                    sx={{mb: 0.5, fontWeight: 500}}
                                 >
                                     {t('accounts:balance')}
                                 </Typography>
                                 <Typography
                                     variant="h4"
-                                    sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: '-0.5px' }}
+                                    sx={{fontWeight: 800, color: 'primary.main', letterSpacing: '-0.5px'}}
                                 >
                                     {formatBalance(account.balance, account.currency)}
                                 </Typography>
                             </Box>
 
-                            <Divider sx={{ my: 2 }} />
+                            <Divider sx={{my: 2}}/>
 
                             {/* Firma bloğu (pill) */}
                             {account.company && (
@@ -314,11 +364,11 @@ export default function AccountList() {
                                         backgroundColor: 'action.hover',
                                     }}
                                 >
-                                    <Business sx={{ fontSize: 20, color: 'primary.main', opacity: 0.9 }} />
+                                    <Business sx={{fontSize: 20, color: 'primary.main', opacity: 0.9}}/>
 
                                     <Typography
                                         variant="body2"
-                                        sx={{ fontWeight: 600, color: 'text.primary' }}
+                                        sx={{fontWeight: 600, color: 'text.primary'}}
                                     >
                                         {account.company.company_name}
                                     </Typography>
@@ -342,14 +392,22 @@ export default function AccountList() {
                                 </Box>
                             )}
 
-                            {/* Kayıt tarihi */}
-                            <Box sx={{ mt: 1.5 }}>
+                            {/* Kayıt tarihi ve Son Çalışma */}
+                            <Box sx={{mt: 1.5}}>
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <CalendarToday sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                    <CalendarToday sx={{fontSize: 16, color: 'text.secondary'}}/>
                                     <Typography variant="caption" color="text.secondary">
-                                        {t('accounts:registeredAt', { date: formatDate(account.created_at) })}
+                                        {t('accounts:registeredAt', {date: formatDate(account.created_at)})}
                                     </Typography>
                                 </Stack>
+                                {account.is_working === 1 && account.last_worked_at && (
+                                    <Stack direction="row" spacing={1} alignItems="center" sx={{mt: 0.5}}>
+                                        <WorkOutline sx={{fontSize: 16, color: 'success.main'}}/>
+                                        <Typography variant="caption" sx={{color: 'success.main', fontWeight: 600}}>
+                                            {t('accounts:lastWorkedAt', {date: formatDate(account.last_worked_at)})}
+                                        </Typography>
+                                    </Stack>
+                                )}
                             </Box>
                         </CardContent>
                     </Card>
@@ -371,15 +429,15 @@ export default function AccountList() {
                 }}
             >
                 <MenuItem onClick={handleTransferClick}>
-                    <SwapHoriz sx={{ mr: 1, fontSize: 20 }} />
+                    <SwapHoriz sx={{mr: 1, fontSize: 20}}/>
                     {t('accounts:menu.moneyTransfer')}
                 </MenuItem>
                 <MenuItem onClick={handleExternalMoneyClick}>
-                    <AddCircle sx={{ mr: 1, fontSize: 20 }} />
+                    <AddCircle sx={{mr: 1, fontSize: 20}}/>
                     {t('accounts:menu.addIncome')}
                 </MenuItem>
                 <MenuItem onClick={handleTransfersHistoryClick}>
-                    <History sx={{ mr: 1, fontSize: 20 }} />
+                    <History sx={{mr: 1, fontSize: 20}}/>
                     {t('accounts:menu.viewTransferHistory')}
                 </MenuItem>
             </Menu>

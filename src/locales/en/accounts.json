@@ -2,6 +2,9 @@
   "title": "My Accounts",
   "empty": "You do not have any accounts yet.",
   "balance": "Balance",
+  "working": "Working",
+  "notWorking": "Not Working",
+  "lastWorkedAt": "Last Worked At: {{date}}",
   "registeredAt": "Registered on: {{date}}",
   "menu": {
     "moneyTransfer": "Money Transfer",

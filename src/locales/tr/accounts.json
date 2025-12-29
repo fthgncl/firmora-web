@@ -2,6 +2,9 @@
   "title": "Hesaplarım",
   "empty": "Henüz hesabınız bulunmamaktadır.",
   "balance": "Bakiye",
+  "working": "İşte",
+  "notWorking": "İşte Değil",
+  "lastWorkedAt": "Son Çalışma: {{date}}",
   "registeredAt": "Kayıt Tarihi: {{date}}",
   "menu": {
     "moneyTransfer": "Para Transferi",
