@@ -2,9 +2,10 @@
   "title": "Meine Konten",
   "empty": "Sie haben noch keine Konten.",
   "balance": "Kontostand",
-  "working": "In Betrieb",
-  "notWorking": "Außer Betrieb",
-  "lastWorkedAt": "Zuletzt in Betrieb: {{date}}",
+  "working": "Bei der Arbeit",
+  "notWorking": "Nicht bei der Arbeit",
+  "workStartedAt": "Beginn: {{date}}",
+  "workEndedAt": "Ende: {{date}}",
   "registeredAt": "Registriert am: {{date}}",
   "menu": {
     "moneyTransfer": "Geldüberweisung",

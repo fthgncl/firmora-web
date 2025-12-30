@@ -102,6 +102,16 @@ export default function AccountList() {
         });
     };
 
+    const formatDateTime = (dateString) => {
+        return new Date(dateString).toLocaleString(mapLngToLocale(i18n.language), {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
     const formatBalance = (balance, currency) => {
         return new Intl.NumberFormat(mapLngToLocale(i18n.language), {
             style: 'currency',
@@ -361,7 +371,7 @@ export default function AccountList() {
                                 </Box>
                             )}
 
-                            {/* Kayıt tarihi ve Son Çalışma */}
+                            {/* Kayıt tarihi ve Çalışma Saati */}
                             <Box sx={{mt: 1.5}}>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <CalendarToday sx={{fontSize: 16, color: 'text.secondary'}}/>
@@ -369,12 +379,23 @@ export default function AccountList() {
                                         {t('accounts:registeredAt', {date: formatDate(account.created_at)})}
                                     </Typography>
                                 </Stack>
-                                {account.is_working === 1 && account.last_worked_at && (
+                                {account.last_worked_at && (
                                     <Stack direction="row" spacing={1} alignItems="center" sx={{mt: 0.5}}>
-                                        <WorkOutline sx={{fontSize: 16, color: 'success.main'}}/>
-                                        <Typography variant="caption" sx={{color: 'success.main', fontWeight: 600}}>
-                                            {t('accounts:lastWorkedAt', {date: formatDate(account.last_worked_at)})}
-                                        </Typography>
+                                        {account.is_working === 1 ? (
+                                            <>
+                                                <WorkOutline sx={{fontSize: 16, color: 'success.main'}}/>
+                                                <Typography variant="caption" sx={{color: 'success.main', fontWeight: 600}}>
+                                                    {t('accounts:workStartedAt', {date: formatDateTime(account.last_worked_at)})}
+                                                </Typography>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <WorkOff sx={{fontSize: 16, color: 'text.secondary'}}/>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {t('accounts:workEndedAt', {date: formatDateTime(account.last_worked_at)})}
+                                                </Typography>
+                                            </>
+                                        )}
                                     </Stack>
                                 )}
                             </Box>

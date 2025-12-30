@@ -4,7 +4,8 @@
   "balance": "Bakiye",
   "working": "İşte",
   "notWorking": "İşte Değil",
-  "lastWorkedAt": "Son Çalışma: {{date}}",
+  "workStartedAt": "Başlangıç: {{date}}",
+  "workEndedAt": "Çıkış: {{date}}",
   "registeredAt": "Kayıt Tarihi: {{date}}",
   "menu": {
     "moneyTransfer": "Para Transferi",
