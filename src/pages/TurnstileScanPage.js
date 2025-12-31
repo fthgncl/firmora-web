@@ -76,8 +76,6 @@ export default function TurnstileScanPage() {
                 }
             );
 
-            console.log(response.data);
-
             if (response.data?.status === 'success') {
                 // Başarı overlay'ini göster
                 setShowSuccessOverlay(true);

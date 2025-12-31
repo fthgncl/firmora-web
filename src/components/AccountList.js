@@ -68,7 +68,6 @@ export default function AccountList() {
                 }
             );
 
-            console.log('Accounts fetched:', response.data);
             if (response.data.status === 'success') {
                 setAccounts(response.data.accounts);
             }
