@@ -1,7 +1,10 @@
 import React from 'react';
-import {Paper, Typography, Box, useTheme} from '@mui/material';
+import {Paper, Typography, Box, useTheme, Divider, Chip, Stack} from '@mui/material';
 import {useTranslation} from "react-i18next";
 import {Bar, BarChart, CartesianGrid, Rectangle, Tooltip, XAxis, YAxis, ResponsiveContainer} from 'recharts';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 
 export default function WorkTimelineChart({sessions}) {
     const {t, i18n} = useTranslation();
@@ -39,22 +42,28 @@ export default function WorkTimelineChart({sessions}) {
         }
     });
 
-    // Custom Rectangle component with MUI theme colors
+    // Custom Rectangle component with gradient and shadow
     const CustomFillRectangle = (props) => {
         const isOpen = props.payload?.isOpen || false;
         const barColor = isOpen
             ? theme.palette.success.main
             : theme.palette.primary.main;
-        return <Rectangle {...props} fill={barColor}/>;
+        return <Rectangle {...props} fill={barColor} opacity={0.9}/>;
     };
 
-    // Active bar style with MUI theme
+    // Active bar style with enhanced hover effect
     const ActiveRectangle = (props) => {
         const isOpen = props.payload?.isOpen || false;
         const barColor = isOpen
             ? theme.palette.success.main
             : theme.palette.primary.main;
-        return <Rectangle {...props} fill={barColor} stroke={theme.palette.warning.main} strokeWidth={2}/>;
+        return <Rectangle
+            {...props}
+            fill={barColor}
+            stroke={theme.palette.warning.main}
+            strokeWidth={3}
+            opacity={1}
+        />;
     };
 
     // Transform sessions data for the chart
@@ -156,49 +165,163 @@ export default function WorkTimelineChart({sessions}) {
         return null;
     };
 
+    // Calculate total stats
+    const totalSessions = splitSessions.length;
+    const activeSessions = splitSessions.filter(s => s.isOpen).length;
+    const completedSessions = totalSessions - activeSessions;
+
     return (
-        <Paper elevation={2} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-                {t('users:workTimeline', 'Çalışma Zaman Çizelgesi')}
-            </Typography>
-            <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 60)}>
-                <BarChart
-                    layout="vertical"
-                    data={chartData}
-                    margin={{ top: 20, right: 30, left: 100, bottom: 50 }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-                    <Tooltip content={<CustomTooltip />} shared={false} cursor={{ fill: theme.palette.action.hover }} />
-                    <XAxis
-                        type="number"
-                        domain={[0, 24]}
-                        ticks={[0, 3, 6, 9, 12, 15, 18, 21, 24]}
-                        tickFormatter={(value) => `${value}:00`}
-                        height={50}
-                        label={{ value: t('users:hours', 'Saat'), position: 'insideBottom', offset: -10 }}
-                        stroke={theme.palette.text.secondary}
-                        tick={{ fill: theme.palette.text.secondary }}
-                    />
-                    <YAxis
-                        type="category"
-                        dataKey="name"
-                        width={90}
-                        stroke={theme.palette.text.secondary}
-                        tick={{ fill: theme.palette.text.secondary }}
-                    />
-                    {Array.from({ length: maxSessions }, (_, idx) => (
-                        <Bar
-                            key={`session${idx}`}
-                            dataKey={`session${idx}`}
-                            stackId="a"
-                            radius={8}
-                            maxBarSize={35}
-                            shape={CustomFillRectangle}
-                            activeBar={ActiveRectangle}
+        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <Paper
+                elevation={3}
+                sx={{
+                    p: 4,
+                    maxWidth: 1400,
+                    width: '100%',
+                    borderRadius: 2,
+                    background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.background.default} 100%)`
+                }}
+            >
+                {/* Header Section */}
+                <Box sx={{ mb: 3 }}>
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                        <AccessTimeIcon sx={{ fontSize: 28, color: theme.palette.primary.main }} />
+                        <Typography variant="h5" fontWeight="bold" sx={{ color: theme.palette.text.primary }}>
+                            {t('users:workTimeline', 'Çalışma Zaman Çizelgesi')}
+                        </Typography>
+                    </Stack>
+
+                    {/* Stats Chips */}
+                    <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+                        <Chip
+                            icon={<CheckCircleIcon />}
+                            label={`${completedSessions} ${t('users:completedSessions', 'Tamamlanan')}`}
+                            color="primary"
+                            variant="outlined"
+                            size="small"
                         />
-                    ))}
-                </BarChart>
-            </ResponsiveContainer>
-        </Paper>
+                        <Chip
+                            icon={<RadioButtonCheckedIcon />}
+                            label={`${activeSessions} ${t('users:activeSessions', 'Devam Eden')}`}
+                            color="success"
+                            variant="outlined"
+                            size="small"
+                        />
+                        <Chip
+                            label={`${chartData.length} ${t('users:days', 'Gün')}`}
+                            variant="outlined"
+                            size="small"
+                        />
+                    </Stack>
+
+                    <Divider sx={{ mt: 2 }} />
+                </Box>
+
+                {/* Chart Section */}
+                <Box sx={{
+                    bgcolor: theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.02)'
+                        : 'rgba(0, 0, 0, 0.02)',
+                    borderRadius: 2,
+                    p: 2,
+                    width: '100%'
+                }}>
+                    <Box sx={{ width: '100%', height: Math.max(650, chartData.length * 65) }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                            layout="vertical"
+                            data={chartData}
+                        >
+                            <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke={theme.palette.divider}
+                                opacity={0.5}
+                            />
+                            <Tooltip
+                                content={<CustomTooltip />}
+                                shared={false}
+                                cursor={{
+                                    fill: theme.palette.action.hover,
+                                    opacity: 0.3
+                                }}
+                            />
+                            <XAxis
+                                type="number"
+                                domain={[0, 24]}
+                                ticks={[0, 3, 6, 9, 12, 15, 18, 21, 24]}
+                                tickFormatter={(value) => `${value}:00`}
+                                height={60}
+                                label={{
+                                    value: t('users:hours', 'Saat'),
+                                    position: 'insideBottom',
+                                    offset: -15,
+                                    style: {
+                                        fill: theme.palette.text.primary,
+                                        fontWeight: 600,
+                                        fontSize: 14
+                                    }
+                                }}
+                                stroke={theme.palette.text.secondary}
+                                tick={{
+                                    fill: theme.palette.text.secondary,
+                                    fontSize: 12
+                                }}
+                            />
+                            <YAxis
+                                type="category"
+                                dataKey="name"
+                                width={110}
+                                stroke={theme.palette.text.secondary}
+                                tick={{
+                                    fill: theme.palette.text.primary,
+                                    fontSize: 12,
+                                    fontWeight: 500
+                                }}
+                            />
+                            {Array.from({ length: maxSessions }, (_, idx) => (
+                                <Bar
+                                    key={`session${idx}`}
+                                    dataKey={`session${idx}`}
+                                    stackId="a"
+                                    radius={[10, 10, 10, 10]}
+                                    maxBarSize={40}
+                                    shape={CustomFillRectangle}
+                                    activeBar={ActiveRectangle}
+                                />
+                            ))}
+                        </BarChart>
+                        </ResponsiveContainer>
+                    </Box>
+                </Box>
+
+                {/* Legend */}
+                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 3 }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        <Box sx={{
+                            width: 16,
+                            height: 16,
+                            bgcolor: theme.palette.primary.main,
+                            borderRadius: 1,
+                            opacity: 0.9
+                        }} />
+                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+                            {t('users:completedWork', 'Tamamlanan Çalışma')}
+                        </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        <Box sx={{
+                            width: 16,
+                            height: 16,
+                            bgcolor: theme.palette.success.main,
+                            borderRadius: 1,
+                            opacity: 0.9
+                        }} />
+                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+                            {t('users:ongoingWork', 'Devam Eden Çalışma')}
+                        </Typography>
+                    </Stack>
+                </Box>
+            </Paper>
+        </Box>
     );
 }
