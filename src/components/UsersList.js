@@ -80,17 +80,30 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
 
     // Bakiye görüntüleme yetkisi kontrolü
     const [canViewBalance, setCanViewBalance] = useState(false);
+    const [canViewWorkStatus, setCanViewWorkStatus] = useState(false);
 
     useEffect(() => {
         const checkPermission = async () => {
             if (token && user && companyId) {
-                const hasPermission = await permissionsService.checkUserRoles(
-                    token,
-                    user,
-                    companyId,
-                    ['can_view_other_users_transfer_history']
+
+                setCanViewWorkStatus(
+                    await permissionsService.checkUserRoles(
+                        token,
+                        user,
+                        companyId,
+                        ['can_view_user_work_status']
+                    )
                 );
-                setCanViewBalance(hasPermission);
+
+                setCanViewBalance(
+                    await permissionsService.checkUserRoles(
+                        token,
+                        user,
+                        companyId,
+                        ['can_view_other_users_transfer_history']
+                    )
+                );
+
             }
         };
         checkPermission();
@@ -547,7 +560,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                 }}>
                     <TableHead>
                         <TableRow>
-                            <TableCell>{t('list.columns.working_status')}</TableCell>
+                            {canViewWorkStatus && <TableCell>{t('list.columns.working_status')}</TableCell>}
                             {COLUMN_DEFS.filter(c => {
                                 if (c.key === 'balance' && !hasAnyBalance) return false;
                                 if (c.key === 'permissions' && !hasAnyPermissions) return false;
@@ -565,7 +578,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     if (c.key === 'balance' && !hasAnyBalance) return false;
                                     if (c.key === 'permissions' && !hasAnyPermissions) return false;
                                     return visibleCols[c.key];
-                                }).length + 1}>
+                                }).length + (canViewWorkStatus ? 1 : 0)}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <CircularProgress size={18} />
                                         <Typography variant="body2" color="text.secondary">{t('list.loading')}</Typography>
@@ -578,7 +591,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     if (c.key === 'balance' && !hasAnyBalance) return false;
                                     if (c.key === 'permissions' && !hasAnyPermissions) return false;
                                     return visibleCols[c.key];
-                                }).length + 1}>
+                                }).length + (canViewWorkStatus ? 1 : 0)}>
                                     <Box
                                         sx={{
                                             py: 6,
