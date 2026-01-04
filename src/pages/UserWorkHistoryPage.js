@@ -15,9 +15,10 @@ import {
     Box,
     Avatar,
     IconButton,
-    Paper
+    Paper,
+    InputAdornment
 } from '@mui/material';
-import { ArrowBack, AccessTime, Phone } from '@mui/icons-material';
+import { ArrowBack, AccessTime, Phone, CalendarToday } from '@mui/icons-material';
 import WorkTimelineChart from '../components/WorkTimelineChart';
 import { formatPhoneForTel } from '../utils/phoneUtils';
 
@@ -134,8 +135,8 @@ export default function UserWorkHistoryPage() {
             {/* Date Filter Card */}
             <Card sx={{ mb: 3, borderRadius: 3, border: (t) => `1px solid ${t.palette.divider}` }}>
                 <Box sx={{ p: 3 }}>
-                    <Grid container spacing={2} alignItems="flex-end">
-                        <Grid item xs={12} md={4}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} sm={5}>
                             <TextField
                                 fullWidth
                                 type="date"
@@ -143,9 +144,16 @@ export default function UserWorkHistoryPage() {
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
                                 InputLabelProps={{ shrink: true }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <CalendarToday sx={{ color: 'text.secondary' }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} sm={5}>
                             <TextField
                                 fullWidth
                                 type="date"
@@ -153,9 +161,16 @@ export default function UserWorkHistoryPage() {
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 InputLabelProps={{ shrink: true }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <CalendarToday sx={{ color: 'text.secondary' }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
                             />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} sm={2}>
                             <Button
                                 fullWidth
                                 variant="contained"
