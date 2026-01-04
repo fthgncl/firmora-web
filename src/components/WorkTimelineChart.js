@@ -165,7 +165,8 @@ export default function WorkTimelineChart({sessions}) {
                                 <Box key={index} sx={{ mb: 0.5 }}>
                                     <Typography variant="caption" display="block" sx={{ color: entry.color, fontWeight: 600 }}>
                                         {String(hours).padStart(2, '0')}:{String(mins).padStart(2, '0')} - {String(endHours).padStart(2, '0')}:{String(endMins).padStart(2, '0')}
-                                        {' '}({durationHours}h {durationMins}m)
+                                        {' '}({durationHours} {t('common:hour')} {durationMins} {t('common:minute')})
+
                                     </Typography>
                                     {meta?.entryNote && (
                                         <Typography variant="caption" display="block" sx={{ color: theme.palette.info.main, fontStyle: 'italic' }}>
