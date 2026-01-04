@@ -61,5 +61,8 @@
   "balance": "Kontostand",
   "optional": "Optional",
   "rightsReserved": "Alle Rechte vorbehalten.",
-  "filter": "Filter"
+  "filter": "Filter",
+  "hour": "Stunde",
+  "minute": "Minute",
+  "second": "Sekunde"
 }

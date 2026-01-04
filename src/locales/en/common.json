@@ -61,5 +61,8 @@
   "balance": "Balance",
   "optional": "Optional",
   "rightsReserved": "All rights reserved.",
-  "filter": "Filter"
+  "filter": "Filter",
+  "hour": "Hour",
+  "minute": "Minute",
+  "second": "Second"
 }

@@ -62,5 +62,8 @@
   "balance": "Bakiye",
   "optional": "İsteğe bağlı",
   "rightsReserved": "Tüm hakları saklıdır.",
-  "filter": "Filtrele"
+  "filter": "Filtrele",
+  "hour": "Saat",
+  "minute": "Dakika",
+  "second": "Saniye"
 }
