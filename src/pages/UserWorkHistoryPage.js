@@ -1,30 +1,35 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import {
     Container,
     Card,
-    CardHeader,
-    CardContent,
     CircularProgress,
     Alert,
     Button,
     TextField,
     Grid,
     Typography,
-    Box
+    Box,
+    Avatar,
+    IconButton,
+    Paper
 } from '@mui/material';
+import { ArrowBack, AccessTime, Phone } from '@mui/icons-material';
 import WorkTimelineChart from '../components/WorkTimelineChart';
+import { formatPhoneForTel } from '../utils/phoneUtils';
 
 export default function UserWorkHistoryPage() {
     const { userId, companyId } = useParams();
+    const navigate = useNavigate();
     const { token } = useAuth();
     const { t } = useTranslation(['users']);
 
     const [sessions, setSessions] = useState([]);
     const [totalMinutes, setTotalMinutes] = useState(0);
+    const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -60,6 +65,7 @@ export default function UserWorkHistoryPage() {
 
             setSessions(response.data.sessions || []);
             setTotalMinutes(response.data.totalMinutes || 0);
+            setUserInfo(response.data.user || null);
         } catch (err) {
             console.error('Work history fetch error:', err);
             setError(err?.response?.data?.message || err.message || 'Beklenmeyen bir hata oluştu');
@@ -84,71 +90,128 @@ export default function UserWorkHistoryPage() {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-            <Card>
-                <CardHeader
-                    title={<Typography variant="h5">{t('users:workHistory', 'Çalışma Geçmişi')}</Typography>}
-                />
-                <CardContent>
-                    {/* Date Filter Form */}
-                    <Box sx={{ mb: 3 }}>
-                        <Grid container spacing={2} alignItems="flex-end">
-                            <Grid item xs={12} md={4}>
-                                <TextField
-                                    fullWidth
-                                    type="date"
-                                    label={t('users:startDate', 'Başlangıç Tarihi')}
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={4}>
-                                <TextField
-                                    fullWidth
-                                    type="date"
-                                    label={t('users:endDate', 'Bitiş Tarihi')}
-                                    value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={4}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    onClick={fetchWorkHistory}
-                                    disabled={loading}
-                                >
-                                    {t('users:filter', 'Filtrele')}
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Box>
-
-                    <Alert severity="info" sx={{ mb: 3 }}>
-                        <strong>{t('users:totalWorkTime', 'Toplam Çalışma Süresi')}:</strong> {formatDuration(totalMinutes)}
-                    </Alert>
-
-                    {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
-                    {loading && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-                            <CircularProgress />
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            {/* Header with Back Button */}
+            <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <IconButton
+                    onClick={() => navigate(`/company/${companyId}/work-status`)}
+                    sx={{ color: 'primary.main' }}
+                >
+                    <ArrowBack />
+                </IconButton>
+                {userInfo && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+                        <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
+                            {userInfo.name?.[0]}{userInfo.surname?.[0]}
+                        </Avatar>
+                        <Box sx={{ flex: 1 }}>
+                            <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                {userInfo.name} {userInfo.surname}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {userInfo.phone}
+                            </Typography>
                         </Box>
-                    )}
+                        {userInfo.phone && formatPhoneForTel(userInfo.phone) && (
+                            <IconButton
+                                component="a"
+                                href={`tel:${formatPhoneForTel(userInfo.phone)}`}
+                                sx={{
+                                    bgcolor: 'primary.main',
+                                    color: 'white',
+                                    '&:hover': {
+                                        bgcolor: 'primary.dark'
+                                    }
+                                }}
+                            >
+                                <Phone />
+                            </IconButton>
+                        )}
+                    </Box>
+                )}
+            </Box>
 
-                    {!loading && sessions.length > 0 && (
-                        <WorkTimelineChart sessions={sessions} />
-                    )}
-
-                    {!loading && sessions.length === 0 && !error && (
-                        <Alert severity="info">
-                            {t('users:noWorkHistory', 'Bu tarih aralığında çalışma kaydı bulunamadı.')}
-                        </Alert>
-                    )}
-                </CardContent>
+            {/* Date Filter Card */}
+            <Card sx={{ mb: 3, borderRadius: 3, border: (t) => `1px solid ${t.palette.divider}` }}>
+                <Box sx={{ p: 3 }}>
+                    <Grid container spacing={2} alignItems="flex-end">
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                type="date"
+                                label={t('transfers:list.filters.startDate')}
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                fullWidth
+                                type="date"
+                                label={t('transfers:list.filters.endDate')}
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={fetchWorkHistory}
+                                disabled={loading}
+                                sx={{ py: 1.5 }}
+                            >
+                                {t('common:filter')}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Box>
             </Card>
+
+            {/* Total Work Time Card */}
+            <Paper
+                sx={{
+                    mb: 3,
+                    p: 3,
+                    borderRadius: 3,
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white'
+                }}
+            >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', width: 56, height: 56 }}>
+                        <AccessTime sx={{ fontSize: 32 }} />
+                    </Avatar>
+                    <Box>
+                        <Typography variant="body2" sx={{ opacity: 0.9, mb: 0.5 }}>
+                            {t('users:totalWorkTime')}
+                        </Typography>
+                        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                            {formatDuration(totalMinutes)}
+                        </Typography>
+                    </Box>
+                </Box>
+            </Paper>
+
+            {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>{error}</Alert>}
+
+            {loading && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', my: 8 }}>
+                    <CircularProgress size={60} />
+                </Box>
+            )}
+
+            {!loading && sessions.length > 0 && (
+                <WorkTimelineChart sessions={sessions} />
+            )}
+
+            {!loading && sessions.length === 0 && !error && (
+                <Alert severity="info" sx={{ borderRadius: 2 }}>
+                    {t('users:noWorkHistory')}
+                </Alert>
+            )}
         </Container>
     );
 }

@@ -1,4 +1,6 @@
 {
+  "totalWorkTime": "Gesamte Arbeitszeit",
+  "noWorkHistory": "Für diesen Datumsbereich wurden keine Arbeitsaufzeichnungen gefunden.",
   "search": {
     "placeholder": "Suchen (Name, E-Mail, Telefon, Benutzername)",
     "resultsFound": "{{count}} Ergebnis(se) gefunden",

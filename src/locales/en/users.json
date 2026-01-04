@@ -1,4 +1,6 @@
 {
+  "totalWorkTime": "Total Work Time",
+  "noWorkHistory": "No work history found for this date range.",
   "search": {
     "placeholder": "Search (name, email, phone, username)",
     "resultsFound": "{{count}} result(s) found",

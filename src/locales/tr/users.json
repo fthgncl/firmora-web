@@ -1,4 +1,6 @@
 {
+  "totalWorkTime": "Toplam Çalışma Süresi",
+  "noWorkHistory": "Bu tarih aralığında çalışma kaydı bulunamadı.",
   "search": {
     "placeholder": "Ara (isim, e-posta, telefon, kullanıcı adı)",
     "resultsFound": "{{count}} sonuç bulundu",

@@ -49,6 +49,7 @@ import WorkStatusDisplay from './WorkStatusDisplay';
 import AddUserDialog from './AddUserDialog';
 import TransfersDialog from './TransfersDialog';
 import { permissionsService } from '../services/permissionsService';
+import { formatPhoneForTel } from '../utils/phoneUtils';
 
 const COLUMN_DEFS = [
     { key: 'name',          labelKey: 'list.columns.name' },
@@ -106,16 +107,6 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
         };
         checkPermission();
     }, [token, user, companyId]);
-
-    const formatPhoneForTel = (val) => {
-        if (!val) return null;
-        let s = String(val).trim();
-        if (s.startsWith('00')) s = '+' + s.slice(2);
-        s = s.replace(/[^\d+]/g, '');
-        if (!s.startsWith('+')) s = '+' + s;
-        if (s.replace(/\D/g, '').length < 8) return null;
-        return s;
-    };
 
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [transfersDialogOpen, setTransfersDialogOpen] = useState(false);

@@ -60,5 +60,6 @@
   "error_message": "An error occurred. Please try again.",
   "balance": "Balance",
   "optional": "Optional",
-  "rightsReserved": "All rights reserved."
+  "rightsReserved": "All rights reserved.",
+  "filter": "Filter"
 }

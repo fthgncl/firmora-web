@@ -60,5 +60,6 @@
   "error_message": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
   "balance": "Kontostand",
   "optional": "Optional",
-  "rightsReserved": "Alle Rechte vorbehalten."
+  "rightsReserved": "Alle Rechte vorbehalten.",
+  "filter": "Filter"
 }
