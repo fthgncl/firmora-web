@@ -316,34 +316,6 @@ export default function WorkTimelineChart({sessions}) {
                         </ResponsiveContainer>
                     </Box>
                 </Box>
-
-                {/* Legend */}
-                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 3 }}>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                        <Box sx={{
-                            width: 16,
-                            height: 16,
-                            bgcolor: theme.palette.primary.main,
-                            borderRadius: 1,
-                            opacity: 0.9
-                        }} />
-                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            {t('workTimelineChart:completedWork')}
-                        </Typography>
-                    </Stack>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                        <Box sx={{
-                            width: 16,
-                            height: 16,
-                            bgcolor: theme.palette.success.main,
-                            borderRadius: 1,
-                            opacity: 0.9
-                        }} />
-                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            {t('workTimelineChart:ongoingWork')}
-                        </Typography>
-                    </Stack>
-                </Box>
             </Paper>
         </Box>
     );
