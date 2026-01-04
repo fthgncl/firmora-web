@@ -1,3 +1,11 @@
 {
-  "title": "Çalışma Zaman Çizelgesi Grafiği"
+  "title": "Çalışma Zaman Çizelgesi",
+  "completedSessions": "Tamamlanan",
+  "activeSessions": "Devam Eden",
+  "days": "Gün",
+  "hours": "Saat",
+  "completedWork": "Tamamlanan Çalışma",
+  "ongoingWork": "Devam Eden Çalışma",
+  "entry": "Giriş",
+  "exit": "Çıkış"
 }

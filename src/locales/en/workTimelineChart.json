@@ -1,3 +1,11 @@
 {
-  "title": "Work Timeline Chart"
+  "title": "Work Timeline",
+  "completedSessions": "Completed",
+  "activeSessions": "Ongoing",
+  "days": "Days",
+  "hours": "Hours",
+  "completedWork": "Completed Work",
+  "ongoingWork": "Ongoing Work",
+  "entry": "Entry",
+  "exit": "Exit"
 }

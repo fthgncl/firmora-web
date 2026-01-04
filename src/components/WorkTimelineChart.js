@@ -7,7 +7,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 
 export default function WorkTimelineChart({sessions}) {
-    const {t, i18n} = useTranslation();
+    const {t, i18n} = useTranslation(['workTimelineChart']);
     const theme = useTheme();
 
     // Split sessions by day (already done by parent, but keep logic here for reference)
@@ -96,7 +96,9 @@ export default function WorkTimelineChart({sessions}) {
                 entryTime: session.entryTime,
                 exitTime: session.exitTime,
                 duration: session.durationMinutes,
-                isSegment: session.isSegment
+                isSegment: session.isSegment,
+                entryNote: session.entryNote,
+                exitNote: session.exitNote
             });
         });
 
@@ -107,6 +109,11 @@ export default function WorkTimelineChart({sessions}) {
                 const dayData = { name: day.name };
                 day.sessions.forEach((session, idx) => {
                     dayData[`session${idx}`] = session.range;
+                    dayData[`session${idx}_meta`] = {
+                        isOpen: session.isOpen,
+                        entryNote: session.entryNote,
+                        exitNote: session.exitNote
+                    };
                     dayData.isOpen = session.isOpen;
                 });
                 return dayData;
@@ -150,11 +157,27 @@ export default function WorkTimelineChart({sessions}) {
                             const durationHours = Math.floor(duration / 60);
                             const durationMins = duration % 60;
 
+                            // Get metadata for this session
+                            const metaKey = `${entry.dataKey}_meta`;
+                            const meta = entry.payload?.[metaKey];
+
                             return (
-                                <Typography key={index} variant="caption" display="block" sx={{ color: entry.color }}>
-                                    {String(hours).padStart(2, '0')}:{String(mins).padStart(2, '0')} - {String(endHours).padStart(2, '0')}:{String(endMins).padStart(2, '0')}
-                                    {' '}({durationHours}h {durationMins}m)
-                                </Typography>
+                                <Box key={index} sx={{ mb: 0.5 }}>
+                                    <Typography variant="caption" display="block" sx={{ color: entry.color, fontWeight: 600 }}>
+                                        {String(hours).padStart(2, '0')}:{String(mins).padStart(2, '0')} - {String(endHours).padStart(2, '0')}:{String(endMins).padStart(2, '0')}
+                                        {' '}({durationHours}h {durationMins}m)
+                                    </Typography>
+                                    {meta?.entryNote && (
+                                        <Typography variant="caption" display="block" sx={{ color: theme.palette.info.main, fontStyle: 'italic' }}>
+                                            📝 {t('workTimelineChart:entry')}: {meta.entryNote}
+                                        </Typography>
+                                    )}
+                                    {meta?.exitNote && (
+                                        <Typography variant="caption" display="block" sx={{ color: theme.palette.info.main, fontStyle: 'italic' }}>
+                                            📝 {t('workTimelineChart:exit')}: {meta.exitNote}
+                                        </Typography>
+                                    )}
+                                </Box>
                             );
                         }
                         return null;
@@ -187,7 +210,7 @@ export default function WorkTimelineChart({sessions}) {
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                         <AccessTimeIcon sx={{ fontSize: 28, color: theme.palette.primary.main }} />
                         <Typography variant="h5" fontWeight="bold" sx={{ color: theme.palette.text.primary }}>
-                            {t('users:workTimeline', 'Çalışma Zaman Çizelgesi')}
+                            {t('workTimelineChart:title')}
                         </Typography>
                     </Stack>
 
@@ -195,20 +218,20 @@ export default function WorkTimelineChart({sessions}) {
                     <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
                         <Chip
                             icon={<CheckCircleIcon />}
-                            label={`${completedSessions} ${t('users:completedSessions', 'Tamamlanan')}`}
+                            label={`${completedSessions} ${t('workTimelineChart:completedSessions')}`}
                             color="primary"
                             variant="outlined"
                             size="small"
                         />
                         <Chip
                             icon={<RadioButtonCheckedIcon />}
-                            label={`${activeSessions} ${t('users:activeSessions', 'Devam Eden')}`}
+                            label={`${activeSessions} ${t('workTimelineChart:activeSessions')}`}
                             color="success"
                             variant="outlined"
                             size="small"
                         />
                         <Chip
-                            label={`${chartData.length} ${t('users:days', 'Gün')}`}
+                            label={`${chartData.length} ${t('workTimelineChart:days')}`}
                             variant="outlined"
                             size="small"
                         />
@@ -252,7 +275,7 @@ export default function WorkTimelineChart({sessions}) {
                                 tickFormatter={(value) => `${value}:00`}
                                 height={60}
                                 label={{
-                                    value: t('users:hours', 'Saat'),
+                                    value: t('workTimelineChart:hours'),
                                     position: 'insideBottom',
                                     offset: -15,
                                     style: {
@@ -305,7 +328,7 @@ export default function WorkTimelineChart({sessions}) {
                             opacity: 0.9
                         }} />
                         <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            {t('users:completedWork', 'Tamamlanan Çalışma')}
+                            {t('workTimelineChart:completedWork')}
                         </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center" spacing={1}>
@@ -317,7 +340,7 @@ export default function WorkTimelineChart({sessions}) {
                             opacity: 0.9
                         }} />
                         <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            {t('users:ongoingWork', 'Devam Eden Çalışma')}
+                            {t('workTimelineChart:ongoingWork')}
                         </Typography>
                     </Stack>
                 </Box>
