@@ -536,7 +536,9 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
             <TableContainer sx={{ overflowX: 'auto' }}>
                 <Table size="small" sx={{
                     minWidth: { xs: 700, md: 'auto' },
-                    'thead th': { fontWeight: 700, whiteSpace: 'nowrap' },
+                    tableLayout: 'auto',
+                    'thead th': { fontWeight: 700, whiteSpace: 'nowrap', px: 1 },
+                    'tbody td': { whiteSpace: 'nowrap', px: 1 },
                     'tbody tr': {
                         transition: 'background-color 120ms ease, transform 120ms ease',
                         '&:hover': { bgcolor: 'action.hover' }
@@ -545,7 +547,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                 }}>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ width: 100 }}>{t('list.columns.working_status')}</TableCell>
+                            <TableCell>{t('list.columns.working_status')}</TableCell>
                             {COLUMN_DEFS.filter(c => {
                                 if (c.key === 'balance' && !hasAnyBalance) return false;
                                 if (c.key === 'permissions' && !hasAnyPermissions) return false;
@@ -611,7 +613,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         ) : (
                             paginatedRows.map(u => (
                                 <TableRow key={u.id} hover>
-                                    <TableCell sx={{ width: 100 }}>
+                                    <TableCell>
                                         <Chip
                                             icon={u.is_working === 1 ? <WorkOutline /> : <WorkOff />}
                                             label={u.is_working === 1 ? t('accounts:working') : t('accounts:notWorking')}
@@ -632,15 +634,15 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}
                                     {visibleCols.balance && hasAnyBalance && u.balance != null && (
-                                        <TableCell align="center">
+                                        <TableCell>
                                             <Box
                                                 sx={{
-                                                    display: 'inline-flex',
+                                                    display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: 1,
+                                                    gap: 0.5,
+                                                    justifyContent: 'center',
                                                 }}
                                             >
-                                                {/* Action - LEFT */}
                                                 <Tooltip title={t('list.viewTransfers')}>
                                                     <IconButton
                                                         size="small"
@@ -667,25 +669,16 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                                     </IconButton>
                                                 </Tooltip>
 
-                                                {/* Balance */}
-                                                <Box
+                                                <Typography
+                                                    variant="body2"
                                                     sx={{
-                                                        minWidth: 120,
-                                                        textAlign: 'left',
+                                                        fontWeight: 600,
+                                                        color: 'text.primary',
+                                                        fontVariantNumeric: 'tabular-nums',
                                                     }}
                                                 >
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{
-                                                            fontWeight: 600,
-                                                            color: 'text.primary',
-                                                            whiteSpace: 'nowrap',
-                                                            fontVariantNumeric: 'tabular-nums',
-                                                        }}
-                                                    >
-                                                        {formatBalance(u.balance, u.currency)}
-                                                    </Typography>
-                                                </Box>
+                                                    {formatBalance(u.balance, u.currency)}
+                                                </Typography>
                                             </Box>
                                         </TableCell>
 
