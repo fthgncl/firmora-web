@@ -31,6 +31,7 @@ import {useAuth} from '../contexts/AuthContext';
 import MoneyTransferDialog from './MoneyTransferDialog';
 import ExternalMoneyDialog from './ExternalMoneyDialog';
 import TransfersDialog from './TransfersDialog';
+import WorkStatusDisplay from './WorkStatusDisplay';
 import {useTranslation} from 'react-i18next';
 
 export default function AccountList() {
@@ -293,20 +294,10 @@ export default function AccountList() {
                                     sx={{fontWeight: 600}}
                                 />
 
-                                <Chip
-                                    icon={account.is_working === 1 ? <WorkOutline /> : <WorkOff />}
-                                    label={account.is_working === 1 ? t('accounts:working') : t('accounts:notWorking')}
-                                    color={account.is_working === 1 ? "success" : "default"}
-                                    size="small"
-                                    variant={account.is_working === 1 ? "filled" : "outlined"}
-                                    sx={{
-                                        fontWeight: 600,
-                                        ...(account.is_working === 1 && {
-                                            '& .MuiChip-icon': {
-                                                color: 'inherit',
-                                            },
-                                        }),
-                                    }}
+                                <WorkStatusDisplay
+                                    userId={user.id}
+                                    companyId={account.company?.id}
+                                    isWorking={account.is_working}
                                 />
                             </Box>
 

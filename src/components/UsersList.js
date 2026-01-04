@@ -39,15 +39,13 @@ import {
     PersonAdd,
     Group,
     Phone,
-    History,
-    WorkOutline,
-    WorkOff
+    History
 } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
-
 import { useAuth } from '../contexts/AuthContext';
 import PermissionsDisplay from './PermissionsDisplay';
+import WorkStatusDisplay from './WorkStatusDisplay';
 import AddUserDialog from './AddUserDialog';
 import TransfersDialog from './TransfersDialog';
 import { permissionsService } from '../services/permissionsService';
@@ -626,23 +624,11 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         ) : (
                             paginatedRows.map(u => (
                                 <TableRow key={u.id} hover>
-                                    <TableCell>
-                                        <Chip
-                                            icon={u.is_working === 1 ? <WorkOutline /> : <WorkOff />}
-                                            label={u.is_working === 1 ? t('accounts:working') : t('accounts:notWorking')}
-                                            color={u.is_working === 1 ? "success" : "default"}
-                                            size="small"
-                                            variant={u.is_working === 1 ? "filled" : "outlined"}
-                                            sx={{
-                                                fontWeight: 600,
-                                                ...(u.is_working === 1 && {
-                                                    '& .MuiChip-icon': {
-                                                        color: 'inherit',
-                                                    },
-                                                }),
-                                            }}
-                                        />
-                                    </TableCell>
+                                    {canViewWorkStatus && (
+                                        <TableCell>
+                                            <WorkStatusDisplay userId={u.id} companyId={companyId} isWorking={u.is_working} />
+                                        </TableCell>
+                                    )}
                                     {visibleCols.name && <TableCell>{u.name}</TableCell>}
                                     {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}

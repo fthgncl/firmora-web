@@ -12,6 +12,8 @@ import TransferDetailPage from "./pages/TransferDetailPage";
 import TurnstileDisplayPage from "./pages/TurnstileDisplayPage";
 import TurnstileScanPage from "./pages/TurnstileScanPage";
 import ResetPassword from "./pages/ResetPassword";
+import UserWorkHistoryPage from "./pages/UserWorkHistoryPage";
+import WorkStatusOverviewPage from "./pages/WorkStatusOverviewPage";
 import React from "react";
 import AppBar from "./components/AppBar";
 
@@ -67,7 +69,7 @@ function App() {
                     <AuthRoute
                         requireAuth={true}
                         redirectTo="/sign-in"
-                        requireRoles={['sys_admin','personnel_manager','can_view_company_transfer_history','can_view_other_users_transfer_history']}>
+                        requireRoles={['sys_admin','personnel_manager','can_view_company_transfer_history','can_view_other_users_transfer_history','can_view_user_work_status']}>
                         <CompanyPage/>
                     </AuthRoute>
                 }/>
@@ -75,6 +77,21 @@ function App() {
                 <Route path="/transfer/:transferId" element={
                     <AuthRoute requireAuth={true} redirectTo="/sign-in">
                         <TransferDetailPage/>
+                    </AuthRoute>
+                }/>
+
+                <Route path="/company/:companyId/work-history" element={
+                    <AuthRoute
+                        requireAuth={true}
+                        redirectTo="/sign-in"
+                        requireRoles={['can_view_user_work_status']}>
+                        <WorkStatusOverviewPage/>
+                    </AuthRoute>
+                }/>
+
+                <Route path="/company/:companyId/user/:userId/work-history" element={
+                    <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                        <UserWorkHistoryPage/>
                     </AuthRoute>
                 }/>
 
