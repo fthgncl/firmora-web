@@ -76,7 +76,7 @@ const formatAmount = (amount, currency) => {
     }
 };
 
-const PendingTransfers = ({companyId}) => {
+const PendingTransfers = ({companyId, onTransferUpdated}) => {
     const {t} = useTranslation(['transfers']);
     const {token} = useAuth();
     const navigate = useNavigate();
@@ -173,6 +173,9 @@ const PendingTransfers = ({companyId}) => {
                 await fetchPendingTransfers();
                 setApproveDialogOpen(false);
                 setSelectedTransfer(null);
+                if (onTransferUpdated) {
+                    onTransferUpdated();
+                }
             } else {
                 setErrorMsg(data?.message || 'Transfer onaylanamadı');
             }

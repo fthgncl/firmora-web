@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, forwardRef, useImperativeHandle} from 'react';
 import {
     Container,
     Box,
@@ -34,7 +34,7 @@ import TransfersDialog from './TransfersDialog';
 import WorkStatusDisplay from './WorkStatusDisplay';
 import {useTranslation} from 'react-i18next';
 
-export default function AccountList() {
+const AccountList = forwardRef((props, ref) => {
     const {t, i18n} = useTranslation(['accounts']);
     const {token, user} = useAuth();
     const [accounts, setAccounts] = useState([]);
@@ -93,6 +93,10 @@ export default function AccountList() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
+
+    useImperativeHandle(ref, () => ({
+        refreshAccounts: fetchAccounts
+    }));
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString(mapLngToLocale(i18n.language), {
@@ -446,4 +450,6 @@ export default function AccountList() {
             />
         </Container>
     );
-}
+});
+
+export default AccountList;
