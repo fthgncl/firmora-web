@@ -21,7 +21,8 @@
       "email": "E-posta",
       "emailverified": "E-posta Onayı",
       "created_at": "Kayıt tarihi",
-      "balance": "Bakiye"
+      "balance": "Bakiye",
+      "working_status": "Çalışma Durumu"
     },
     "sort": {
       "asc": "Artan",

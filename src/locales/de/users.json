@@ -21,7 +21,8 @@
       "email": "E-Mail",
       "emailverified": "E-Mail-Bestätigung",
       "created_at": "Erstellt am",
-        "balance": "Guthaben"
+      "balance": "Guthaben",
+      "working_status": "Arbeitsstatus"
     },
     "sort": {
       "asc": "Aufsteigend",

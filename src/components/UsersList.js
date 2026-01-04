@@ -39,7 +39,9 @@ import {
     PersonAdd,
     Group,
     Phone,
-    History
+    History,
+    WorkOutline,
+    WorkOff
 } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
@@ -543,6 +545,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                 }}>
                     <TableHead>
                         <TableRow>
+                            <TableCell sx={{ width: 100 }}>{t('list.columns.working_status')}</TableCell>
                             {COLUMN_DEFS.filter(c => {
                                 if (c.key === 'balance' && !hasAnyBalance) return false;
                                 if (c.key === 'permissions' && !hasAnyPermissions) return false;
@@ -560,7 +563,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     if (c.key === 'balance' && !hasAnyBalance) return false;
                                     if (c.key === 'permissions' && !hasAnyPermissions) return false;
                                     return visibleCols[c.key];
-                                }).length}>
+                                }).length + 1}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <CircularProgress size={18} />
                                         <Typography variant="body2" color="text.secondary">{t('list.loading')}</Typography>
@@ -573,7 +576,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     if (c.key === 'balance' && !hasAnyBalance) return false;
                                     if (c.key === 'permissions' && !hasAnyPermissions) return false;
                                     return visibleCols[c.key];
-                                }).length}>
+                                }).length + 1}>
                                     <Box
                                         sx={{
                                             py: 6,
@@ -608,6 +611,23 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         ) : (
                             paginatedRows.map(u => (
                                 <TableRow key={u.id} hover>
+                                    <TableCell sx={{ width: 100 }}>
+                                        <Chip
+                                            icon={u.is_working === 1 ? <WorkOutline /> : <WorkOff />}
+                                            label={u.is_working === 1 ? t('accounts:working') : t('accounts:notWorking')}
+                                            color={u.is_working === 1 ? "success" : "default"}
+                                            size="small"
+                                            variant={u.is_working === 1 ? "filled" : "outlined"}
+                                            sx={{
+                                                fontWeight: 600,
+                                                ...(u.is_working === 1 && {
+                                                    '& .MuiChip-icon': {
+                                                        color: 'inherit',
+                                                    },
+                                                }),
+                                            }}
+                                        />
+                                    </TableCell>
                                     {visibleCols.name && <TableCell>{u.name}</TableCell>}
                                     {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}

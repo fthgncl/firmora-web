@@ -21,7 +21,8 @@
       "email": "Email",
       "emailverified": "Email Verified",
       "created_at": "Created at",
-      "balance": "Balance"
+      "balance": "Balance",
+      "working_status": "Working Status"
     },
     "sort": {
       "asc": "Ascending",
