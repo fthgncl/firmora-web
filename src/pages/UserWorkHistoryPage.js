@@ -151,6 +151,11 @@ export default function UserWorkHistoryPage() {
                                         </InputAdornment>
                                     ),
                                 }}
+                                sx={{
+                                    '& input[type="date"]::-webkit-calendar-picker-indicator': {
+                                        display: 'none',
+                                    },
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={5}>
@@ -167,6 +172,11 @@ export default function UserWorkHistoryPage() {
                                             <CalendarToday sx={{ color: 'text.secondary' }} />
                                         </InputAdornment>
                                     ),
+                                }}
+                                sx={{
+                                    '& input[type="date"]::-webkit-calendar-picker-indicator': {
+                                        display: 'none',
+                                    },
                                 }}
                             />
                         </Grid>
