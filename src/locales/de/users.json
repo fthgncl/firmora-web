@@ -45,6 +45,7 @@
     "total": "Gesamt: {{total}}",
     "totalFiltered": "Gesamt: {{filtered}} (von {{total}})",
     "rowsPerPage": "Zeilen pro Seite",
-    "displayedRows": "{{from}}-{{to}} / {{count}}"
+    "displayedRows": "{{from}}-{{to}} / {{count}}",
+    "viewTransfers": "Benutzertransfers anzeigen"
   }
 }

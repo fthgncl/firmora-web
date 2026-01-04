@@ -45,6 +45,7 @@
     "total": "Toplam: {{total}}",
     "totalFiltered": "Toplam: {{filtered}} ({{total}} içinden)",
     "rowsPerPage": "Sayfa başına",
-    "displayedRows": "{{from}}-{{to}} / {{count}}"
+    "displayedRows": "{{from}}-{{to}} / {{count}}",
+    "viewTransfers": "Kullanıcı transferlerini görüntüle"
   }
 }

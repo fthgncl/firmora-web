@@ -137,7 +137,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     // column visibility
     const [visibleCols, setVisibleCols] = useState(() =>
         COLUMN_DEFS.reduce(
-            (acc, c) => ({ ...acc, [c.key]: !['created_at', 'email', 'emailverified'].includes(c.key) }),
+            (acc, c) => ({ ...acc, [c.key]: !['created_at','username', 'email', 'emailverified'].includes(c.key) }),
             {}
         )
     );
@@ -612,8 +612,15 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                     {visibleCols.surname && <TableCell>{u.surname}</TableCell>}
                                     {visibleCols.username && <TableCell>{u.username}</TableCell>}
                                     {visibleCols.balance && hasAnyBalance && u.balance != null && (
-                                        <TableCell>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <TableCell align="center">
+                                            <Box
+                                                sx={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                }}
+                                            >
+                                                {/* Action - LEFT */}
                                                 <Tooltip title={t('list.viewTransfers')}>
                                                     <IconButton
                                                         size="small"
@@ -622,20 +629,48 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                                                             handleOpenTransfersDialog(u);
                                                         }}
                                                         sx={{
-                                                            border: (theme) => `1px solid ${theme.palette.divider}`,
-                                                            bgcolor: 'action.hover',
-                                                            '&:hover': { bgcolor: 'action.selected' }
+                                                            width: 28,
+                                                            height: 28,
+                                                            borderRadius: 1.25,
+                                                            border: (theme) =>
+                                                                `1px solid ${theme.palette.divider}`,
+                                                            color: 'text.secondary',
+                                                            transition: 'all 0.15s ease',
+                                                            '&:hover': {
+                                                                bgcolor: 'action.hover',
+                                                                color: 'primary.main',
+                                                            },
                                                         }}
                                                         aria-label={t('list.viewTransfers')}
                                                     >
                                                         <History fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
-                                                <Typography sx={{ fontWeight: 600 }}>
-                                                    {formatBalance(u.balance, u.currency)}
-                                                </Typography>
+
+                                                {/* Balance */}
+                                                <Box
+                                                    sx={{
+                                                        minWidth: 120,
+                                                        textAlign: 'left',
+                                                    }}
+                                                >
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{
+                                                            fontWeight: 600,
+                                                            color: 'text.primary',
+                                                            whiteSpace: 'nowrap',
+                                                            fontVariantNumeric: 'tabular-nums',
+                                                        }}
+                                                    >
+                                                        {formatBalance(u.balance, u.currency)}
+                                                    </Typography>
+                                                </Box>
                                             </Box>
                                         </TableCell>
+
+
+
                                     )}
                                     {visibleCols.permissions && hasAnyPermissions && (
                                         <TableCell>
