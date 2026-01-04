@@ -45,7 +45,7 @@ const WorkStatusDisplay = ({ userId, companyId, isWorking }) => {
                 variant="subtitle2"
                 sx={{
                     opacity: 0.9,
-                    display: { xs: 'none', sm: 'block' }
+                    padding: 0.5
                 }}
             >
                 {isWorking === 1 ? t('working') : t('notWorking')}
