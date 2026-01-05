@@ -17,7 +17,6 @@ import {
 } from '@mui/material';
 import {
     Logout,
-    Settings,
     Person,
     Menu as MenuIcon,
 } from '@mui/icons-material';
@@ -54,16 +53,6 @@ export default function MenuAppBar() {
 
     const handleClose = () => {
         setAnchorEl(null);
-    };
-
-    const handleProfile = () => {
-        navigate('/profile');
-        handleClose();
-    };
-
-    const handleSettings = () => {
-        navigate('/settings');
-        handleClose();
     };
 
     const handleLogout = () => {
@@ -206,46 +195,24 @@ export default function MenuAppBar() {
                                     sx={{
                                         mt: 1.5,
                                         '& .MuiMenu-paper': {
-                                            minWidth: 200,
                                             borderRadius: 2,
                                             boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                                         }
                                     }}
                                 >
-                                    {/* User Info Header */}
-                                    <Box sx={{ px: 2, py: 1.5 }}>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                                            {user.username}
-                                        </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            {user.email || 'Kullanıcı'}
-                                        </Typography>
-                                    </Box>
 
-                                    <Divider />
-
-                                    {/* Menu Items */}
-                                    <MenuItem onClick={handleProfile} sx={{ py: 1.5 }}>
+                                    <MenuItem >
                                         <ListItemIcon>
                                             <Person fontSize="small" />
                                         </ListItemIcon>
                                         <Typography variant="body2">
-                                            {t('appbar:profile')}
-                                        </Typography>
-                                    </MenuItem>
-
-                                    <MenuItem onClick={handleSettings} sx={{ py: 1.5 }}>
-                                        <ListItemIcon>
-                                            <Settings fontSize="small" />
-                                        </ListItemIcon>
-                                        <Typography variant="body2">
-                                            {t('appbar:settings')}
+                                            {user.username}
                                         </Typography>
                                     </MenuItem>
 
                                     <Divider />
 
-                                    <MenuItem onClick={handleLogout} sx={{ py: 1.5, color: 'error.main' }}>
+                                    <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
                                         <ListItemIcon>
                                             <Logout fontSize="small" color="error" />
                                         </ListItemIcon>
