@@ -95,7 +95,7 @@ export default function UserWorkHistoryPage() {
             {/* Header with Back Button */}
             <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
                 <IconButton
-                    onClick={() => navigate(`/company/${companyId}/work-status`)}
+                    onClick={() => navigate(-1)}
                     sx={{ color: 'primary.main' }}
                 >
                     <ArrowBack />
@@ -108,9 +108,6 @@ export default function UserWorkHistoryPage() {
                         <Box sx={{ flex: 1 }}>
                             <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary' }}>
                                 {userInfo.name} {userInfo.surname}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {userInfo.phone}
                             </Typography>
                         </Box>
                         {userInfo.phone && formatPhoneForTel(userInfo.phone) && (
