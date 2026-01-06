@@ -6,5 +6,7 @@
   "days": "Tage",
   "hours": "Stunden",
   "entry": "Eintritt",
-  "exit": "Austritt"
+  "exit": "Austritt",
+  "startDate": "Anfangsdatum",
+  "endDate": "Enddatum"
 }

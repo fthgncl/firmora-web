@@ -6,5 +6,7 @@
   "days": "Days",
   "hours": "Hours",
   "entry": "Entry",
-  "exit": "Exit"
+  "exit": "Exit",
+  "startDate": "Start Date",
+  "endDate": "End Date"
 }

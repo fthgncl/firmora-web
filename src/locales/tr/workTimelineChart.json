@@ -1,10 +1,12 @@
 {
-  "title": "Çalışma Zaman Çizelgesi",
+  "title": "Çalışma Zamanı Çizelgesi",
   "completedSessions": "Giriş-Çıkış",
   "paidLeave": "İzinli Gün",
   "activeWorkPeriod": "Aktif Çalışma Dönemi",
   "days": "Gün",
   "hours": "Saat",
   "entry": "Giriş",
-  "exit": "Çıkış"
+  "exit": "Çıkış",
+  "startDate": "Başlangıç Tarihi",
+  "endDate": "Bitiş Tarihi"
 }

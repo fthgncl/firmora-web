@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
+import {useAuth} from '../contexts/AuthContext';
 import {
     Box,
     Card,
@@ -10,11 +10,16 @@ import {
     Tooltip,
     TextField,
     Collapse,
+    CircularProgress,
+    Alert,
 } from '@mui/material';
-import { ExpandMore, Groups } from '@mui/icons-material';
+import {ExpandMore, WorkHistory} from '@mui/icons-material';
+import {useTranslation} from "react-i18next";
+import CompanyUsersWorkTimelineChart from "./CompanyUsersWorkTimelineChart";
 
-export default function CompanyUsersWorkStatus({ companyId }) {
-    const { token } = useAuth();
+export default function CompanyUsersWorkStatus({companyId}) {
+    const {token} = useAuth();
+    const {t} = useTranslation();
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -31,15 +36,10 @@ export default function CompanyUsersWorkStatus({ companyId }) {
         return new Date().toISOString().split('T')[0];
     });
 
-    useEffect(() => {
-        console.log(employees);
-    }, [employees]);
-
     const fetchCompanyUsersWorkStatus = useCallback(async () => {
         try {
             setLoading(true);
             setError('');
-
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/work-status/company-users-work-status`,
                 {
@@ -58,7 +58,7 @@ export default function CompanyUsersWorkStatus({ companyId }) {
             setHasFetched(true);
         } catch (err) {
             console.error('Company users work status fetch error:', err);
-            setError(err?.response?.data?.message || err.message || 'Beklenmeyen bir hata oluştu');
+            setError(err?.response?.data?.message || err.message || t('common:unexpectedError'));
         } finally {
             setLoading(false);
         }
@@ -74,7 +74,11 @@ export default function CompanyUsersWorkStatus({ companyId }) {
 
     useEffect(() => {
         if (isExpanded && hasFetched && token && companyId) {
-            fetchCompanyUsersWorkStatus();
+            const timeoutId = setTimeout(() => {
+                fetchCompanyUsersWorkStatus();
+            }, 2000);
+
+            return () => clearTimeout(timeoutId);
         }
         // eslint-disable-next-line
     }, [startDate, endDate]);
@@ -99,13 +103,13 @@ export default function CompanyUsersWorkStatus({ companyId }) {
             {/* Başlık Şeridi */}
             <Box
                 sx={{
-                    px: { xs: 1.5, sm: 2.5 },
-                    py: { xs: 1.25, sm: 2 },
+                    px: {xs: 1.5, sm: 2.5},
+                    py: {xs: 1.25, sm: 2},
                     display: 'flex',
                     alignItems: 'center',
                     flexWrap: 'wrap',
-                    rowGap: { xs: 1, sm: 1.5 },
-                    columnGap: { xs: 1, sm: 1.5 },
+                    rowGap: {xs: 1, sm: 1.5},
+                    columnGap: {xs: 1, sm: 1.5},
                     boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
                     borderBottom: '1px solid rgba(255,255,255,0.15)',
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -117,32 +121,21 @@ export default function CompanyUsersWorkStatus({ companyId }) {
                     sx={{
                         color: 'white',
                         bgcolor: 'rgba(255,255,255,0.18)',
-                        width: { xs: 36, sm: 42 },
-                        height: { xs: 36, sm: 42 },
+                        width: {xs: 36, sm: 42},
+                        height: {xs: 36, sm: 42},
                         backdropFilter: 'blur(4px)',
                         boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
                         flexShrink: 0,
                         order: 0,
                     }}
                 >
-                    <Groups />
+                    <WorkHistory/>
                 </Avatar>
 
-                <Box sx={{ flex: 1, minWidth: 0, order: 1 }}>
+                <Box sx={{flex: 1, minWidth: 0, order: 1}}>
                     <Typography variant="h6" noWrap
-                                sx={{ fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-                        Çalışan Çalışma Durumu
-                    </Typography>
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            opacity: 0.9,
-                            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
-                            display: 'block',
-                            whiteSpace: { xs: 'normal', sm: 'nowrap' }
-                        }}
-                    >
-                        Toplam: {employees.length} çalışan
+                                sx={{fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)'}}>
+                        {t('workTimelineChart:title')}
                     </Typography>
                 </Box>
 
@@ -152,12 +145,12 @@ export default function CompanyUsersWorkStatus({ companyId }) {
                         alignItems: 'center',
                         gap: 1,
                         flexWrap: 'wrap',
-                        justifyContent: { xs: 'flex-end', sm: 'flex-end' },
-                        width: { xs: 'auto', sm: 'auto' },
+                        justifyContent: {xs: 'flex-end', sm: 'flex-end'},
+                        width: {xs: 'auto', sm: 'auto'},
                         order: 2,
                     }}
                 >
-                    <Tooltip title={isExpanded ? "Kapat" : "Aç"}>
+                    <Tooltip title={isExpanded ? t('common:close') : t('common:open')}>
                         <IconButton
                             onClick={handleToggleExpand}
                             size="small"
@@ -165,49 +158,66 @@ export default function CompanyUsersWorkStatus({ companyId }) {
                                 color: '#fff',
                                 bgcolor: 'rgba(255,255,255,0.18)',
                                 border: '1px solid rgba(255,255,255,0.25)',
-                                '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                                '&:hover': {bgcolor: 'rgba(255,255,255,0.28)'},
                                 transition: 'all 0.2s ease',
                                 transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                             }}
                         >
-                            <ExpandMore />
+                            <ExpandMore/>
                         </IconButton>
                     </Tooltip>
                 </Box>
             </Box>
 
             <Collapse in={isExpanded}>
-                {/* Tarih Filtreleri */}
-                <Box sx={{ px: 2.5, py: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-                        <TextField
-                            size="small"
-                            type="date"
-                            label="Başlangıç Tarihi"
-                            InputLabelProps={{ shrink: true }}
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            sx={{ flex: '1 1 180px', minWidth: 180 }}
-                        />
+                {isExpanded && (<>
+                    <Box sx={{px: 2.5, py: 2}}>
+                        <Box sx={{display: 'flex', gap: 1.5, flexWrap: 'wrap'}}>
+                            <TextField
+                                size="small"
+                                type="date"
+                                label={t('workTimelineChart:startDate')}
+                                InputLabelProps={{shrink: true}}
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                sx={{flex: '1 1 180px', minWidth: 180}}
+                            />
 
-                        <TextField
-                            size="small"
-                            type="date"
-                            label="Bitiş Tarihi"
-                            InputLabelProps={{ shrink: true }}
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            sx={{ flex: '1 1 180px', minWidth: 180 }}
-                        />
+                            <TextField
+                                size="small"
+                                type="date"
+                                label={t('workTimelineChart:endDate')}
+                                InputLabelProps={{shrink: true}}
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                sx={{flex: '1 1 180px', minWidth: 180}}
+                            />
+                        </Box>
                     </Box>
-                </Box>
 
-                {/* İçerik buraya gelecek */}
-                <Box sx={{ p: 2.5 }}>
-                    <Typography variant="body2" color="text.secondary">
-                        İçerik yakında eklenecek...
-                    </Typography>
-                </Box>
+                    {/* Error Message */}
+                    {error && (
+                        <Box sx={{px: 2.5, pb: 2}}>
+                            <Alert severity="error" sx={{borderRadius: 2}}>
+                                {error}
+                            </Alert>
+                        </Box>
+                    )}
+
+                    {/* Loading Indicator */}
+                    {loading && (
+                        <Box sx={{display: 'flex', justifyContent: 'center', p: 4}}>
+                            <CircularProgress size={40}/>
+                        </Box>
+                    )}
+
+                    {/* Content */}
+                    {!loading && !error && (
+                        <Box sx={{p: 2.5}}>
+                            <CompanyUsersWorkTimelineChart employees={employees}/>
+                        </Box>
+                    )}
+                </>)}
             </Collapse>
         </Card>
     );
