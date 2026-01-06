@@ -8,14 +8,18 @@ import {
     Typography,
     IconButton,
     Tooltip,
+    TextField,
+    Collapse,
 } from '@mui/material';
-import { Refresh, Groups } from '@mui/icons-material';
+import { ExpandMore, Groups } from '@mui/icons-material';
 
 export default function CompanyUsersWorkStatus({ companyId }) {
     const { token } = useAuth();
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [hasFetched, setHasFetched] = useState(false);
 
     // Date filters
     const [startDate, setStartDate] = useState(() => {
@@ -51,6 +55,7 @@ export default function CompanyUsersWorkStatus({ companyId }) {
             );
 
             setEmployees(response.data.employees || []);
+            setHasFetched(true);
         } catch (err) {
             console.error('Company users work status fetch error:', err);
             setError(err?.response?.data?.message || err.message || 'Beklenmeyen bir hata oluştu');
@@ -58,14 +63,25 @@ export default function CompanyUsersWorkStatus({ companyId }) {
             setLoading(false);
         }
         // eslint-disable-next-line
-    }, [startDate, endDate]);
+    }, [startDate, endDate, companyId, token]);
 
     useEffect(() => {
-        if (token && companyId) {
+        if (isExpanded && token && companyId && !hasFetched) {
             fetchCompanyUsersWorkStatus();
         }
         // eslint-disable-next-line
-    }, []);
+    }, [isExpanded]);
+
+    useEffect(() => {
+        if (isExpanded && hasFetched && token && companyId) {
+            fetchCompanyUsersWorkStatus();
+        }
+        // eslint-disable-next-line
+    }, [startDate, endDate]);
+
+    const handleToggleExpand = () => {
+        setIsExpanded(!isExpanded);
+    };
 
     return (
         <Card
@@ -141,9 +157,9 @@ export default function CompanyUsersWorkStatus({ companyId }) {
                         order: 2,
                     }}
                 >
-                    <Tooltip title="Yenile">
+                    <Tooltip title={isExpanded ? "Kapat" : "Aç"}>
                         <IconButton
-                            onClick={fetchCompanyUsersWorkStatus}
+                            onClick={handleToggleExpand}
                             size="small"
                             sx={{
                                 color: '#fff',
@@ -151,20 +167,48 @@ export default function CompanyUsersWorkStatus({ companyId }) {
                                 border: '1px solid rgba(255,255,255,0.25)',
                                 '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
                                 transition: 'all 0.2s ease',
+                                transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                             }}
                         >
-                            <Refresh />
+                            <ExpandMore />
                         </IconButton>
                     </Tooltip>
                 </Box>
             </Box>
 
-            {/* İçerik buraya gelecek */}
-            <Box sx={{ p: 2.5 }}>
-                <Typography variant="body2" color="text.secondary">
-                    İçerik yakında eklenecek...
-                </Typography>
-            </Box>
+            <Collapse in={isExpanded}>
+                {/* Tarih Filtreleri */}
+                <Box sx={{ px: 2.5, py: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                        <TextField
+                            size="small"
+                            type="date"
+                            label="Başlangıç Tarihi"
+                            InputLabelProps={{ shrink: true }}
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            sx={{ flex: '1 1 180px', minWidth: 180 }}
+                        />
+
+                        <TextField
+                            size="small"
+                            type="date"
+                            label="Bitiş Tarihi"
+                            InputLabelProps={{ shrink: true }}
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            sx={{ flex: '1 1 180px', minWidth: 180 }}
+                        />
+                    </Box>
+                </Box>
+
+                {/* İçerik buraya gelecek */}
+                <Box sx={{ p: 2.5 }}>
+                    <Typography variant="body2" color="text.secondary">
+                        İçerik yakında eklenecek...
+                    </Typography>
+                </Box>
+            </Collapse>
         </Card>
     );
 }
