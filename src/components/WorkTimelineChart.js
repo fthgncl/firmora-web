@@ -70,6 +70,41 @@ export default function WorkTimelineChart({sessions}) {
     const prepareChartData = () => {
         const grouped = {};
 
+        // İlk ve son tarihi bul
+        let minDate = null;
+        let maxDate = null;
+        
+        splitSessions.forEach((session) => {
+            const entryDate = new Date(session.entryTime);
+            const dateOnly = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
+            
+            if (!minDate || dateOnly < minDate) minDate = dateOnly;
+            if (!maxDate || dateOnly > maxDate) maxDate = dateOnly;
+        });
+
+        // Tüm tarihleri doldur
+        if (minDate && maxDate) {
+            const currentDate = new Date(maxDate);
+            while (currentDate >= minDate) {
+                const dateKey = currentDate.toLocaleDateString(i18n.language, {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                if (!grouped[dateKey]) {
+                    grouped[dateKey] = {
+                        name: dateKey,
+                        sessions: [],
+                        rawDate: new Date(currentDate)
+                    };
+                }
+                
+                currentDate.setDate(currentDate.getDate() - 1);
+            }
+        }
+
+        // Oturumları ekle
         splitSessions.forEach((session) => {
             const entryDate = new Date(session.entryTime);
             const dateKey = entryDate.toLocaleDateString(i18n.language, {
@@ -77,14 +112,6 @@ export default function WorkTimelineChart({sessions}) {
                 month: 'short',
                 year: 'numeric'
             });
-
-            if (!grouped[dateKey]) {
-                grouped[dateKey] = {
-                    name: dateKey,
-                    sessions: [],
-                    rawDate: new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate())
-                };
-            }
 
             const startHour = entryDate.getHours() + entryDate.getMinutes() / 60 + entryDate.getSeconds() / 3600;
             const exitDate = session.exitTime ? new Date(session.exitTime) : new Date();
