@@ -1,7 +1,8 @@
 {
   "title": "Arbeitszeit-Zeitstrahl",
   "completedSessions": "Ein-/Ausgänge",
-  "activeSessions": "Laufend",
+  "paidLeave": "Bezahlter Urlaub",
+  "activeWorkPeriod": "Aktive Arbeitsperiode",
   "days": "Tage",
   "hours": "Stunden",
   "entry": "Eintritt",

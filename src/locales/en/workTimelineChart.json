@@ -1,7 +1,8 @@
 {
   "title": "Work Timeline",
   "completedSessions": "Check-ins",
-  "activeSessions": "Ongoing",
+  "paidLeave": "Paid Leave",
+  "activeWorkPeriod": "Active Work Period",
   "days": "Days",
   "hours": "Hours",
   "entry": "Entry",

@@ -1,7 +1,8 @@
 {
   "title": "Çalışma Zaman Çizelgesi",
   "completedSessions": "Giriş-Çıkış",
-  "activeSessions": "Devam Eden",
+  "paidLeave": "İzinli Gün",
+  "activeWorkPeriod": "Aktif Çalışma Dönemi",
   "days": "Gün",
   "hours": "Saat",
   "entry": "Giriş",

@@ -5,6 +5,7 @@ import {Bar, BarChart, CartesianGrid, Rectangle, Tooltip, XAxis, YAxis, Responsi
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
+import WorkIcon from '@mui/icons-material/Work';
 
 export default function WorkTimelineChart({sessions}) {
     const {t, i18n} = useTranslation(['workTimelineChart']);
@@ -73,11 +74,11 @@ export default function WorkTimelineChart({sessions}) {
         // İlk ve son tarihi bul
         let minDate = null;
         let maxDate = null;
-        
+
         splitSessions.forEach((session) => {
             const entryDate = new Date(session.entryTime);
             const dateOnly = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
-            
+
             if (!minDate || dateOnly < minDate) minDate = dateOnly;
             if (!maxDate || dateOnly > maxDate) maxDate = dateOnly;
         });
@@ -91,7 +92,7 @@ export default function WorkTimelineChart({sessions}) {
                     month: 'short',
                     year: 'numeric'
                 });
-                
+
                 if (!grouped[dateKey]) {
                     grouped[dateKey] = {
                         name: dateKey,
@@ -99,7 +100,7 @@ export default function WorkTimelineChart({sessions}) {
                         rawDate: new Date(currentDate)
                     };
                 }
-                
+
                 currentDate.setDate(currentDate.getDate() - 1);
             }
         }
@@ -133,7 +134,7 @@ export default function WorkTimelineChart({sessions}) {
         return Object.values(grouped)
             .sort((a, b) => b.rawDate - a.rawDate)
             .map(day => {
-                const dayData = { name: day.name };
+                const dayData = {name: day.name};
                 day.sessions.forEach((session, idx) => {
                     dayData[`session${idx}`] = session.range;
                     dayData[`session${idx}_meta`] = {
@@ -159,7 +160,7 @@ export default function WorkTimelineChart({sessions}) {
     const maxSessions = getMaxSessions();
 
     // Custom tooltip with MUI theme colors
-    const CustomTooltip = ({ active, payload }) => {
+    const CustomTooltip = ({active, payload}) => {
         if (active && payload && payload.length) {
             return (
                 <Box sx={{
@@ -170,7 +171,7 @@ export default function WorkTimelineChart({sessions}) {
                     borderRadius: 1,
                     boxShadow: theme.shadows[4]
                 }}>
-                    <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5, color: theme.palette.text.primary }}>
+                    <Typography variant="body2" fontWeight="bold" sx={{mb: 0.5, color: theme.palette.text.primary}}>
                         {payload[0].payload.name}
                     </Typography>
                     {payload.map((entry, index) => {
@@ -189,19 +190,22 @@ export default function WorkTimelineChart({sessions}) {
                             const meta = entry.payload?.[metaKey];
 
                             return (
-                                <Box key={index} sx={{ mb: 0.5 }}>
-                                    <Typography variant="caption" display="block" sx={{ color: entry.color, fontWeight: 600 }}>
+                                <Box key={index} sx={{mb: 0.5}}>
+                                    <Typography variant="caption" display="block"
+                                                sx={{color: entry.color, fontWeight: 600}}>
                                         {String(hours).padStart(2, '0')}:{String(mins).padStart(2, '0')} - {String(endHours).padStart(2, '0')}:{String(endMins).padStart(2, '0')}
                                         {' '}({durationHours} {t('common:hour')} {durationMins} {t('common:minute')})
 
                                     </Typography>
                                     {meta?.entryNote && (
-                                        <Typography variant="caption" display="block" sx={{ color: theme.palette.info.main, fontStyle: 'italic' }}>
+                                        <Typography variant="caption" display="block"
+                                                    sx={{color: theme.palette.info.main, fontStyle: 'italic'}}>
                                             📝 {t('workTimelineChart:entry')}: {meta.entryNote}
                                         </Typography>
                                     )}
                                     {meta?.exitNote && (
-                                        <Typography variant="caption" display="block" sx={{ color: theme.palette.info.main, fontStyle: 'italic' }}>
+                                        <Typography variant="caption" display="block"
+                                                    sx={{color: theme.palette.info.main, fontStyle: 'italic'}}>
                                             📝 {t('workTimelineChart:exit')}: {meta.exitNote}
                                         </Typography>
                                     )}
@@ -222,7 +226,7 @@ export default function WorkTimelineChart({sessions}) {
     const completedSessions = totalSessions - activeSessions;
 
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+        <Box sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
             <Paper
                 elevation={3}
                 sx={{
@@ -234,27 +238,35 @@ export default function WorkTimelineChart({sessions}) {
                 }}
             >
                 {/* Header Section */}
-                <Box sx={{ mb: 3 }}>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-                        <AccessTimeIcon sx={{ fontSize: 28, color: theme.palette.primary.main }} />
-                        <Typography variant="h5" fontWeight="bold" sx={{ color: theme.palette.text.primary }}>
+                <Box sx={{mb: 3}}>
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{mb: 2}}>
+                        <AccessTimeIcon sx={{fontSize: 28, color: theme.palette.primary.main}}/>
+                        <Typography variant="h5" fontWeight="bold" sx={{color: theme.palette.text.primary}}>
                             {t('workTimelineChart:title')}
                         </Typography>
                     </Stack>
 
                     {/* Stats Chips */}
-                    <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+                    <Stack direction="row" spacing={2} sx={{mb: 2}}>
                         <Chip
-                            icon={<CheckCircleIcon />}
+                            icon={<CheckCircleIcon/>}
                             label={`${completedSessions} ${t('workTimelineChart:completedSessions')}`}
                             color="primary"
                             variant="outlined"
                             size="small"
                         />
                         <Chip
-                            icon={<RadioButtonCheckedIcon />}
-                            label={`${activeSessions} ${t('workTimelineChart:activeSessions')}`}
+
+                            icon={<WorkIcon/>}
+                            label={`${activeSessions} ${t('workTimelineChart:activeWorkPeriod')}`}
                             color="success"
+                            variant="outlined"
+                            size="small"
+                        />
+                        <Chip
+                            icon={<RadioButtonCheckedIcon/>}
+                            label={`X ${t('workTimelineChart:paidLeave')}`} // TODO: İzinli gün sayısını ekle
+                            color="error"
                             variant="outlined"
                             size="small"
                         />
@@ -265,7 +277,7 @@ export default function WorkTimelineChart({sessions}) {
                         />
                     </Stack>
 
-                    <Divider sx={{ mt: 2 }} />
+                    <Divider sx={{mt: 2}}/>
                 </Box>
 
                 {/* Chart Section */}
@@ -277,70 +289,70 @@ export default function WorkTimelineChart({sessions}) {
                     p: 2,
                     width: '100%'
                 }}>
-                    <Box sx={{ width: '100%', height: Math.max(650, chartData.length * 65) }}>
+                    <Box sx={{width: '100%', height: Math.max(650, chartData.length * 65)}}>
                         <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                            layout="vertical"
-                            data={chartData}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke={theme.palette.divider}
-                                opacity={0.5}
-                            />
-                            <Tooltip
-                                content={<CustomTooltip />}
-                                shared={false}
-                                cursor={{
-                                    fill: theme.palette.action.hover,
-                                    opacity: 0.3
-                                }}
-                            />
-                            <XAxis
-                                type="number"
-                                domain={[0, 24]}
-                                ticks={[0, 3, 6, 9, 12, 15, 18, 21, 24]}
-                                tickFormatter={(value) => `${value}:00`}
-                                height={60}
-                                label={{
-                                    value: t('workTimelineChart:hours'),
-                                    position: 'insideBottom',
-                                    offset: -15,
-                                    style: {
-                                        fill: theme.palette.text.primary,
-                                        fontWeight: 600,
-                                        fontSize: 14
-                                    }
-                                }}
-                                stroke={theme.palette.text.secondary}
-                                tick={{
-                                    fill: theme.palette.text.secondary,
-                                    fontSize: 12
-                                }}
-                            />
-                            <YAxis
-                                type="category"
-                                dataKey="name"
-                                width={110}
-                                stroke={theme.palette.text.secondary}
-                                tick={{
-                                    fill: theme.palette.text.primary,
-                                    fontSize: 12,
-                                    fontWeight: 500
-                                }}
-                            />
-                            {Array.from({ length: maxSessions }, (_, idx) => (
-                                <Bar
-                                    key={`session${idx}`}
-                                    dataKey={`session${idx}`}
-                                    stackId="a"
-                                    radius={[10, 10, 10, 10]}
-                                    maxBarSize={40}
-                                    shape={CustomFillRectangle}
-                                    activeBar={ActiveRectangle}
+                            <BarChart
+                                layout="vertical"
+                                data={chartData}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    stroke={theme.palette.divider}
+                                    opacity={0.5}
                                 />
-                            ))}
-                        </BarChart>
+                                <Tooltip
+                                    content={<CustomTooltip/>}
+                                    shared={false}
+                                    cursor={{
+                                        fill: theme.palette.action.hover,
+                                        opacity: 0.3
+                                    }}
+                                />
+                                <XAxis
+                                    type="number"
+                                    domain={[0, 24]}
+                                    ticks={[0, 3, 6, 9, 12, 15, 18, 21, 24]}
+                                    tickFormatter={(value) => `${value}:00`}
+                                    height={60}
+                                    label={{
+                                        value: t('workTimelineChart:hours'),
+                                        position: 'insideBottom',
+                                        offset: -15,
+                                        style: {
+                                            fill: theme.palette.text.primary,
+                                            fontWeight: 600,
+                                            fontSize: 14
+                                        }
+                                    }}
+                                    stroke={theme.palette.text.secondary}
+                                    tick={{
+                                        fill: theme.palette.text.secondary,
+                                        fontSize: 12
+                                    }}
+                                />
+                                <YAxis
+                                    type="category"
+                                    dataKey="name"
+                                    width={110}
+                                    stroke={theme.palette.text.secondary}
+                                    tick={{
+                                        fill: theme.palette.text.primary,
+                                        fontSize: 12,
+                                        fontWeight: 500
+                                    }}
+                                />
+                                {Array.from({length: maxSessions}, (_, idx) => (
+                                    <Bar
+                                        key={`session${idx}`}
+                                        dataKey={`session${idx}`}
+                                        stackId="a"
+                                        radius={[10, 10, 10, 10]}
+                                        maxBarSize={40}
+                                        shape={CustomFillRectangle}
+                                        activeBar={ActiveRectangle}
+                                    />
+                                ))}
+                            </BarChart>
                         </ResponsiveContainer>
                     </Box>
                 </Box>
