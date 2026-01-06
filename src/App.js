@@ -69,7 +69,19 @@ function App() {
                     <AuthRoute
                         requireAuth={true}
                         redirectTo="/sign-in"
-                        requireRoles={['sys_admin','personnel_manager','can_view_company_transfer_history','can_view_other_users_transfer_history','can_view_user_work_status']}>
+                        requireRoles={[
+                            "sys_admin",
+                            "personnel_manager",
+                            "can_transfer_company_to_same_company_user",
+                            "can_transfer_company_to_other_company_user",
+                            "can_transfer_company_to_other_company",
+                            "can_transfer_company_to_external",
+                            "can_receive_external_to_company",
+                            "can_view_company_transfer_history",
+                            "can_view_other_users_transfer_history",
+                            "can_act_as_turnstile",
+                            "can_view_user_work_status"
+                        ]}>
                         <CompanyPage/>
                     </AuthRoute>
                 }/>
