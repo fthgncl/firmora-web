@@ -21,6 +21,7 @@ import {
 import { ArrowBack, AccessTime, Phone, CalendarToday } from '@mui/icons-material';
 import WorkTimelineChart from '../components/WorkTimelineChart';
 import { formatPhoneForTel } from '../utils/phoneUtils';
+import { splitByDay } from '../utils/sessionTime';
 
 export default function UserWorkHistoryPage() {
     const { userId, companyId } = useParams();
@@ -64,7 +65,7 @@ export default function UserWorkHistoryPage() {
                 }
             );
 
-            setSessions(response.data.sessions || []);
+            setSessions( splitByDay(response.data.sessions) || []);
             setTotalMinutes(response.data.totalMinutes || 0);
             setUserInfo(response.data.user || null);
         } catch (err) {

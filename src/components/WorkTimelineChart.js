@@ -11,38 +11,6 @@ export default function WorkTimelineChart({sessions}) {
     const {t, i18n} = useTranslation(['workTimelineChart']);
     const theme = useTheme();
 
-    // Split sessions by day (already done by parent, but keep logic here for reference)
-    const splitSessions = [];
-
-    sessions.forEach((session) => {
-        const entryDate = new Date(session.entryTime);
-        const exitDate = session.exitTime ? new Date(session.exitTime) : new Date();
-
-        let currentStart = new Date(entryDate);
-
-        while (currentStart < exitDate) {
-            const endOfDay = new Date(currentStart);
-            endOfDay.setHours(23, 59, 59, 999);
-
-            const currentEnd = endOfDay < exitDate ? endOfDay : exitDate;
-
-            const durationMinutes = Math.round(
-                (currentEnd - currentStart) / (1000 * 60)
-            );
-
-            splitSessions.push({
-                ...session,
-                entryTime: new Date(currentStart),
-                exitTime: new Date(currentEnd),
-                durationMinutes
-            });
-
-            currentStart = new Date(currentEnd);
-            currentStart.setHours(0, 0, 0, 0);
-            currentStart.setDate(currentStart.getDate() + 1);
-        }
-    });
-
     // Custom Rectangle component with gradient and shadow
     const CustomFillRectangle = (props) => {
         const isOpen = props.payload?.isOpen || false;
@@ -75,7 +43,7 @@ export default function WorkTimelineChart({sessions}) {
         let minDate = null;
         let maxDate = null;
 
-        splitSessions.forEach((session) => {
+        sessions.forEach((session) => {
             const entryDate = new Date(session.entryTime);
             const dateOnly = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
 
@@ -106,7 +74,7 @@ export default function WorkTimelineChart({sessions}) {
         }
 
         // Oturumları ekle
-        splitSessions.forEach((session) => {
+        sessions.forEach((session) => {
             const entryDate = new Date(session.entryTime);
             const dateKey = entryDate.toLocaleDateString(i18n.language, {
                 day: '2-digit',
@@ -221,8 +189,8 @@ export default function WorkTimelineChart({sessions}) {
     };
 
     // Calculate total stats
-    const totalSessions = splitSessions.length;
-    const activeSessions = splitSessions.filter(s => s.isOpen).length;
+    const totalSessions = sessions.length;
+    const activeSessions = sessions.filter(s => s.isOpen).length;
     const completedSessions = totalSessions - activeSessions;
 
     return (
