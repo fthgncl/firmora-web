@@ -90,7 +90,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         token,
                         user,
                         companyId,
-                        ['can_view_user_work_status']
+                        ['can_view_users_work_status']
                     )
                 );
 

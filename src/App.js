@@ -80,7 +80,7 @@ function App() {
                             "can_view_company_transfer_history",
                             "can_view_other_users_transfer_history",
                             "can_act_as_turnstile",
-                            "can_view_user_work_status"
+                            "can_view_users_work_status"
                         ]}>
                         <CompanyPage/>
                     </AuthRoute>
@@ -96,7 +96,7 @@ function App() {
                     <AuthRoute
                         requireAuth={true}
                         redirectTo="/sign-in"
-                        requireRoles={['can_view_user_work_status']}>
+                        requireRoles={['can_view_users_work_status']}>
                         <WorkStatusOverviewPage/>
                     </AuthRoute>
                 }/>
