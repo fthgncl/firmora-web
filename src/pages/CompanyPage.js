@@ -35,6 +35,7 @@ import axios from 'axios';
 import {useTranslation} from 'react-i18next';
 import TransfersTable from "../components/TransfersTable";
 import {permissionsService} from "../services/permissionsService";
+import CompanyUsersWorkStatus from "../components/CompanyUsersWorkStatus";
 
 export default function CompanyPage() {
     const {companyId} = useParams();
@@ -533,9 +534,14 @@ export default function CompanyPage() {
                 <UserList ref={userListRef} companyId={companyId}/>
             </Grid>
 
-            {/* Transfer Kayıtları Listesi Listesi */}
+            {/* Transfer Kayıtları Listesi */}
             <Grid sx={{mt: 4}}>
                 <TransfersTable companyId={companyId}/>
+            </Grid>
+
+            {/* Kullanıcı Giriş-Çıkış Kayıtları Listesi */}
+            <Grid sx={{mt: 4}}>
+                <CompanyUsersWorkStatus companyId={companyId}/>
             </Grid>
 
             {/* Dialoglar */}

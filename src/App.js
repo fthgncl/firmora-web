@@ -13,7 +13,6 @@ import TurnstileDisplayPage from "./pages/TurnstileDisplayPage";
 import TurnstileScanPage from "./pages/TurnstileScanPage";
 import ResetPassword from "./pages/ResetPassword";
 import UserWorkHistoryPage from "./pages/UserWorkHistoryPage";
-import WorkStatusOverviewPage from "./pages/WorkStatusOverviewPage";
 import React from "react";
 import AppBar from "./components/AppBar";
 
@@ -89,15 +88,6 @@ function App() {
                 <Route path="/transfer/:transferId" element={
                     <AuthRoute requireAuth={true} redirectTo="/sign-in">
                         <TransferDetailPage/>
-                    </AuthRoute>
-                }/>
-
-                <Route path="/company/:companyId/work-history" element={
-                    <AuthRoute
-                        requireAuth={true}
-                        redirectTo="/sign-in"
-                        requireRoles={['can_view_users_work_status']}>
-                        <WorkStatusOverviewPage/>
                     </AuthRoute>
                 }/>
 
