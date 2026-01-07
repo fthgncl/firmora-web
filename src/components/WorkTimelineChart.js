@@ -82,8 +82,6 @@ export default function WorkTimelineChart({sessions}) {
                 year: 'numeric'
             });
 
-            console.log('dateKey', dateKey);
-
             const startHour = entryDate.getHours() + entryDate.getMinutes() / 60 + entryDate.getSeconds() / 3600;
             const exitDate = session.exitTime ? new Date(session.exitTime) : new Date();
             const endHour = exitDate.getHours() + exitDate.getMinutes() / 60 + exitDate.getSeconds() / 3600;
