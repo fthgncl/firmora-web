@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {Chip} from "@mui/material";
-import {useTranslation} from "react-i18next";
+import { Chip, useTheme } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export default function CompanyUsersWorkTimelineChart({ employees }) {
     const navigate = useNavigate();
-    const {i18n} = useTranslation();
+    const { i18n } = useTranslation();
     const { companyId } = useParams();
+    const theme = useTheme();
     const containerRef = useRef(null);
     const [containerWidth, setContainerWidth] = useState(1000);
 
@@ -97,7 +98,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                             textAnchor="end"
                             dominantBaseline="middle"
                             fontSize="12"
-                            fill="#666"
+                            fill={theme.palette.text.primary}
                             fontWeight="bold"
                         >
                             {formatDuration(employee.totalMinutes || 0)}
@@ -155,7 +156,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                     y1={chartHeight - bottomMargin}
                     x2={containerWidth - rightMargin}
                     y2={chartHeight - bottomMargin}
-                    stroke="#333"
+                    stroke={theme.palette.divider}
                     strokeWidth="2"
                 />
                 {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
@@ -168,7 +169,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                                 y1={chartHeight - bottomMargin}
                                 x2={x}
                                 y2={chartHeight - bottomMargin + 5}
-                                stroke="#333"
+                                stroke={theme.palette.divider}
                                 strokeWidth="2"
                             />
                             <text
@@ -176,7 +177,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                                 y={chartHeight - bottomMargin + 20}
                                 textAnchor="middle"
                                 fontSize="12"
-                                fill="#666"
+                                fill={theme.palette.text.secondary}
                             >
                                 {formatDate(timestamp)}
                             </text>
