@@ -16,6 +16,7 @@ import {
 import {ExpandMore, WorkHistory} from '@mui/icons-material';
 import {useTranslation} from "react-i18next";
 import CompanyUsersWorkTimelineChart from "./CompanyUsersWorkTimelineChart";
+import {emloyeeSessionsSplitByDay} from "../utils/sessionTime";
 
 export default function CompanyUsersWorkStatus({companyId}) {
     const {token} = useAuth();
@@ -54,7 +55,7 @@ export default function CompanyUsersWorkStatus({companyId}) {
                 }
             );
 
-            setEmployees(response.data.employees || []);
+            setEmployees( emloyeeSessionsSplitByDay(response.data.employees) || []);
             setHasFetched(true);
         } catch (err) {
             console.error('Company users work status fetch error:', err);
