@@ -149,9 +149,9 @@ export default function WorkTimelineChart({sessions}) {
                             const mins = Math.round((start % 1) * 60);
                             let endHours = Math.floor(end);
                             let endMins = Math.round((end % 1) * 60);
-                            while (endMins>59) {
-                                endMins -=60;
-                                endHours +=1;
+                            while (endMins > 59) {
+                                endMins -= 60;
+                                endHours += 1;
                             }
                             const duration = Math.round((end - start) * 60);
                             const durationHours = Math.floor(duration / 60);
@@ -196,6 +196,7 @@ export default function WorkTimelineChart({sessions}) {
     const totalSessions = sessions.length;
     const activeSessions = sessions.filter(s => s.isOpen).length;
     const completedSessions = totalSessions - activeSessions;
+    const chartHeight = Math.max(650, chartData.length * 65);
 
     return (
         <Box sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
@@ -261,8 +262,8 @@ export default function WorkTimelineChart({sessions}) {
                     p: 2,
                     width: '100%'
                 }}>
-                    <Box sx={{width: '100%', height: Math.max(650, chartData.length * 65)}}>
-                        <ResponsiveContainer width="100%" height="100%">
+                    <Box sx={{width: '100%', height: chartHeight, minHeight: 400}}>
+                        <ResponsiveContainer width="100%" height={chartHeight} minHeight={400}>
                             <BarChart
                                 layout="vertical"
                                 data={chartData}
