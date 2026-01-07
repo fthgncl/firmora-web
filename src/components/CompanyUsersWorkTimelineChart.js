@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import {Chip} from "@mui/material";
 
 export default function CompanyUsersWorkTimelineChart({ employees }) {
     const navigate = useNavigate();
@@ -66,18 +67,27 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                 {/* Y Ekseni - Kullanıcı isimleri */}
                 {employees.map((employee, idx) => (
                     <g key={employee.id}>
-                        <text
-                            x={leftMargin - 10}
-                            y={topMargin + idx * rowHeight + rowHeight / 2}
-                            textAnchor="end"
-                            dominantBaseline="middle"
-                            fontSize="14"
-                            fill="#1976d2"
-                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                            onClick={() => handleUserClick(employee.id)}
+                        <foreignObject
+                            x={leftMargin - 150}
+                            y={topMargin + idx * rowHeight + rowHeight / 2 - 13}
+                            width={140}
+                            height={32}
                         >
-                            {employee.name} {employee.surname}
-                        </text>
+                            <Chip
+                                label={`${employee.name} ${employee.surname}`}
+                                color="primary"
+                                size="small"
+                                clickable
+                                onClick={() => handleUserClick(employee.id)}
+                                sx={{
+                                    fontSize: 13,
+                                    cursor: 'pointer',
+                                    width: '100%',
+                                    textAlign: 'center',
+                                }}
+                            />
+                        </foreignObject>
+
                         {/* Toplam süre */}
                         <text
                             x={containerWidth - 10}
