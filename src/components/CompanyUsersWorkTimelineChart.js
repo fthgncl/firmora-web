@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Chip, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import SessionTooltip from './SessionTooltip';
 
 export default function CompanyUsersWorkTimelineChart({ employees }) {
     const navigate = useNavigate();
@@ -10,6 +12,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
     const theme = useTheme();
     const containerRef = useRef(null);
     const [containerWidth, setContainerWidth] = useState(1000);
+    const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, data: null });
 
     useEffect(() => {
         const updateWidth = () => {
@@ -137,13 +140,27 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                                         y={y}
                                         width={Math.max(width, 2)}
                                         height={height}
-                                        fill={session.isOpen ? "#82ca9d" : "#8884d8"}
+                                        fill={session.isOpen ? theme.palette.success.main : theme.palette.primary.main}
                                         opacity="0.8"
                                         rx="3"
+                                        style={{ cursor: 'pointer' }}
+                                        onMouseMove={(e) => {
+                                            setTooltip({
+                                                visible: true,
+                                                x: e.clientX,
+                                                y: e.clientY,
+                                                data: {
+                                                    employee,
+                                                    session,
+                                                    startTime: session.entryTime,
+                                                    endTime: session.exitTime
+                                                }
+                                            });
+                                        }}
+                                        onMouseLeave={() => {
+                                            setTooltip({ visible: false, x: 0, y: 0, data: null });
+                                        }}
                                     />
-                                    <title>
-                                        {`${employee.name} ${employee.surname}\n${formatDate(startTime)} - ${formatDate(endTime)}\nSüre: ${formatDuration(session.durationMinutes)}\nDurum: ${session.isOpen ? 'Açık' : 'Kapalı'}`}
-                                    </title>
                                 </g>
                             );
                         })}
@@ -185,6 +202,28 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                     );
                 })}
             </svg>
+
+            {/* Tooltip */}
+            {tooltip.visible && tooltip.data && ReactDOM.createPortal(
+                <div
+                    style={{
+                        position: 'fixed',
+                        left: tooltip.x,
+                        top: tooltip.y - 10,
+                        transform: 'translate(-50%, -100%)',
+                        pointerEvents: 'none',
+                        zIndex: 9999
+                    }}
+                >
+                    <SessionTooltip
+                        employee={tooltip.data.employee}
+                        session={tooltip.data.session}
+                        startTime={tooltip.data.startTime}
+                        endTime={tooltip.data.endTime}
+                    />
+                </div>,
+                document.body
+            )}
         </div>
     );
 }
