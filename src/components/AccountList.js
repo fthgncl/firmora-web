@@ -46,17 +46,6 @@ const AccountList = forwardRef((props, ref) => {
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
     const [transfersDialogOpen, setTransfersDialogOpen] = useState(false);
 
-    const mapLngToLocale = (lng) => {
-        switch (lng) {
-            case 'tr':
-                return 'tr-TR';
-            case 'de':
-                return 'de-DE';
-            default:
-                return 'en-US';
-        }
-    };
-
     const fetchAccounts = useCallback(async () => {
         try {
             setLoading(true);
@@ -99,7 +88,7 @@ const AccountList = forwardRef((props, ref) => {
     }));
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString(mapLngToLocale(i18n.language), {
+        return new Date(dateString).toLocaleDateString(i18n.language, {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -107,7 +96,7 @@ const AccountList = forwardRef((props, ref) => {
     };
 
     const formatDateTime = (dateString) => {
-        return new Date(dateString).toLocaleString(mapLngToLocale(i18n.language), {
+        return new Date(dateString).toLocaleString(i18n.language, {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -117,7 +106,7 @@ const AccountList = forwardRef((props, ref) => {
     };
 
     const formatBalance = (balance, currency) => {
-        return new Intl.NumberFormat(mapLngToLocale(i18n.language), {
+        return new Intl.NumberFormat(i18n.language, {
             style: 'currency',
             currency: currency || 'EUR',
             minimumFractionDigits: 2,

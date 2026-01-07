@@ -27,7 +27,7 @@ import {
 export default function TurnstileDisplayPage() {
 
     const { logout } = useAuth();
-    const {t} = useTranslation(['common', 'turnstile']);
+    const {t, i18n} = useTranslation(['common', 'turnstile']);
     const theme = useTheme();
     const [tokenInfo, setTokenInfo] = useState(null);
     const [tokenError, setTokenError] = useState(false);
@@ -79,7 +79,7 @@ export default function TurnstileDisplayPage() {
 
     const formatDate = (timestamp) => {
         if (!timestamp) return '-';
-        return new Date(timestamp * 1000).toLocaleString('tr-TR', {
+        return new Date(timestamp * 1000).toLocaleString(i18n.language, {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',

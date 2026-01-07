@@ -57,7 +57,7 @@ export default function WorkTimelineChart({sessions}) {
             while (currentDate >= minDate) {
                 const dateKey = currentDate.toLocaleDateString(i18n.language, {
                     day: '2-digit',
-                    month: 'short',
+                    month: 'long',
                     year: 'numeric'
                 });
 
@@ -78,9 +78,11 @@ export default function WorkTimelineChart({sessions}) {
             const entryDate = new Date(session.entryTime);
             const dateKey = entryDate.toLocaleDateString(i18n.language, {
                 day: '2-digit',
-                month: 'short',
+                month: 'long',
                 year: 'numeric'
             });
+
+            console.log('dateKey', dateKey);
 
             const startHour = entryDate.getHours() + entryDate.getMinutes() / 60 + entryDate.getSeconds() / 3600;
             const exitDate = session.exitTime ? new Date(session.exitTime) : new Date();

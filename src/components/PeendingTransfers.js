@@ -77,7 +77,7 @@ const formatAmount = (amount, currency) => {
 };
 
 const PendingTransfers = ({companyId, onTransferUpdated}) => {
-    const {t} = useTranslation(['transfers']);
+    const {t, i18n} = useTranslation(['transfers']);
     const {token} = useAuth();
     const navigate = useNavigate();
     const API_URL = `${process.env.REACT_APP_API_URL}/transfers/pending`;
@@ -232,7 +232,7 @@ const PendingTransfers = ({companyId, onTransferUpdated}) => {
     };
 
     const formatDateTime = (d) =>
-        d ? new Date(d).toLocaleString('tr-TR', {
+        d ? new Date(d).toLocaleString(i18n.language, {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',

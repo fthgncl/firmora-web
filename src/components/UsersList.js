@@ -73,7 +73,7 @@ const SORT_ORDERS = [
 ];
 
 const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) => {
-    const { t } = useTranslation(['users']);
+    const { t, i18n } = useTranslation(['users']);
     const { token, user } = useAuth();
     const API_URL = `${process.env.REACT_APP_API_URL}/search-users`;
 
@@ -261,7 +261,7 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
         );
 
     const formatDate = (d) =>
-        d ? new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+        d ? new Date(d).toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
 
     const formatBalance = (balance, currency) => {
         if (balance == null) return '-';

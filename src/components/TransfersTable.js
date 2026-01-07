@@ -132,7 +132,7 @@ const formatAmount = (amount, currency) => {
 
 const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialLimit = 20, sx}, ref) => {
 
-    const {t} = useTranslation(['transfers']);
+    const {t, i18n} = useTranslation(['transfers']);
     const {token, user} = useAuth();
     const navigate = useNavigate();
     const API_URL = `${process.env.REACT_APP_API_URL}/transfers/list`;
@@ -295,7 +295,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
     const toggleCol = (key) => setVisibleCols((prev) => ({...prev, [key]: !prev[key]}));
 
     const formatDateTime = (d) =>
-        d ? new Date(d).toLocaleString('tr-TR', {
+        d ? new Date(d).toLocaleString(i18n.language, {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',

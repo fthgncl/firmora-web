@@ -79,8 +79,8 @@ const formatAmount = (amount, currency) => {
     }
 };
 
-const formatDateTime = (d) =>
-    d ? new Date(d).toLocaleString('tr-TR', {
+const formatDateTime = (d,langCode) =>
+    d ? new Date(d).toLocaleString(langCode, {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -237,7 +237,7 @@ function ImageViewer({ attachment, token }) {
 export default function TransferDetailPage() {
     const {transferId} = useParams();
     const navigate = useNavigate();
-    const {t} = useTranslation(['transfers','common']);
+    const {t, i18n} = useTranslation(['transfers','common']);
     const {token, user} = useAuth();
     const {showError} = useAlert();
 
@@ -645,7 +645,7 @@ export default function TransferDetailPage() {
                                                 {t('list.columns.created_at')}
                                             </Typography>
                                             <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                {formatDateTime(transfer.created_at)}
+                                                {formatDateTime(transfer.created_at, i18n.language)}
                                             </Typography>
                                         </Box>
                                     </Stack>

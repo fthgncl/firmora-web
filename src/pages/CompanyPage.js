@@ -104,19 +104,8 @@ export default function CompanyPage() {
         // eslint-disable-next-line
     }, [token, user]);
 
-    const mapLngToLocale = (lng) => {
-        switch (lng) {
-            case 'tr':
-                return 'tr-TR';
-            case 'de':
-                return 'de-DE';
-            default:
-                return 'en-US';
-        }
-    };
-
     const formatBalance = (balance, currency) => {
-        return new Intl.NumberFormat(mapLngToLocale(i18n.language), {
+        return new Intl.NumberFormat(i18n.language, {
             style: 'currency',
             currency: currency,
             minimumFractionDigits: 2,

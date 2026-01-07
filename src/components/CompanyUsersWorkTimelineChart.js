@@ -1,9 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {Chip} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 export default function CompanyUsersWorkTimelineChart({ employees }) {
     const navigate = useNavigate();
+    const {i18n} = useTranslation();
     const { companyId } = useParams();
     const containerRef = useRef(null);
     const [containerWidth, setContainerWidth] = useState(1000);
@@ -39,7 +41,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
 
     const formatDate = (timestamp) => {
         const date = new Date(timestamp);
-        return date.toLocaleDateString('tr-TR', {
+        return date.toLocaleDateString(i18n.language, {
             day: '2-digit',
             month: '2-digit',
             hour: '2-digit',
