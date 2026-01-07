@@ -147,8 +147,12 @@ export default function WorkTimelineChart({sessions}) {
                             const [start, end] = entry.value;
                             const hours = Math.floor(start);
                             const mins = Math.round((start % 1) * 60);
-                            const endHours = Math.floor(end);
-                            const endMins = Math.round((end % 1) * 60);
+                            let endHours = Math.floor(end);
+                            let endMins = Math.round((end % 1) * 60);
+                            while (endMins>59) {
+                                endMins -=60;
+                                endHours +=1;
+                            }
                             const duration = Math.round((end - start) * 60);
                             const durationHours = Math.floor(duration / 60);
                             const durationMins = duration % 60;
@@ -264,13 +268,12 @@ export default function WorkTimelineChart({sessions}) {
                                 data={chartData}
                             >
                                 <CartesianGrid
-                                    strokeDasharray="3 3"
+                                    strokeDasharray="6 6"
                                     stroke={theme.palette.divider}
                                     opacity={0.5}
                                 />
                                 <Tooltip
                                     content={<CustomTooltip/>}
-                                    shared={false}
                                     cursor={{
                                         fill: theme.palette.action.hover,
                                         opacity: 0.3
