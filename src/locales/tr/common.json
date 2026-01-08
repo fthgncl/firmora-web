@@ -66,5 +66,6 @@
   "filter": "Filtrele",
   "hour": "Saat",
   "minute": "Dakika",
-  "second": "Saniye"
+  "second": "Saniye",
+  "unexpectedError": "Beklenmeyen bir hata oluştu."
 }

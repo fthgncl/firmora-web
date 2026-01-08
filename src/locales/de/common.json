@@ -65,5 +65,6 @@
   "filter": "Filter",
   "hour": "Stunde",
   "minute": "Minute",
-  "second": "Sekunde"
+  "second": "Sekunde",
+  "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten."
 }

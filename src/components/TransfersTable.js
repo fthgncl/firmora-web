@@ -37,6 +37,8 @@ import {
     Clear,
     ReceiptLong,
     AttachFile, CheckCircle, Schedule, Error as ErrorIcon,
+    ExpandMore,
+    ExpandLess,
 } from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
@@ -76,11 +78,11 @@ const SORT_ORDERS = [
 const statusChipProps = (status) => {
     switch ((status || '').toLowerCase()) {
         case 'completed':
-            return {color: 'success', label: 'Completed', icon: <CheckCircle sx={{fontSize: 18}} />};
+            return {color: 'success', label: 'Completed', icon: <CheckCircle sx={{fontSize: 18}}/>};
         case 'pending':
-            return {color: 'warning', label: 'Pending', icon: <Schedule sx={{fontSize: 18}} />};
+            return {color: 'warning', label: 'Pending', icon: <Schedule sx={{fontSize: 18}}/>};
         case 'reject':
-            return {color: 'error', label: 'rejected', icon: <ErrorIcon sx={{fontSize: 18}} />};
+            return {color: 'error', label: 'rejected', icon: <ErrorIcon sx={{fontSize: 18}}/>};
         default:
             return {color: 'default', label: status || '-', icon: null};
     }
@@ -169,6 +171,9 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
     );
     const [anchorEl, setAnchorEl] = useState(null);
 
+    // Açılıp kapanma durumu
+    const [isExpanded, setIsExpanded] = useState(false);
+
     // Yetki kontrolü
     useEffect(() => {
         const checkPermissions = async () => {
@@ -177,7 +182,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
                 return;
             }
             try {
-                if ( entitySearch === user.id ){
+                if (entitySearch === user.id) {
                     setHasPermission(true);
                     return;
                 }
@@ -257,7 +262,8 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
         } finally {
             setLoading(false);
         }
-    }, [API_URL, authHeaders, buildRequestBody, companyId, t]);
+        // eslint-disable-next-line
+    }, []);
 
     // Debounce için timer ref
     const debounceTimerRef = React.useRef(null);
@@ -274,13 +280,15 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
     }, [fetchTransfers]);
 
     useEffect(() => {
-        debouncedFetchTransfers();
+        if (isExpanded) {
+            debouncedFetchTransfers();
+        }
         return () => {
             if (debounceTimerRef.current) {
                 clearTimeout(debounceTimerRef.current);
             }
         };
-    }, [debouncedFetchTransfers]);
+    }, [debouncedFetchTransfers, isExpanded]);
 
     React.useImperativeHandle(ref, () => ({refresh: fetchTransfers}));
 
@@ -314,7 +322,8 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
 
     const renderStatusChip = (s) => {
         const {color, label} = statusChipProps(s);
-        return <Chip size="small" sx={{color:'white'}} color={color} label={t(`transfers:list.status.${label.toLowerCase()}`, label)}/>;
+        return <Chip size="small" sx={{color: 'white'}} color={color}
+                     label={t(`transfers:list.status.${label.toLowerCase()}`, label)}/>;
     };
 
     const senderFullName = (r) => {
@@ -382,17 +391,20 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
                                 sx={{fontWeight: 600, letterSpacing: 0.3, textShadow: '0 1px 3px rgba(0,0,0,0.3)'}}>
                         {t('transfers:list.title')}
                     </Typography>
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            opacity: 0.9,
-                            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
-                            display: 'block',
-                            whiteSpace: {xs: 'normal', sm: 'nowrap'}
-                        }}
-                    >
-                        {t('transfers:list.total', {total})} • {t('transfers:list.rowsPerPage')} {limit}
-                    </Typography>
+
+                    {total > 0 && (
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                opacity: 0.9,
+                                textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+                                display: 'block',
+                                whiteSpace: {xs: 'normal', sm: 'nowrap'}
+                            }}
+                        >
+                            {t('transfers:list.total', {total})} • {t('transfers:list.rowsPerPage')} {limit}
+                        </Typography>
+                    )}
                 </Box>
 
                 <Box
@@ -437,320 +449,351 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
                             <Refresh/>
                         </IconButton>
                     </Tooltip>
+
+                    <Tooltip title={isExpanded ? t('common:close') : t('common:open')}>
+                        <IconButton
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            size="small"
+                            sx={{
+                                color: '#fff',
+                                bgcolor: 'rgba(255,255,255,0.18)',
+                                border: '1px solid rgba(255,255,255,0.25)',
+                                '&:hover': {bgcolor: 'rgba(255,255,255,0.28)'},
+                                transition: 'all 0.2s ease',
+                            }}
+                        >
+                            {isExpanded ? <ExpandLess/> : <ExpandMore/>}
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             </Box>
 
-            {/* Araç Çubuğu (Filtreler) */}
-            <Box sx={{px: 2.5, py: 2}}>
-                {/* Arama */}
-                <Box sx={{mb: 2}}>
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            px: 1.5,
-                            py: 0.5,
-                            borderRadius: 999,
-                            border: (t) => `1px solid ${t.palette.divider}`,
-                            bgcolor: 'background.paper',
-                        }}
-                    >
-                        <Search fontSize="small" style={{opacity: 0.75}}/>
-                        <TextField
-                            variant="standard"
-                            fullWidth
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder={t('transfers:list.search.placeholder')}
-                            InputProps={{disableUnderline: true}}
-                            sx={{mx: 1}}
-                        />
-                        {searchTerm && (
-                            <IconButton size="small" onClick={() => setSearchTerm('')}>
-                                <Clear fontSize="small"/>
-                            </IconButton>
-                        )}
-                    </Paper>
-                </Box>
+            {/* Araç Çubuğu (Filtreler) - Yalnızca açıksa göster */}
+            {isExpanded && (
+                <>
+                    <Box sx={{px: 2.5, py: 2}}>
+                        {/* Arama */}
+                        <Box sx={{mb: 2}}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    px: 1.5,
+                                    py: 0.5,
+                                    borderRadius: 999,
+                                    border: (t) => `1px solid ${t.palette.divider}`,
+                                    bgcolor: 'background.paper',
+                                }}
+                            >
+                                <Search fontSize="small" style={{opacity: 0.75}}/>
+                                <TextField
+                                    variant="standard"
+                                    fullWidth
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder={t('transfers:list.search.placeholder')}
+                                    InputProps={{disableUnderline: true}}
+                                    sx={{mx: 1}}
+                                />
+                                {searchTerm && (
+                                    <IconButton size="small" onClick={() => setSearchTerm('')}>
+                                        <Clear fontSize="small"/>
+                                    </IconButton>
+                                )}
+                            </Paper>
+                        </Box>
 
-                {/* Filtreler */}
-                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-                    {/* Filtreler Bölümü */}
-                    <Box>
-                        <Typography variant="caption"
-                                    sx={{fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary'}}>
-                            {t('transfers:list.filters.title')}
-                        </Typography>
-                        <Box sx={{display: 'flex', gap: 1.5, flexWrap: 'wrap'}}>
-                            <FormControl size="small" sx={{flex: '1 1 200px', minWidth: 200}}>
-                                <InputLabel>{t('transfers:list.filters.status')}</InputLabel>
-                                <Select value={status} onChange={(e) => setStatus(e.target.value)}
-                                        label={t('transfers:list.filters.status')}>
-                                    {statusOptions.map((o) => (
-                                        <MenuItem key={o.value}
-                                                  value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        {/* Filtreler */}
+                        <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                            {/* Filtreler Bölümü */}
+                            <Box>
+                                <Typography variant="caption"
+                                            sx={{fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary'}}>
+                                    {t('transfers:list.filters.title')}
+                                </Typography>
+                                <Box sx={{display: 'flex', gap: 1.5, flexWrap: 'wrap'}}>
+                                    <FormControl size="small" sx={{flex: '1 1 200px', minWidth: 200}}>
+                                        <InputLabel>{t('transfers:list.filters.status')}</InputLabel>
+                                        <Select value={status} onChange={(e) => setStatus(e.target.value)}
+                                                label={t('transfers:list.filters.status')}>
+                                            {statusOptions.map((o) => (
+                                                <MenuItem key={o.value}
+                                                          value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
 
-                            <FormControl size="small" sx={{flex: '1 1 280px', minWidth: 280}}>
-                                <InputLabel>{t('transfers:list.filters.transferType')}</InputLabel>
-                                <Select value={transferType} onChange={(e) => setTransferType(e.target.value)}
-                                        label={t('transfers:list.filters.transferType')}>
-                                    {transferTypeOptions.map((o) => (
-                                        <MenuItem key={o.value}
-                                                  value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                                    <FormControl size="small" sx={{flex: '1 1 280px', minWidth: 280}}>
+                                        <InputLabel>{t('transfers:list.filters.transferType')}</InputLabel>
+                                        <Select value={transferType} onChange={(e) => setTransferType(e.target.value)}
+                                                label={t('transfers:list.filters.transferType')}>
+                                            {transferTypeOptions.map((o) => (
+                                                <MenuItem key={o.value}
+                                                          value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
 
-                            <FormControl size="small" sx={{flex: '1 1 180px', minWidth: 180}}>
-                                <InputLabel>{t('transfers:list.filters.fromScope')}</InputLabel>
-                                <Select value={fromScope} onChange={(e) => setFromScope(e.target.value)}
-                                        label={t('transfers:list.filters.fromScope')}>
-                                    {scopeOptions.map((o) => (
-                                        <MenuItem key={o.value}
-                                                  value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                                    <FormControl size="small" sx={{flex: '1 1 180px', minWidth: 180}}>
+                                        <InputLabel>{t('transfers:list.filters.fromScope')}</InputLabel>
+                                        <Select value={fromScope} onChange={(e) => setFromScope(e.target.value)}
+                                                label={t('transfers:list.filters.fromScope')}>
+                                            {scopeOptions.map((o) => (
+                                                <MenuItem key={o.value}
+                                                          value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
 
-                            <FormControl size="small" sx={{flex: '1 1 180px', minWidth: 180}}>
-                                <InputLabel>{t('transfers:list.filters.toScope')}</InputLabel>
-                                <Select value={toScope} onChange={(e) => setToScope(e.target.value)}
-                                        label={t('transfers:list.filters.toScope')}>
-                                    {scopeOptions.map((o) => (
-                                        <MenuItem key={o.value}
-                                                  value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                                    <FormControl size="small" sx={{flex: '1 1 180px', minWidth: 180}}>
+                                        <InputLabel>{t('transfers:list.filters.toScope')}</InputLabel>
+                                        <Select value={toScope} onChange={(e) => setToScope(e.target.value)}
+                                                label={t('transfers:list.filters.toScope')}>
+                                            {scopeOptions.map((o) => (
+                                                <MenuItem key={o.value}
+                                                          value={o.value}>{t(`transfers:${o.labelKey}`, o.value || 'Any')}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
 
-                            <TextField
-                                size="small"
-                                type="date"
-                                label={t('transfers:list.filters.startDate')}
-                                InputLabelProps={{shrink: true}}
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                sx={{flex: '1 1 180px', minWidth: 180}}
-                            />
+                                    <TextField
+                                        size="small"
+                                        type="date"
+                                        label={t('transfers:list.filters.startDate')}
+                                        InputLabelProps={{shrink: true}}
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                        sx={{flex: '1 1 180px', minWidth: 180}}
+                                    />
 
-                            <TextField
-                                size="small"
-                                type="date"
-                                label={t('transfers:list.filters.endDate')}
-                                InputLabelProps={{shrink: true}}
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                sx={{flex: '1 1 180px', minWidth: 180}}
-                            />
+                                    <TextField
+                                        size="small"
+                                        type="date"
+                                        label={t('transfers:list.filters.endDate')}
+                                        InputLabelProps={{shrink: true}}
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                        sx={{flex: '1 1 180px', minWidth: 180}}
+                                    />
+                                </Box>
+                            </Box>
+
+                            {/* Sıralama Bölümü */}
+                            <Box>
+                                <Typography variant="caption"
+                                            sx={{fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary'}}>
+                                    {t('transfers:list.sort.title')}
+                                </Typography>
+                                <Box sx={{display: 'flex', gap: 1.5, flexWrap: 'wrap'}}>
+                                    <FormControl size="small" sx={{flex: '1 1 200px', minWidth: 200}}>
+                                        <InputLabel>{t('transfers:list.sort.sortBy')}</InputLabel>
+                                        <Select
+                                            value={sortBy}
+                                            onChange={(e) => {
+                                                setSortBy(e.target.value);
+                                                setPage(0);
+                                            }}
+                                            label={t('transfers:list.sort.sortBy')}
+                                        >
+                                            {SORT_FIELDS.map(f => (
+                                                <MenuItem key={f.value}
+                                                          value={f.value}>{t(`transfers:${f.labelKey}`)}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+
+                                    <FormControl size="small" sx={{flex: '0 1 150px', minWidth: 150}}>
+                                        <InputLabel>{t('transfers:list.sort.order')}</InputLabel>
+                                        <Select
+                                            value={sortOrder}
+                                            onChange={(e) => {
+                                                setSortOrder(e.target.value);
+                                                setPage(0);
+                                            }}
+                                            label={t('transfers:list.sort.order')}
+                                        >
+                                            {SORT_ORDERS.map(o => (
+                                                <MenuItem key={o.value}
+                                                          value={o.value}>{t(`transfers:${o.labelKey}`)}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                            </Box>
                         </Box>
                     </Box>
 
-                    {/* Sıralama Bölümü */}
-                    <Box>
-                        <Typography variant="caption"
-                                    sx={{fontWeight: 600, mb: 1, display: 'block', color: 'text.secondary'}}>
-                            {t('transfers:list.sort.title')}
-                        </Typography>
-                        <Box sx={{display: 'flex', gap: 1.5, flexWrap: 'wrap'}}>
-                            <FormControl size="small" sx={{flex: '1 1 200px', minWidth: 200}}>
-                                <InputLabel>{t('transfers:list.sort.sortBy')}</InputLabel>
-                                <Select
-                                    value={sortBy}
-                                    onChange={(e) => {
-                                        setSortBy(e.target.value);
-                                        setPage(0);
-                                    }}
-                                    label={t('transfers:list.sort.sortBy')}
-                                >
-                                    {SORT_FIELDS.map(f => (
-                                        <MenuItem key={f.value}
-                                                  value={f.value}>{t(`transfers:${f.labelKey}`)}</MenuItem>
+                    <Divider/>
+
+                    {/* Hata */}
+                    {errorMsg && <Alert severity="error" sx={{m: 2}}>{errorMsg}</Alert>}
+
+                    {/* Tablo */}
+                    <TableContainer sx={{overflowX: 'auto'}}>
+                        <Table size="small" sx={{
+                            minWidth: 900,
+                            'thead th': {fontWeight: 700, whiteSpace: 'nowrap'},
+                            'tbody tr': {
+                                transition: 'background-color 120ms ease, transform 120ms ease',
+                                '&:hover': {bgcolor: 'action.hover'}
+                            },
+                            '& thead th, & tbody td': {textAlign: 'center', verticalAlign: 'middle'}
+                        }}>
+                            <TableHead>
+                                <TableRow>
+                                    {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
+                                        <TableCell key={c.key}>{t(`transfers:${c.labelKey}`)}</TableCell>
                                     ))}
-                                </Select>
-                            </FormControl>
-
-                            <FormControl size="small" sx={{flex: '0 1 150px', minWidth: 150}}>
-                                <InputLabel>{t('transfers:list.sort.order')}</InputLabel>
-                                <Select
-                                    value={sortOrder}
-                                    onChange={(e) => {
-                                        setSortOrder(e.target.value);
-                                        setPage(0);
-                                    }}
-                                    label={t('transfers:list.sort.order')}
-                                >
-                                    {SORT_ORDERS.map(o => (
-                                        <MenuItem key={o.value}
-                                                  value={o.value}>{t(`transfers:${o.labelKey}`)}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
-
-            <Divider/>
-
-            {/* Hata */}
-            {errorMsg && <Alert severity="error" sx={{m: 2}}>{errorMsg}</Alert>}
-
-            {/* Tablo */}
-            <TableContainer sx={{overflowX: 'auto'}}>
-                <Table size="small" sx={{
-                    minWidth: 900,
-                    'thead th': {fontWeight: 700, whiteSpace: 'nowrap'},
-                    'tbody tr': {
-                        transition: 'background-color 120ms ease, transform 120ms ease',
-                        '&:hover': {bgcolor: 'action.hover'}
-                    },
-                    '& thead th, & tbody td': {textAlign: 'center', verticalAlign: 'middle'}
-                }}>
-                    <TableHead>
-                        <TableRow>
-                            {COLUMN_DEFS.filter(c => visibleCols[c.key]).map(c => (
-                                <TableCell key={c.key}>{t(`transfers:${c.labelKey}`)}</TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                        {loading ? (
-                            <TableRow>
-                                <TableCell colSpan={COLUMN_DEFS.length}>
-                                    <Box sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        justifyContent: 'center',
-                                        py: 4
-                                    }}>
-                                        <CircularProgress size={20}/>
-                                        <Typography variant="body2"
-                                                    color="text.secondary">{t('transfers:list.loading')}</Typography>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
-                        ) : rows.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={COLUMN_DEFS.length}>
-                                    <Box sx={{py: 6, textAlign: 'center', color: 'text.secondary'}}>
-                                        <Typography variant="subtitle1" sx={{mb: 0.5}}>
-                                            {searchTerm ? t('transfers:list.noResultsForSearch') : t('transfers:list.noRecords')}
-                                        </Typography>
-                                        <Typography variant="body2"
-                                                    sx={{mb: 2}}>{t('transfers:list.search.placeholder')}</Typography>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            rows.map((r) => (
-                                <TableRow 
-                                    key={r.id} 
-                                    hover 
-                                    onClick={() => navigate(`/transfer/${r.id}`)}
-                                    sx={{ cursor: 'pointer' }}
-                                >
-                                    {visibleCols.created_at && <TableCell>{formatDateTime(r.created_at)}</TableCell>}
-                                    {visibleCols.id && <TableCell
-                                        sx={{fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'}}>{r.id}</TableCell>}
-                                    {visibleCols.amount && <TableCell
-                                        sx={{fontWeight: 700}}>{formatAmount(r.amount, r.currency)}</TableCell>}
-                                    {visibleCols.sender && (
-                                        <TableCell>
-                                            <Box sx={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'center',
-                                                gap: 0.5
-                                            }}>
-                                                <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                    {senderFullName(r)}
-                                                </Typography>
-                                                {r.sender_company_name && (
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        {r.sender_company_name}
-                                                    </Typography>
-                                                )}
-                                            </Box>
-                                        </TableCell>
-                                    )}
-                                    {visibleCols.receiver && (
-                                        <TableCell>
-                                            <Box sx={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'center',
-                                                gap: 0.5
-                                            }}>
-                                                <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                    {receiverFullName(r)}
-                                                </Typography>
-                                                {r.receiver_company_name && (
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        {r.receiver_company_name}
-                                                    </Typography>
-                                                )}
-                                            </Box>
-                                        </TableCell>
-                                    )}
-                                    {visibleCols.transfer_type &&
-                                        <TableCell>{renderTypeChip(r.transfer_type)}</TableCell>}
-                                    {visibleCols.description && <TableCell sx={{
-                                        maxWidth: 300,
-                                        whiteSpace: 'normal',
-                                        wordWrap: 'break-word'
-                                    }}>{r.description || '-'}</TableCell>}
-                                    {visibleCols.files_count && (
-                                        <TableCell>
-                                            {r.files_count > 0 ? (
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                                                    <AttachFile fontSize="small" sx={{ color: 'text.secondary' }} />
-                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                                        {r.files_count}
-                                                    </Typography>
-                                                </Box>
-                                            ) : (
-                                                '-'
-                                            )}
-                                        </TableCell>
-                                    )}
-                                    {visibleCols.status && <TableCell>{renderStatusChip(r.status)}</TableCell>}
-                                    {visibleCols.sender_final_balance &&
-                                        <TableCell>{r.sender_final_balance != null ? formatAmount(r.sender_final_balance, r.currency) : '-'}</TableCell>}
-                                    {visibleCols.receiver_final_balance &&
-                                        <TableCell>{r.receiver_final_balance != null ? formatAmount(r.receiver_final_balance, r.currency) : '-'}</TableCell>}
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                            </TableHead>
 
-            {/* Alt bar - Sunucu tarafı sayfalama */}
-            <Box sx={{px: 2, py: 1.5}}>
-                <TablePagination
-                    component="div"
-                    count={total}
-                    page={page}
-                    onPageChange={(_, newPage) => setPage(newPage)}
-                    rowsPerPage={limit}
-                    onRowsPerPageChange={(e) => {
-                        setLimit(parseInt(e.target.value, 10));
-                        setPage(0);
-                    }}
-                    rowsPerPageOptions={[10, 20, 50, 100]}
-                    labelRowsPerPage={t('transfers:list.rowsPerPage')}
-                    labelDisplayedRows={({from, to, count}) => t('transfers:list.displayedRows', {from, to, count})}
-                    sx={{
-                        '.MuiTablePagination-toolbar': {flexWrap: 'wrap', minHeight: {xs: 'auto', sm: 52}},
-                    }}
-                />
-            </Box>
+                            <TableBody>
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={COLUMN_DEFS.length}>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1,
+                                                justifyContent: 'center',
+                                                py: 4
+                                            }}>
+                                                <CircularProgress size={20}/>
+                                                <Typography variant="body2"
+                                                            color="text.secondary">{t('transfers:list.loading')}</Typography>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : rows.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={COLUMN_DEFS.length}>
+                                            <Box sx={{py: 6, textAlign: 'center', color: 'text.secondary'}}>
+                                                <Typography variant="subtitle1" sx={{mb: 0.5}}>
+                                                    {searchTerm ? t('transfers:list.noResultsForSearch') : t('transfers:list.noRecords')}
+                                                </Typography>
+                                                <Typography variant="body2"
+                                                            sx={{mb: 2}}>{t('transfers:list.search.placeholder')}</Typography>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    rows.map((r) => (
+                                        <TableRow
+                                            key={r.id}
+                                            hover
+                                            onClick={() => navigate(`/transfer/${r.id}`)}
+                                            sx={{cursor: 'pointer'}}
+                                        >
+                                            {visibleCols.created_at &&
+                                                <TableCell>{formatDateTime(r.created_at)}</TableCell>}
+                                            {visibleCols.id && <TableCell
+                                                sx={{fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'}}>{r.id}</TableCell>}
+                                            {visibleCols.amount && <TableCell
+                                                sx={{fontWeight: 700}}>{formatAmount(r.amount, r.currency)}</TableCell>}
+                                            {visibleCols.sender && (
+                                                <TableCell>
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        gap: 0.5
+                                                    }}>
+                                                        <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                            {senderFullName(r)}
+                                                        </Typography>
+                                                        {r.sender_company_name && (
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                {r.sender_company_name}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
+                                            )}
+                                            {visibleCols.receiver && (
+                                                <TableCell>
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        gap: 0.5
+                                                    }}>
+                                                        <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                            {receiverFullName(r)}
+                                                        </Typography>
+                                                        {r.receiver_company_name && (
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                {r.receiver_company_name}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
+                                            )}
+                                            {visibleCols.transfer_type &&
+                                                <TableCell>{renderTypeChip(r.transfer_type)}</TableCell>}
+                                            {visibleCols.description && <TableCell sx={{
+                                                maxWidth: 300,
+                                                whiteSpace: 'normal',
+                                                wordWrap: 'break-word'
+                                            }}>{r.description || '-'}</TableCell>}
+                                            {visibleCols.files_count && (
+                                                <TableCell>
+                                                    {r.files_count > 0 ? (
+                                                        <Box sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            gap: 0.5
+                                                        }}>
+                                                            <AttachFile fontSize="small"
+                                                                        sx={{color: 'text.secondary'}}/>
+                                                            <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                                {r.files_count}
+                                                            </Typography>
+                                                        </Box>
+                                                    ) : (
+                                                        '-'
+                                                    )}
+                                                </TableCell>
+                                            )}
+                                            {visibleCols.status && <TableCell>{renderStatusChip(r.status)}</TableCell>}
+                                            {visibleCols.sender_final_balance &&
+                                                <TableCell>{r.sender_final_balance != null ? formatAmount(r.sender_final_balance, r.currency) : '-'}</TableCell>}
+                                            {visibleCols.receiver_final_balance &&
+                                                <TableCell>{r.receiver_final_balance != null ? formatAmount(r.receiver_final_balance, r.currency) : '-'}</TableCell>}
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+
+                    {/* Alt bar - Sunucu tarafı sayfalama */}
+                    <Box sx={{px: 2, py: 1.5}}>
+                        <TablePagination
+                            component="div"
+                            count={total}
+                            page={page}
+                            onPageChange={(_, newPage) => setPage(newPage)}
+                            rowsPerPage={limit}
+                            onRowsPerPageChange={(e) => {
+                                setLimit(parseInt(e.target.value, 10));
+                                setPage(0);
+                            }}
+                            rowsPerPageOptions={[10, 20, 50, 100]}
+                            labelRowsPerPage={t('transfers:list.rowsPerPage')}
+                            labelDisplayedRows={({from, to, count}) => t('transfers:list.displayedRows', {
+                                from,
+                                to,
+                                count
+                            })}
+                            sx={{
+                                '.MuiTablePagination-toolbar': {flexWrap: 'wrap', minHeight: {xs: 'auto', sm: 52}},
+                            }}
+                        />
+                    </Box>
+                </>
+            )}
 
             {/* Kolon menüsü */}
             <Popover

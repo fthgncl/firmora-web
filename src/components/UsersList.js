@@ -39,7 +39,9 @@ import {
     PersonAdd,
     Group,
     Phone,
-    History
+    History,
+    ExpandMore,
+    ExpandLess,
 } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
@@ -147,6 +149,9 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
     );
     const [anchorEl, setAnchorEl] = useState(null);
 
+    // Açılıp kapanma durumu
+    const [isExpanded, setIsExpanded] = useState(false);
+
     const offset = useMemo(() => page * limit, [page, limit]);
 
     const filteredRows = useMemo(() => {
@@ -234,7 +239,11 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
         }
     }, [API_URL, authHeaders, companyId, limit, offset, sortBy, sortOrder]);
 
-    useEffect(() => { fetchUsers(); }, [fetchUsers]);
+    useEffect(() => {
+        if (isExpanded) {
+            fetchUsers();
+        }
+    }, [fetchUsers, isExpanded]);
 
     React.useImperativeHandle(ref, () => ({ refresh: fetchUsers }));
 
@@ -337,17 +346,19 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     >
                         {t('list.title')}
                     </Typography>
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            opacity: 0.9,
-                            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
-                            display: 'block',
-                            whiteSpace: { xs: 'normal', sm: 'nowrap' },
-                        }}
-                    >
-                        {t('list.total', { total })} • {t('list.rowsPerPage')} {limit}
-                    </Typography>
+                    {total > 0 && (
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                opacity: 0.9,
+                                textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+                                display: 'block',
+                                whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                            }}
+                        >
+                            {t('list.total', { total })} • {t('list.rowsPerPage')} {limit}
+                        </Typography>
+                    )}
                 </Box>
 
                 {/* Sağ aksiyonlar */}
@@ -445,97 +456,117 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                             </Button>
                         </Box>
                     </Tooltip>
+
+                    {/* Açılıp kapanma butonu */}
+                    <Tooltip title={isExpanded ? t('common:close') : t('common:open')}>
+                        <IconButton
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            size="small"
+                            sx={{
+                                color: '#fff',
+                                bgcolor: 'rgba(255,255,255,0.18)',
+                                border: '1px solid rgba(255,255,255,0.25)',
+                                '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+                                transition: 'all 0.2s ease',
+                            }}
+                        >
+                            {isExpanded ? <ExpandLess /> : <ExpandMore />}
+                        </IconButton>
+                    </Tooltip>
+
                 </Box>
             </Box>
 
 
 
-            {/* Araç Çubuğu */}
-            <Box
-                sx={{
-                    px: 2.5,
-                    py: 1.5,
-                    display: 'flex',
-                    flexWrap: 'wrap',                 // ⭐ sığmayınca alt satıra geç
-                    alignItems: 'center',
-                    columnGap: 1.2,
-                    rowGap: 1.2,
-                }}
-            >
-                {/* Sol: Arama */}
-                <Box sx={{ flex: '1 1 320px', minWidth: { xs: '100%', sm: 320 } }}>
-                    <Paper
-                        elevation={0}
+            {/* Araç Çubuğu - Yalnızca açıksa göster */}
+            {isExpanded && (
+                <>
+                    <Box
                         sx={{
+                            px: 2.5,
+                            py: 1.5,
                             display: 'flex',
+                            flexWrap: 'wrap',                 // ⭐ sığmayınca alt satıra geç
                             alignItems: 'center',
-                            px: 1.5,
-                            py: 0.5,
-                            borderRadius: 999,
-                            border: (t) => `1px solid ${t.palette.divider}`,
-                            bgcolor: 'background.paper',
-                            width: '100%',               // ⭐ genişliği ebeveyne yayılsın
+                            columnGap: 1.2,
+                            rowGap: 1.2,
                         }}
                     >
-                        <Search fontSize="small" style={{ opacity: 0.75 }} />
-                        <TextField
-                            variant="standard"
-                            fullWidth
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder={t('list.search.placeholder')}
-                            InputProps={{ disableUnderline: true }}
-                            sx={{ mx: 1 }}
-                        />
-                        {searchTerm && (
-                            <IconButton size="small" onClick={() => setSearchTerm('')}>
-                                <Clear fontSize="small" />
-                            </IconButton>
-                        )}
-                    </Paper>
-                </Box>
+                        {/* Sol: Arama */}
+                        <Box sx={{ flex: '1 1 320px', minWidth: { xs: '100%', sm: 320 } }}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    px: 1.5,
+                                    py: 0.5,
+                                    borderRadius: 999,
+                                    border: (t) => `1px solid ${t.palette.divider}`,
+                                    bgcolor: 'background.paper',
+                                    width: '100%',               // ⭐ genişliği ebeveyne yayılsın
+                                }}
+                            >
+                                <Search fontSize="small" style={{ opacity: 0.75 }} />
+                                <TextField
+                                    variant="standard"
+                                    fullWidth
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder={t('list.search.placeholder')}
+                                    InputProps={{ disableUnderline: true }}
+                                    sx={{ mx: 1 }}
+                                />
+                                {searchTerm && (
+                                    <IconButton size="small" onClick={() => setSearchTerm('')}>
+                                        <Clear fontSize="small" />
+                                    </IconButton>
+                                )}
+                            </Paper>
+                        </Box>
 
-                {/* Sağ: Sıralama/Filtreler */}
-                <Box
-                    sx={{
-                        display: 'flex',
-                        gap: 1,
-                        flex: '0 1 420px',              // ⭐ genişlik payı, sığmazsa alta
-                        minWidth: { xs: '100%', sm: 320 }, // xs’de tam satır, sm’de esnek
-                        justifyContent: { xs: 'flex-start', md: 'flex-end' },
-                    }}
-                >
-                    <FormControl size="small" sx={{ minWidth: 160, flex: '1 1 160px' }}>
-                        <Select
-                            value={sortBy}
-                            onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
+                        {/* Sağ: Sıralama/Filtreler */}
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                gap: 1,
+                                flex: '0 1 420px',              // ⭐ genişlik payı, sığmazsa alta
+                                minWidth: { xs: '100%', sm: 320 }, // xs'de tam satır, sm'de esnek
+                                justifyContent: { xs: 'flex-start', md: 'flex-end' },
+                            }}
                         >
-                            {availableSortFields.map(f => (
-                                <MenuItem key={f.value} value={f.value}>{t(`users:${f.labelKey}`)}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                            <FormControl size="small" sx={{ minWidth: 160, flex: '1 1 160px' }}>
+                                <Select
+                                    value={sortBy}
+                                    onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
+                                >
+                                    {availableSortFields.map(f => (
+                                        <MenuItem key={f.value} value={f.value}>{t(`users:${f.labelKey}`)}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
 
-                    <FormControl size="small" sx={{ minWidth: 120, flex: '1 1 120px' }}>
-                        <Select
-                            value={sortOrder}
-                            onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}
-                        >
-                            {SORT_ORDERS.map(o => (
-                                <MenuItem key={o.value} value={o.value}>{t(`users:${o.labelKey}`)}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
-            </Box>
+                            <FormControl size="small" sx={{ minWidth: 120, flex: '1 1 120px' }}>
+                                <Select
+                                    value={sortOrder}
+                                    onChange={(e) => { setSortOrder(e.target.value); setPage(0); }}
+                                >
+                                    {SORT_ORDERS.map(o => (
+                                        <MenuItem key={o.value} value={o.value}>{t(`users:${o.labelKey}`)}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Box>
 
-            <Divider />
+                    <Divider />
 
-            {/* Hata */}
-            {errorMsg && <Alert severity="error" sx={{ m: 2 }}>{errorMsg}</Alert>}
+                    {/* Hata */}
+                    {errorMsg && <Alert severity="error" sx={{ m: 2 }}>{errorMsg}</Alert>}
 
-            {/* Tablo */}
-            <TableContainer sx={{ overflowX: 'auto' }}>
+                    {/* Tablo */}
+                    <TableContainer sx={{ overflowX: 'auto' }}>
                 <Table size="small" sx={{
                     minWidth: { xs: 700, md: 'auto' },
                     tableLayout: 'auto',
@@ -722,10 +753,10 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                         )}
                     </TableBody>
                 </Table>
-            </TableContainer>
+                    </TableContainer>
 
-            {/* Alt bar */}
-            <Box sx={{ px: 2, py: 1.5 }}>
+                    {/* Alt bar */}
+                    <Box sx={{ px: 2, py: 1.5 }}>
                 <TablePagination
                     component="div"
                     count={filteredTotal}
@@ -739,8 +770,10 @@ const UsersList = React.forwardRef(({ companyId, initialLimit = 20, sx }, ref) =
                     sx={{
                         '.MuiTablePagination-toolbar': { flexWrap: 'wrap', minHeight: { xs: 'auto', sm: 52 } },
                     }}
-                />
-            </Box>
+                    />
+                    </Box>
+                </>
+            )}
 
             {/* Kolon menüsü */}
             <Popover
