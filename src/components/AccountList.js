@@ -33,6 +33,7 @@ import ExternalMoneyDialog from './ExternalMoneyDialog';
 import TransfersDialog from './TransfersDialog';
 import WorkStatusDisplay from './WorkStatusDisplay';
 import {useTranslation} from 'react-i18next';
+import {permissionsService} from '../services/permissionsService';
 
 const AccountList = forwardRef((props, ref) => {
     const {t, i18n} = useTranslation(['accounts']);
@@ -45,6 +46,7 @@ const AccountList = forwardRef((props, ref) => {
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
     const [transfersDialogOpen, setTransfersDialogOpen] = useState(false);
+    const [accountPermissions, setAccountPermissions] = useState({});
 
     const fetchAccounts = useCallback(async () => {
         try {
@@ -60,6 +62,8 @@ const AccountList = forwardRef((props, ref) => {
 
             if (response.data.status === 'success') {
                 setAccounts(response.data.accounts);
+                // Her hesap için yetki kontrolü
+                checkPermissionsForAccounts(response.data.accounts);
             }
         } catch (err) {
             console.error(t('accounts:errors.consoleLoadError'), err);
@@ -75,6 +79,54 @@ const AccountList = forwardRef((props, ref) => {
         }
         // eslint-disable-next-line
     }, [token]);
+
+    const checkPermissionsForAccounts = async (accountsList) => {
+        if (!user || !token) return;
+
+        const permissionsMap = {};
+
+        for (const account of accountsList) {
+            const companyId = account.company?.id;
+            if (!companyId) continue;
+
+            try {
+                // Gelir ekleme yetkisi kontrolü
+                const canAddIncome = await permissionsService.checkUserRoles(
+                    token,
+                    user,
+                    companyId,
+                    ['can_receive_external_to_user']
+                );
+
+                // Para transferi yetkileri kontrolü
+                const canTransfer = await permissionsService.checkUserRoles(
+                    token,
+                    user,
+                    companyId,
+                    [
+                        'can_transfer_user_to_same_company_user',
+                        'can_transfer_user_to_other_company_user',
+                        'can_transfer_user_to_own_company',
+                        'can_transfer_user_to_other_company',
+                        'can_transfer_user_to_external'
+                    ]
+                );
+
+                permissionsMap[account.id] = {
+                    canAddIncome,
+                    canTransfer
+                };
+            } catch (error) {
+                console.error(`Yetki kontrolü hatası (Hesap ID: ${account.id}):`, error);
+                permissionsMap[account.id] = {
+                    canAddIncome: false,
+                    canTransfer: false
+                };
+            }
+        }
+
+        setAccountPermissions(permissionsMap);
+    };
 
     useEffect(() => {
         if (token) {
@@ -234,20 +286,23 @@ const AccountList = forwardRef((props, ref) => {
                         <CardContent sx={{pt: 3.5, pb: 2, px: 3}}>
                             {/* Başlık: avatar yerine ikon + title/subheader */}
                             <Box sx={{position: 'relative'}}>
-                                <IconButton
-                                    onClick={(e) => handleMenuOpen(e, account)}
-                                    size="small"
-                                    sx={{
-                                        position: 'absolute',
-                                        top: -4,
-                                        right: -4,
-                                        color: 'text.secondary',
-                                        '&:hover': {color: 'primary.main', backgroundColor: 'action.hover'},
-                                    }}
-                                    aria-label={t('accounts:aria.more')}
-                                >
-                                    <MoreVert/>
-                                </IconButton>
+                                {/* 3 noktalı menü düğmesi - sadece yetki varsa göster */}
+                                {(accountPermissions[account.id]?.canAddIncome || accountPermissions[account.id]?.canTransfer) && (
+                                    <IconButton
+                                        onClick={(e) => handleMenuOpen(e, account)}
+                                        size="small"
+                                        sx={{
+                                            position: 'absolute',
+                                            top: -4,
+                                            right: -4,
+                                            color: 'text.secondary',
+                                            '&:hover': {color: 'primary.main', backgroundColor: 'action.hover'},
+                                        }}
+                                        aria-label={t('accounts:aria.more')}
+                                    >
+                                        <MoreVert/>
+                                    </IconButton>
+                                )}
 
                                 <Stack direction="row" spacing={1.5} alignItems="center">
                                     <Person sx={{fontSize: 28, color: 'primary.main'}}/>
@@ -272,45 +327,49 @@ const AccountList = forwardRef((props, ref) => {
                                 </Stack>
                             </Box>
 
-                            {/* Meta satırı */}
-                            <Box
-                                sx={{
-                                    mt: 2,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                }}
-                            >
-                                <Chip
-                                    label={account.currency}
-                                    size="small"
-                                    color="primary"
-                                    sx={{fontWeight: 600}}
-                                />
+                            {/* Meta satırı - sadece yetki varsa göster */}
+                            {(accountPermissions[account.id]?.canAddIncome || accountPermissions[account.id]?.canTransfer) && (
+                                <>
+                                    <Box
+                                        sx={{
+                                            mt: 2,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                        }}
+                                    >
+                                        <Chip
+                                            label={account.currency}
+                                            size="small"
+                                            color="primary"
+                                            sx={{fontWeight: 600}}
+                                        />
 
-                                <WorkStatusDisplay
-                                    userId={user.id}
-                                    companyId={account.company?.id}
-                                    isWorking={account.is_working}
-                                />
-                            </Box>
+                                        <WorkStatusDisplay
+                                            userId={user.id}
+                                            companyId={account.company?.id}
+                                            isWorking={account.is_working}
+                                        />
+                                    </Box>
 
-                            {/* Bakiye */}
-                            <Box sx={{mt: 1.5}}>
-                                <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    sx={{mb: 0.5, fontWeight: 500}}
-                                >
-                                    {t('accounts:balance')}
-                                </Typography>
-                                <Typography
-                                    variant="h4"
-                                    sx={{fontWeight: 800, color: 'primary.main', letterSpacing: '-0.5px'}}
-                                >
-                                    {formatBalance(account.balance, account.currency)}
-                                </Typography>
-                            </Box>
+                                    {/* Bakiye */}
+                                    <Box sx={{mt: 1.5}}>
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            sx={{mb: 0.5, fontWeight: 500}}
+                                        >
+                                            {t('accounts:balance')}
+                                        </Typography>
+                                        <Typography
+                                            variant="h4"
+                                            sx={{fontWeight: 800, color: 'primary.main', letterSpacing: '-0.5px'}}
+                                        >
+                                            {formatBalance(account.balance, account.currency)}
+                                        </Typography>
+                                    </Box>
+                                </>
+                            )}
 
                             <Divider sx={{my: 2}}/>
 
@@ -402,11 +461,17 @@ const AccountList = forwardRef((props, ref) => {
                     horizontal: 'right',
                 }}
             >
-                <MenuItem onClick={handleTransferClick}>
+                <MenuItem
+                    onClick={handleTransferClick}
+                    disabled={!accountPermissions[selectedAccount?.id]?.canTransfer}
+                >
                     <SwapHoriz sx={{mr: 1, fontSize: 20}}/>
                     {t('accounts:menu.moneyTransfer')}
                 </MenuItem>
-                <MenuItem onClick={handleExternalMoneyClick}>
+                <MenuItem
+                    onClick={handleExternalMoneyClick}
+                    disabled={!accountPermissions[selectedAccount?.id]?.canAddIncome}
+                >
                     <AddCircle sx={{mr: 1, fontSize: 20}}/>
                     {t('accounts:menu.addIncome')}
                 </MenuItem>
