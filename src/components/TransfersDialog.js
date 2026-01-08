@@ -117,7 +117,7 @@ export default function TransfersDialog({ open, onClose, accountId }) {
                     </Box>
                 )}
                 {!loading && !error && accountData?.company?.id && accountData?.user_id && (
-                    <TransfersTable entitySearch={accountData.user_id} companyId={accountData.company.id} />
+                    <TransfersTable entitySearch={accountData.user_id} companyId={accountData.company.id} open={true} />
                 )}
             </DialogContent>
         </Dialog>

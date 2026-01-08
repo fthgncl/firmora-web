@@ -132,7 +132,7 @@ const formatAmount = (amount, currency) => {
     }
 };
 
-const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialLimit = 20, sx}, ref) => {
+const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialLimit = 20, sx, open = false}, ref) => {
 
     const {t, i18n} = useTranslation(['transfers']);
     const {token, user} = useAuth();
@@ -172,7 +172,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
     const [anchorEl, setAnchorEl] = useState(null);
 
     // Açılıp kapanma durumu
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(open);
 
     // Yetki kontrolü
     useEffect(() => {
