@@ -169,7 +169,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                             fontWeight="bold"
                             opacity={isNarrowRight ? 0.6 : 1}
                         >
-                            {formatSessionDuration(employee.totalMinutes || 0)}
+                            {formatSessionDuration(employee.totalMinutes || 0, 40)}
                         </text>
 
                     </g>
