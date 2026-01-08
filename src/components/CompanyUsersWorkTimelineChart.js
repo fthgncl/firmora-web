@@ -59,13 +59,48 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
         return `${hours}s ${mins}dk`;
     };
 
+    const getDisplayName = (employee) => {
+        if (containerWidth < 600) {
+            return `${employee.name} ${employee.surname?.[0] || ''}.`;
+        }
+        return `${employee.name} ${employee.surname}`;
+    };
+
+
+    const nameGap = 8;
     const rowHeight = 50;
-    const leftMargin = 150;
     const topMargin = 30;
     const bottomMargin = 30;
-    const rightMargin = 100;
     const chartHeight = employees.length * rowHeight + 60;
+    const nameWidth = containerWidth < 600 ? 80 : 140;
+    const isNarrow = containerWidth < 500;
+    const leftMargin = isNarrow
+        ? 20
+        : Math.max(nameWidth + nameGap + 4, Math.min(150, containerWidth * 0.2));
+
+    const isNarrowRight = containerWidth < 700;
+    const rightMargin = isNarrowRight ? 20 : 100;
     const chartWidth = containerWidth - leftMargin - rightMargin;
+
+
+
+    const getDurationX = (employee, idx) => {
+        if (!isNarrowRight) {
+            return containerWidth - 10;
+        }
+
+        // Son session'ın bitişi
+        const lastSession = employee.sessions?.[employee.sessions.length - 1];
+        if (!lastSession) return containerWidth - 10;
+
+        const endTime = new Date(lastSession.exitTime).getTime();
+        const endX =
+            leftMargin +
+            ((endTime - minTime) / timeRange) * chartWidth;
+
+        return Math.min(endX + 6, containerWidth - 10);
+    };
+
 
     return (
         <div ref={containerRef} style={{ width: '100%', height: '100%', overflowX: 'auto' }}>
@@ -74,38 +109,51 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                 {employees.map((employee, idx) => (
                     <g key={employee.id}>
                         <foreignObject
-                            x={leftMargin - 150}
+                            x={
+                                isNarrow
+                                    ? leftMargin + 4          // grafik içi → değişmesin
+                                    : leftMargin - nameWidth - nameGap
+                            }
                             y={topMargin + idx * rowHeight + rowHeight / 2 - 13}
-                            width={140}
+                            width={nameWidth}
                             height={32}
                         >
                             <Chip
-                                label={`${employee.name} ${employee.surname}`}
-                                color="primary"
+                                label={getDisplayName(employee)}
                                 size="small"
+                                color="primary"
                                 clickable
                                 onClick={() => handleUserClick(employee.id)}
                                 sx={{
-                                    fontSize: 13,
-                                    cursor: 'pointer',
+                                    fontSize: 11,
                                     width: '100%',
-                                    textAlign: 'center',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    cursor: 'pointer',
+                                    opacity: isNarrow ? 0.85 : 1,
+                                    boxShadow: isNarrow ? 'none' : '0 0 0 1px rgba(0,0,0,0.04)',
+                                    backgroundColor: isNarrow
+                                        ? theme.palette.primary.main
+                                        : undefined
                                 }}
                             />
                         </foreignObject>
 
                         {/* Toplam süre */}
                         <text
-                            x={containerWidth - 10}
+                            x={getDurationX(employee, idx)}
                             y={topMargin + idx * rowHeight + rowHeight / 2}
-                            textAnchor="end"
+                            textAnchor={isNarrowRight ? 'start' : 'end'}
                             dominantBaseline="middle"
-                            fontSize="12"
+                            fontSize={isNarrowRight ? 11 : 12}
                             fill={theme.palette.text.primary}
                             fontWeight="bold"
+                            opacity={isNarrowRight ? 0.6 : 1}
                         >
                             {formatDuration(employee.totalMinutes || 0)}
                         </text>
+
                     </g>
                 ))}
 
@@ -211,7 +259,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                         left: tooltip.x,
                         top: tooltip.y - 10,
                         transform: 'translate(-50%, -100%)',
-                        pointerEvents: 'none',
+                        pointerEvents: 'auto',
                         zIndex: 9999
                     }}
                 >
