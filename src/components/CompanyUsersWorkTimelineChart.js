@@ -78,7 +78,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
 
 
 
-    const getDurationX = (employee, idx) => {
+    const getDurationX = (employee) => {
         if (!isNarrowRight) {
             return containerWidth - 10;
         }
@@ -160,7 +160,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
 
                         {/* Toplam süre */}
                         <text
-                            x={getDurationX(employee, idx)}
+                            x={getDurationX(employee)}
                             y={topMargin + idx * rowHeight + rowHeight / 2}
                             textAnchor={isNarrowRight ? 'start' : 'end'}
                             dominantBaseline="middle"
