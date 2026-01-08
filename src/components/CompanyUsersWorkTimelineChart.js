@@ -45,12 +45,19 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
 
     const formatDate = (timestamp) => {
         const date = new Date(timestamp);
-        return date.toLocaleDateString(i18n.language, {
-            day: '2-digit',
-            month: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
+
+        const dayMonth = date.toLocaleDateString(i18n.language, {
+            day: 'numeric',
+            month: 'long'
         });
+
+        const time = date.toLocaleTimeString(i18n.language, {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+
+        return { dayMonth, time };
     };
 
     const getDisplayName = (employee) => {
@@ -265,6 +272,8 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                 {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
                     const x = leftMargin + ratio * chartWidth;
                     const timestamp = minTime + ratio * timeRange;
+                    const { dayMonth, time } = formatDate(timestamp);
+
                     return (
                         <g key={ratio}>
                             <line
@@ -277,13 +286,19 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                             />
                             <text
                                 x={x}
-                                y={chartHeight - bottomMargin + 20}
+                                y={chartHeight - bottomMargin + 14}
                                 textAnchor="middle"
-                                fontSize="12"
                                 fill={theme.palette.text.secondary}
                             >
-                                {formatDate(timestamp)}
+                                <tspan x={x} dy="0" fontSize="12" fontWeight="500">
+                                    {dayMonth}
+                                </tspan>
+                                <tspan x={x} dy="14" fontSize="11">
+                                    {time}
+                                </tspan>
                             </text>
+
+
                         </g>
                     );
                 })}
