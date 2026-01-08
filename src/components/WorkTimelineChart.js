@@ -221,6 +221,15 @@ export default function WorkTimelineChart({sessions}) {
 
                     {/* Stats Chips */}
                     <Stack direction="row" spacing={2} sx={{mb: 2}}>
+
+                        {chartData.length > 0 && (
+                            <Chip
+                                label={`${chartData.length} ${t('workTimelineChart:days')}`}
+                                variant="outlined"
+                                size="small"
+                            />
+                        )}
+
                         <Chip
                             icon={<CheckCircleIcon/>}
                             label={`${completedSessions} ${t('workTimelineChart:completedSessions')}`}
@@ -228,23 +237,21 @@ export default function WorkTimelineChart({sessions}) {
                             variant="outlined"
                             size="small"
                         />
-                        <Chip
 
-                            icon={<WorkIcon/>}
-                            label={`${activeSessions} ${t('workTimelineChart:activeWorkPeriod')}`}
-                            color="success"
-                            variant="outlined"
-                            size="small"
-                        />
+                        {activeSessions > 0 && (
+                            <Chip
+                                icon={<WorkIcon/>}
+                                label={t('accounts:working')}
+                                color="success"
+                                variant="outlined"
+                                size="small"
+                            />
+                        )}
+
                         <Chip
                             icon={<RadioButtonCheckedIcon/>}
                             label={`X ${t('workTimelineChart:paidLeave')}`} // TODO: İzinli gün sayısını ekle
                             color="error"
-                            variant="outlined"
-                            size="small"
-                        />
-                        <Chip
-                            label={`${chartData.length} ${t('workTimelineChart:days')}`}
                             variant="outlined"
                             size="small"
                         />

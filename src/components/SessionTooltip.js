@@ -57,7 +57,7 @@ export default function SessionTooltip({ employee, session, startTime, endTime }
                 {session.isOpen && (
                     <Typography variant="caption" display="block"
                         sx={{ color: theme.palette.success.main, fontWeight: 600, mt: 0.5 }}>
-                        ● {t('workTimelineChart:activeWorkPeriod')}
+                        ● {t('accounts:working')}
                     </Typography>
                 )}
             </Box>

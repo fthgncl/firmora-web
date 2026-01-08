@@ -2,7 +2,7 @@
   "title": "Hesaplarım",
   "empty": "Henüz hesabınız bulunmamaktadır.",
   "balance": "Bakiye",
-  "working": "İşte",
+  "working": "Çalışıyor",
   "notWorking": "İşte Değil",
   "workStartedAt": "Başlangıç: {{date}}",
   "workEndedAt": "Çıkış: {{date}}",
