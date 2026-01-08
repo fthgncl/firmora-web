@@ -42,7 +42,9 @@ export default function UserWorkHistoryPage() {
         return date.toISOString().split('T')[0];
     });
     const [endDate, setEndDate] = useState(() => {
-        return new Date().toISOString().split('T')[0];
+        const date = new Date();
+        date.setDate(date.getDate() + 7); // 7 days ahead
+        return date.toISOString().split('T')[0];
     });
 
     const fetchWorkHistory = useCallback(async () => {
