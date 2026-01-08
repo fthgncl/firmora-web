@@ -64,7 +64,10 @@
   "rightsReserved": "Alle Rechte vorbehalten.",
   "filter": "Filter",
   "hour": "Stunde",
+  "hourShort": "h",
   "minute": "Minute",
+  "minuteShort": "min",
   "second": "Sekunde",
+  "secondShort": "s",
   "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten."
 }

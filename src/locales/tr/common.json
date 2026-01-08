@@ -65,7 +65,10 @@
   "rightsReserved": "Tüm hakları saklıdır.",
   "filter": "Filtrele",
   "hour": "Saat",
+  "hourShort": "s",
   "minute": "Dakika",
+  "minuteShort": "dk",
   "second": "Saniye",
+  "secondShort": "sn",
   "unexpectedError": "Beklenmeyen bir hata oluştu."
 }

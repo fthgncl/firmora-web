@@ -64,7 +64,10 @@
   "rightsReserved": "All rights reserved.",
   "filter": "Filter",
   "hour": "Hour",
+  "hourShort": "h",
   "minute": "Minute",
+  "minuteShort": "m",
   "second": "Second",
+  "secondShort": "s",
   "unexpectedError": "An unexpected error occurred."
 }

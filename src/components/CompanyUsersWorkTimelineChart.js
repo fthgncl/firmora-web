@@ -7,7 +7,7 @@ import SessionTooltip from './SessionTooltip';
 
 export default function CompanyUsersWorkTimelineChart({ employees }) {
     const navigate = useNavigate();
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { companyId } = useParams();
     const theme = useTheme();
     const containerRef = useRef(null);
@@ -53,12 +53,6 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
         });
     };
 
-    const formatDuration = (minutes) => {
-        const hours = Math.floor(minutes / 60);
-        const mins = minutes % 60;
-        return `${hours}s ${mins}dk`;
-    };
-
     const getDisplayName = (employee) => {
         if (containerWidth < 600) {
             return `${employee.name} ${employee.surname?.[0] || ''}.`;
@@ -101,6 +95,29 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
         return Math.min(endX + 6, containerWidth - 10);
     };
 
+    const formatSessionDuration = (minutes, availableWidth) => {
+        if (minutes == null) return '';
+
+        const useShort = availableWidth < 55;
+
+        const hour = t(useShort ? 'common:hourShort' : 'common:hour');
+        const minute = t(useShort ? 'common:minuteShort' : 'common:minute');
+
+        if (minutes < 60) {
+            return `${minutes} ${minute}`;
+        }
+
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+
+        if (m > 0) {
+            return `${h} ${hour} ${m} ${minute}`;
+        }
+
+        return `${h} ${hour}`;
+    };
+
+
 
     return (
         <div ref={containerRef} style={{ width: '100%', height: '100%', overflowX: 'auto' }}>
@@ -127,6 +144,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                                 sx={{
                                     fontSize: 11,
                                     width: '100%',
+                                    color: "palette.common.white",
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
@@ -151,7 +169,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                             fontWeight="bold"
                             opacity={isNarrowRight ? 0.6 : 1}
                         >
-                            {formatDuration(employee.totalMinutes || 0)}
+                            {formatSessionDuration(employee.totalMinutes || 0)}
                         </text>
 
                     </g>
@@ -181,6 +199,8 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                             const y = topMargin + idx * rowHeight + 10;
                             const height = rowHeight - 20;
 
+                            const isSmallBar = width < 35;
+
                             return (
                                 <g key={sessionIdx}>
                                     <rect
@@ -188,7 +208,9 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                                         y={y}
                                         width={Math.max(width, 2)}
                                         height={height}
-                                        fill={session.isOpen ? theme.palette.success.main : theme.palette.primary.main}
+                                        fill={session.isOpen
+                                            ? theme.palette.success.main
+                                            : theme.palette.primary.main}
                                         opacity="0.8"
                                         rx="3"
                                         style={{ cursor: 'pointer' }}
@@ -209,6 +231,22 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                                             setTooltip({ visible: false, x: 0, y: 0, data: null });
                                         }}
                                     />
+
+                                    {/* ⏱️ Süre etiketi */}
+                                    {!!session.durationMinutes && (
+                                        <text
+                                            x={startX + width / 2}
+                                            y={isSmallBar ? y - 4 : y + height / 2}
+                                            textAnchor="middle"
+                                            dominantBaseline={isSmallBar ? 'auto' : 'middle'}
+                                            fontSize="10"
+                                            fontWeight="bold"
+                                            fill={isSmallBar ? theme.palette.text.primary : '#fff'}
+                                            pointerEvents="none"
+                                        >
+                                            {formatSessionDuration(session.durationMinutes, width)}
+                                        </text>
+                                    )}
                                 </g>
                             );
                         })}
