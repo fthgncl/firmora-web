@@ -3,7 +3,6 @@ import CompanyList from "../components/CompanyList";
 import AccountList from "../components/AccountList";
 import PeendingTransfers from "../components/PeendingTransfers";
 import QRInfoBanner from "../components/QRInfoBanner";
-import Divider from '@mui/material/Divider';
 
 export default function HomePage() {
     const accountListRef = useRef();
@@ -17,11 +16,8 @@ export default function HomePage() {
     return (
         <>
             <QRInfoBanner />
-            <Divider/>
             <PeendingTransfers onTransferUpdated={handleTransferUpdated} />
-            <Divider/>
             <CompanyList />
-            <Divider/>
             <AccountList ref={accountListRef} />
         </>
     );
