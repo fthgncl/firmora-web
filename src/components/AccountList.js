@@ -172,13 +172,14 @@ const AccountList = forwardRef((props, ref) => {
     }
 
     if (accounts.length === 0) {
-        return (
+        return null;
+        /*return (
             <Container maxWidth="lg" sx={{mt: 4}}>
                 <Alert severity="info" sx={{borderRadius: 2}}>
                     {t('accounts:empty')}
                 </Alert>
             </Container>
-        );
+        );*/
     }
 
     return (
