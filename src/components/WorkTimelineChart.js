@@ -6,10 +6,12 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import WorkIcon from '@mui/icons-material/Work';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 export default function WorkTimelineChart({sessions}) {
-    const {t, i18n} = useTranslation(['workTimelineChart']);
     const theme = useTheme();
+    const isNarrow = useMediaQuery(theme.breakpoints.down('sm'));
+    const {t, i18n} = useTranslation(['workTimelineChart']);
 
     // Custom Rectangle component with gradient and shadow
     const CustomFillRectangle = (props) => {
@@ -312,14 +314,19 @@ export default function WorkTimelineChart({sessions}) {
                                 <YAxis
                                     type="category"
                                     dataKey="name"
-                                    width={110}
-                                    stroke={theme.palette.text.secondary}
+                                    width={isNarrow ? 40 : 110}
+                                    stroke="none"
                                     tick={{
                                         fill: theme.palette.text.primary,
-                                        fontSize: 12,
-                                        fontWeight: 500
+                                        fontSize: isNarrow ? 11 : 12,
+                                        fontWeight: 500,
+                                        dx: isNarrow ? 35 : 0,   // 👈 yazıyı grafiğin içine it
+                                        textAnchor: isNarrow ? 'start' : 'end'
                                     }}
+                                    tickLine={false}
+                                    axisLine={false}
                                 />
+
                                 {Array.from({length: maxSessions}, (_, idx) => (
                                     <Bar
                                         key={`session${idx}`}
