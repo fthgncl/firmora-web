@@ -132,7 +132,7 @@ const formatAmount = (amount, currency) => {
     }
 };
 
-const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialLimit = 20, sx, open = false}, ref) => {
+const TransfersTable = React.forwardRef(({companyId, entitySearch: initialEntitySearch = '', initialLimit = 20, sx, open = false}, ref) => {
 
     const {t, i18n} = useTranslation(['transfers']);
     const {token, user} = useAuth();
@@ -151,6 +151,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
     const [hasPermission, setHasPermission] = useState(false);
 
     // Filtreler
+    const [entitySearch, setEntitySearch] = useState(initialEntitySearch);
     const [searchTerm, setSearchTerm] = useState('');
     const [status, setStatus] = useState('');
     const [transferType, setTransferType] = useState('');
@@ -294,7 +295,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
     // Arama yazıldıkça sayfayı başa al
     useEffect(() => {
         setPage(0);
-    }, [searchTerm, status, transferType, fromScope, toScope, startDate, endDate, sortBy, sortOrder, limit]);
+    }, [entitySearch, searchTerm, status, transferType, fromScope, toScope, startDate, endDate, sortBy, sortOrder, limit]);
 
     // Kolon menüsü
     const openColsMenu = (e) => setAnchorEl(e.currentTarget);
@@ -332,6 +333,38 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
     const receiverFullName = (r) => {
         const fullName = [r?.receiver_name, r?.receiver_surname].filter(Boolean).join(' ');
         return fullName || r?.to_external_name;
+    };
+
+    const handleSenderClick = (e, row) => {
+        e.stopPropagation();
+        if (row.from_scope === 'user' && row.user_id) {
+            setEntitySearch(row.user_id);
+        } else if (row.from_scope === 'company' && row.company_id) {
+            setEntitySearch(row.company_id);
+        }
+    };
+
+    const handleReceiverClick = (e, row) => {
+        e.stopPropagation();
+        if (row.to_scope === 'user' && row.to_user_id) {
+            setEntitySearch(row.to_user_id);
+        } else if (row.to_scope === 'company' && row.to_user_company_id) {
+            setEntitySearch(row.to_user_company_id);
+        }
+    };
+
+    const handleSenderCompanyClick = (e, row) => {
+        e.stopPropagation();
+        if (row.company_id) {
+            setEntitySearch(row.company_id);
+        }
+    };
+
+    const handleReceiverCompanyClick = (e, row) => {
+        e.stopPropagation();
+        if (row.to_user_company_id) {
+            setEntitySearch(row.to_user_company_id);
+        }
     };
 
     // Yetki yoksa null döndür
@@ -698,11 +731,33 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
                                                         alignItems: 'center',
                                                         gap: 0.5
                                                     }}>
-                                                        <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                cursor: 'pointer',
+                                                                '&:hover': {
+                                                                    textDecoration: 'underline',
+                                                                    color: 'primary.main'
+                                                                }
+                                                            }}
+                                                            onClick={(e) => handleSenderClick(e, r)}
+                                                        >
                                                             {senderFullName(r)}
                                                         </Typography>
                                                         {r.sender_company_name && (
-                                                            <Typography variant="caption" color="text.secondary">
+                                                            <Typography
+                                                                variant="caption"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    cursor: 'pointer',
+                                                                    '&:hover': {
+                                                                        textDecoration: 'underline',
+                                                                        color: 'primary.main'
+                                                                    }
+                                                                }}
+                                                                onClick={(e) => handleSenderCompanyClick(e, r)}
+                                                            >
                                                                 {r.sender_company_name}
                                                             </Typography>
                                                         )}
@@ -717,11 +772,33 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch = '', initialL
                                                         alignItems: 'center',
                                                         gap: 0.5
                                                     }}>
-                                                        <Typography variant="body2" sx={{fontWeight: 600}}>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                cursor: 'pointer',
+                                                                '&:hover': {
+                                                                    textDecoration: 'underline',
+                                                                    color: 'primary.main'
+                                                                }
+                                                            }}
+                                                            onClick={(e) => handleReceiverClick(e, r)}
+                                                        >
                                                             {receiverFullName(r)}
                                                         </Typography>
                                                         {r.receiver_company_name && (
-                                                            <Typography variant="caption" color="text.secondary">
+                                                            <Typography
+                                                                variant="caption"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    cursor: 'pointer',
+                                                                    '&:hover': {
+                                                                        textDecoration: 'underline',
+                                                                        color: 'primary.main'
+                                                                    }
+                                                                }}
+                                                                onClick={(e) => handleReceiverCompanyClick(e, r)}
+                                                            >
                                                                 {r.receiver_company_name}
                                                             </Typography>
                                                         )}
