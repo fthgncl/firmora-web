@@ -7,6 +7,8 @@
   "quick_select": "Quick Select",
   "today": "Today",
   "tomorrow": "Tomorrow",
+  "next_monday": "Next Monday",
+  "next_week": "Next Week (Mon-Fri)",
   "fields": {
     "all_day": "All Day",
     "start_datetime": "Start Date and Time",

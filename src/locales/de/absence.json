@@ -7,6 +7,8 @@
   "quick_select": "Schnellauswahl",
   "today": "Heute",
   "tomorrow": "Morgen",
+  "next_monday": "Nächster Montag",
+  "next_week": "Nächste Woche (Mo-Fr)",
   "fields": {
     "all_day": "Ganztägig",
     "start_datetime": "Startdatum und -zeit",

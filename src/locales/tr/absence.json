@@ -7,6 +7,8 @@
   "quick_select": "Hızlı Seçim",
   "today": "Bugün",
   "tomorrow": "Yarın",
+  "next_monday": "Gelecek Pazartesi",
+  "next_week": "Gelecek Hafta (Pzt-Cum)",
   "fields": {
     "all_day": "Tüm Gün",
     "start_datetime": "Başlangıç Tarihi ve Saati",

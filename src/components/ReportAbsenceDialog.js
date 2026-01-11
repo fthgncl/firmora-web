@@ -337,7 +337,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                     <Typography variant="subtitle2" sx={{mb: 1.5, color: 'text.secondary'}}>
                         {t('absence:quick_select')}
                     </Typography>
-                    <Stack direction="row" spacing={1.5}>
+                    <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
                         <Button
                             variant="outlined"
                             size="small"
@@ -371,6 +371,49 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                             }}
                         >
                             {t('absence:tomorrow')}
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                                const today = new Date();
+                                const nextMonday = new Date(today);
+                                const dayOfWeek = today.getDay();
+                                const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+                                nextMonday.setDate(today.getDate() + daysUntilMonday);
+                                const mondayStr = nextMonday.toISOString().split('T')[0];
+                                handleStartDateChange(mondayStr);
+                                handleEndDateChange(mondayStr);
+                            }}
+                            sx={{
+                                borderRadius: 2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                            }}
+                        >
+                            {t('absence:next_monday')}
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                                const today = new Date();
+                                const monday = new Date(today);
+                                const dayOfWeek = today.getDay();
+                                const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+                                monday.setDate(today.getDate() + daysUntilMonday);
+                                const friday = new Date(monday);
+                                friday.setDate(monday.getDate() + 4);
+                                handleStartDateChange(monday.toISOString().split('T')[0]);
+                                handleEndDateChange(friday.toISOString().split('T')[0]);
+                            }}
+                            sx={{
+                                borderRadius: 2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                            }}
+                        >
+                            {t('absence:next_week')}
                         </Button>
                     </Stack>
                 </Box>
