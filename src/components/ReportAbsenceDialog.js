@@ -27,8 +27,22 @@ import {useAlert} from '../contexts/AlertContext';
 import Paper from "@mui/material/Paper";
 import Switch from "@mui/material/Switch";
 
+// Tarihten formatlanmış string al (örn: "13 Ocak Pazartesi")
+const getFormattedDate = (dateStr, locale) => {
+    if (!dateStr) return '';
+    try {
+        const date = new Date(dateStr + 'T00:00:00');
+        const day = date.getDate();
+        const month = date.toLocaleDateString(locale, {month: 'long'});
+        const weekday = date.toLocaleDateString(locale, {weekday: 'long'});
+        return `${day} ${month} ${weekday}`;
+    } catch {
+        return '';
+    }
+};
+
 export default function ReportAbsenceDialog({open, onClose, sourceAccount = null, handleSuccess}) {
-    const {t} = useTranslation(['absence', 'common']);
+    const {t, i18n} = useTranslation(['absence', 'common']);
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const {token} = useAuth();
@@ -483,6 +497,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                     allDay={allDay}
                     icon={<CalendarMonthIcon color="primary"/>}
                     title={t('absence:fields.start_datetime')}
+                    subtitle={getFormattedDate(startDate, i18n.language)}
                 >
                     <Stack
                         direction={{xs: 'column', sm: 'row'}}
@@ -515,6 +530,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                     allDay={allDay}
                     icon={<CalendarMonthIcon color="secondary"/>}
                     title={t('absence:fields.end_datetime')}
+                    subtitle={getFormattedDate(endDate, i18n.language)}
                 >
                     <Stack
                         direction={{xs: 'column', sm: 'row'}}
@@ -714,6 +730,11 @@ const DateTimeSection = ({ icon, title, subtitle, children, allDay }) => {
                 </Paper>
 
                 <Box sx={{flex: 1, minWidth: 0}}>
+
+                    <Typography variant="subtitle1" sx={{fontWeight: 600}}>
+                        {title}
+                    </Typography>
+
                     <Typography
                         variant="overline"
                         sx={{
@@ -727,9 +748,6 @@ const DateTimeSection = ({ icon, title, subtitle, children, allDay }) => {
                         {subtitle}
                     </Typography>
 
-                    <Typography variant="subtitle1" sx={{fontWeight: 600}}>
-                        {title}
-                    </Typography>
                 </Box>
             </Box>
 
