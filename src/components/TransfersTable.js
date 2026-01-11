@@ -264,6 +264,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch: initialEntity
         } finally {
             setLoading(false);
         }
+        // eslint-disable-next-line
     }, [companyId, entitySearch, buildRequestBody, authHeaders, API_URL, t]);
 
     // Debounce için timer ref
