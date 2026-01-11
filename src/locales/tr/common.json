@@ -70,5 +70,6 @@
   "minuteShort": "dk",
   "second": "Saniye",
   "secondShort": "sn",
-  "unexpectedError": "Beklenmeyen bir hata oluştu."
+  "unexpectedError": "Beklenmeyen bir hata oluştu.",
+  "time": "Zaman"
 }

@@ -69,5 +69,6 @@
   "minuteShort": "min",
   "second": "Sekunde",
   "secondShort": "s",
-  "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten."
+  "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+  "time": "Zeit"
 }

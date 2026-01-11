@@ -1,0 +1,35 @@
+{
+  "dialog": {
+    "title": "Mazeret Bildir",
+    "submit": "Gönder",
+    "source_account": "Hesap"
+  },
+  "fields": {
+    "all_day": "Tüm Gün",
+    "start_datetime": "Başlangıç Tarihi ve Saati",
+    "end_datetime": "Bitiş Tarihi ve Saati",
+    "description": "Açıklama",
+    "attachments": "Ekler"
+  },
+  "buttons": {
+    "attach_files": "Dosya Ekle",
+    "take_photo": "Fotoğraf Çek"
+  },
+  "hints": {
+    "file_upload": "Maksimum 10MB boyutunda resim veya PDF dosyası yükleyebilirsiniz.",
+    "all_day": "Bu seçenek seçildiğinde izin, günün tamamını kapsar."
+  },
+  "validations": {
+    "start_date_required": "Başlangıç tarihi gereklidir",
+    "start_time_required": "Başlangıç saati gereklidir",
+    "end_date_required": "Bitiş tarihi gereklidir",
+    "end_time_required": "Bitiş saati gereklidir",
+    "end_must_be_after_start": "Bitiş tarihi başlangıç tarihinden sonra olmalıdır",
+    "invalid_file_type": "Geçersiz dosya türü. Sadece resim veya PDF dosyası yükleyebilirsiniz.",
+    "file_too_large": "Dosya boyutu çok büyük. Maksimum 10MB olmalıdır."
+  },
+  "create": {
+    "success": "Mazeret bildirimi başarıyla gönderildi",
+    "failed": "Mazeret bildirimi gönderilemedi"
+  }
+}

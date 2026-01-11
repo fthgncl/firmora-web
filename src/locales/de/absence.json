@@ -1,0 +1,35 @@
+{
+  "dialog": {
+    "title": "Abwesenheit Melden",
+    "submit": "Senden",
+    "source_account": "Konto"
+  },
+  "fields": {
+    "all_day": "Ganztägig",
+    "start_datetime": "Startdatum und -zeit",
+    "end_datetime": "Enddatum und -zeit",
+    "description": "Beschreibung",
+    "attachments": "Anhänge"
+  },
+  "buttons": {
+    "attach_files": "Dateien Anhängen",
+    "take_photo": "Foto Aufnehmen"
+  },
+  "hints": {
+    "file_upload": "Sie können Bilder oder PDF-Dateien bis zu 10MB hochladen.",
+    "all_day": "Selecting this option means the leave applies to the entire day."
+  },
+  "validations": {
+    "start_date_required": "Startdatum ist erforderlich",
+    "start_time_required": "Startzeit ist erforderlich",
+    "end_date_required": "Enddatum ist erforderlich",
+    "end_time_required": "Endzeit ist erforderlich",
+    "end_must_be_after_start": "Enddatum muss nach dem Startdatum liegen",
+    "invalid_file_type": "Ungültiger Dateityp. Nur Bilder oder PDF-Dateien sind erlaubt.",
+    "file_too_large": "Datei ist zu groß. Maximal 10MB erlaubt."
+  },
+  "create": {
+    "success": "Abwesenheitsmeldung erfolgreich gesendet",
+    "failed": "Abwesenheitsmeldung konnte nicht gesendet werden"
+  }
+}

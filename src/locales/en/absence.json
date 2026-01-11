@@ -1,0 +1,35 @@
+{
+  "dialog": {
+    "title": "Report Absence",
+    "submit": "Submit",
+    "source_account": "Account"
+  },
+  "fields": {
+    "all_day": "All Day",
+    "start_datetime": "Start Date and Time",
+    "end_datetime": "End Date and Time",
+    "description": "Description",
+    "attachments": "Attachments"
+  },
+  "buttons": {
+    "attach_files": "Attach Files",
+    "take_photo": "Take Photo"
+  },
+  "hints": {
+    "file_upload": "You can upload images or PDF files up to 10MB.",
+    "all_day": "When this option is selected, the leave covers the entire day."
+  },
+  "validations": {
+    "start_date_required": "Start date is required",
+    "start_time_required": "Start time is required",
+    "end_date_required": "End date is required",
+    "end_time_required": "End time is required",
+    "end_must_be_after_start": "End date must be after start date",
+    "invalid_file_type": "Invalid file type. Only images or PDF files are allowed.",
+    "file_too_large": "File size is too large. Maximum 10MB allowed."
+  },
+  "create": {
+    "success": "Absence report submitted successfully",
+    "failed": "Failed to submit absence report"
+  }
+}

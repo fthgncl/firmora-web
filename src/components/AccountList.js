@@ -34,6 +34,7 @@ import MoneyTransferDialog from './MoneyTransferDialog';
 import ExternalMoneyDialog from './ExternalMoneyDialog';
 import TransfersDialog from './TransfersDialog';
 import WorkStatusDisplay from './WorkStatusDisplay';
+import ReportAbsenceDialog from './ReportAbsenceDialog';
 import {useTranslation} from 'react-i18next';
 import {permissionsService} from '../services/permissionsService';
 import {useNavigate} from "react-router-dom";
@@ -50,6 +51,7 @@ const AccountList = forwardRef((props, ref) => {
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
     const [externalMoneyDialogOpen, setExternalMoneyDialogOpen] = useState(false);
     const [transfersDialogOpen, setTransfersDialogOpen] = useState(false);
+    const [reportAbsenceDialogOpen, setReportAbsenceDialogOpen] = useState(false);
     const [accountPermissions, setAccountPermissions] = useState({});
 
     const fetchAccounts = useCallback(async () => {
@@ -214,6 +216,16 @@ const AccountList = forwardRef((props, ref) => {
         const { user_id, company } = selectedAccount;
         navigate(`/company/${company.id}/user/${user_id}/work-history`);
     }
+
+    const handleReportAbsenceClick = () => {
+        handleMenuClose();
+        setReportAbsenceDialogOpen(true);
+    };
+
+    const handleReportAbsenceDialogClose = () => {
+        setReportAbsenceDialogOpen(false);
+        setSelectedAccount(null);
+    };
 
     if (loading) {
         return (
@@ -493,10 +505,7 @@ const AccountList = forwardRef((props, ref) => {
                     <WorkHistoryOutlined sx={{mr: 1, fontSize: 20}}/>
                     {t('accounts:menu.viewWorkHistory')}
                 </MenuItem>
-                <MenuItem sx={{color: 'error.main'}} onClick={() => {
-                    handleMenuClose();
-                    // Mazeret bildirme dialog'u açılacak
-                }}>
+                <MenuItem sx={{color: 'error.main'}} onClick={handleReportAbsenceClick}>
                     <EventBusy sx={{mr: 1, fontSize: 20}}/>
                     {t('accounts:menu.reportAbsence')}
                 </MenuItem>
@@ -523,6 +532,13 @@ const AccountList = forwardRef((props, ref) => {
                 onClose={handleTransfersDialogClose}
                 accountId={selectedAccount?.id || null}
                 userId={user.id}
+            />
+
+            <ReportAbsenceDialog
+                open={reportAbsenceDialogOpen}
+                onClose={handleReportAbsenceDialogClose}
+                sourceAccount={selectedAccount}
+                handleSuccess={fetchAccounts}
             />
         </Container>
     );
