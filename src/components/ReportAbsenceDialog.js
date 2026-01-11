@@ -200,7 +200,9 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                 }
             );
 
-            if (res?.data?.success === true) {
+            console.log(res);
+
+            if (res?.data?.status === "success") {
                 showSuccess(res?.data?.data?.message || t('absence:create.success'));
                 // reset
                 setStartDate('');
