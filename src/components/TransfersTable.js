@@ -152,6 +152,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch: initialEntity
 
     // Filtreler
     const [entitySearch, setEntitySearch] = useState(initialEntitySearch);
+    const [entitySearchLabel, setEntitySearchLabel] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [status, setStatus] = useState('');
     const [transferType, setTransferType] = useState('');
@@ -263,7 +264,7 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch: initialEntity
         } finally {
             setLoading(false);
         }
-    }, [companyId, buildRequestBody, authHeaders, API_URL, t]);
+    }, [companyId, entitySearch, buildRequestBody, authHeaders, API_URL, t]);
 
     // Debounce için timer ref
     const debounceTimerRef = React.useRef(null);
@@ -339,8 +340,10 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch: initialEntity
         e.stopPropagation();
         if (row.from_scope === 'user' && row.user_id) {
             setEntitySearch(row.user_id);
+            setEntitySearchLabel(senderFullName(row));
         } else if (row.from_scope === 'company' && row.company_id) {
             setEntitySearch(row.company_id);
+            setEntitySearchLabel(senderFullName(row));
         }
     };
 
@@ -348,22 +351,26 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch: initialEntity
         e.stopPropagation();
         if (row.to_scope === 'user' && row.to_user_id) {
             setEntitySearch(row.to_user_id);
+            setEntitySearchLabel(receiverFullName(row));
         } else if (row.to_scope === 'company' && row.to_user_company_id) {
             setEntitySearch(row.to_user_company_id);
+            setEntitySearchLabel(receiverFullName(row));
         }
     };
 
     const handleSenderCompanyClick = (e, row) => {
         e.stopPropagation();
-        if (row.company_id) {
+        if (row.company_id && row.sender_company_name) {
             setEntitySearch(row.company_id);
+            setEntitySearchLabel(row.sender_company_name);
         }
     };
 
     const handleReceiverCompanyClick = (e, row) => {
         e.stopPropagation();
-        if (row.to_user_company_id) {
+        if (row.to_user_company_id && row.receiver_company_name) {
             setEntitySearch(row.to_user_company_id);
+            setEntitySearchLabel(row.receiver_company_name);
         }
     };
 
@@ -535,6 +542,21 @@ const TransfersTable = React.forwardRef(({companyId, entitySearch: initialEntity
                                 )}
                             </Paper>
                         </Box>
+
+                        {/* Entity Search Göstergesi */}
+                        {entitySearch && entitySearchLabel && (
+                            <Box sx={{mb: 2}}>
+                                <Chip
+                                    label={entitySearchLabel}
+                                    onDelete={() => {
+                                        setEntitySearch('');
+                                        setEntitySearchLabel('');
+                                    }}
+                                    color="primary"
+                                    variant="outlined"
+                                />
+                            </Box>
+                        )}
 
                         {/* Filtreler */}
                         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
