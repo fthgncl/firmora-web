@@ -159,19 +159,24 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
         try {
             const formData = new FormData();
 
-            formData.append('company_id', companyId);
-            formData.append('start_datetime', `${startDate}T${startTime}`);
-            formData.append('end_datetime', `${endDate}T${endTime}`);
-            formData.append('all_day', allDay ? '1' : '0');
+            formData.append('companyId', companyId);
+
+            // Tarih ve saati ISO formatında gönder (saat dilimi dahil)
+            const startDateTime = new Date(`${startDate}T${startTime}`);
+            const endDateTime = new Date(`${endDate}T${endTime}`);
+
+            formData.append('startDate', startDateTime.toISOString());
+            formData.append('endDate', endDateTime.toISOString());
+
             if (description?.trim()) formData.append('description', description.trim());
 
             // dosyaları ekle
             attachedFiles.forEach((file) => {
-                formData.append('attachments', file);
+                formData.append('files', file);
             });
 
             const res = await axios.post(
-                `${process.env.REACT_APP_API_URL}/absences/report`,
+                `${process.env.REACT_APP_API_URL}/user-allowed-days/create`,
                 formData,
                 {
                     headers: {
@@ -181,14 +186,14 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                 }
             );
 
-            if (res?.data?.status === 'success') {
-                showSuccess(res?.data?.message || t('absence:create.success'));
+            if (res?.data?.success === true) {
+                showSuccess(res?.data?.data?.message || t('absence:create.success'));
                 // reset
                 setStartDate('');
-                setStartTime('');
+                setStartTime('00:00');
                 setEndDate('');
-                setEndTime('');
-                setAllDay(false);
+                setEndTime('23:59');
+                setAllDay(true);
                 setDescription('');
                 setAttachedFiles([]);
                 onClose?.(res.data);
@@ -197,10 +202,10 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                     handleSuccess();
                 }
             } else {
-                showError(res?.data?.message || t('absence:create.failed'));
+                showError(res?.data?.error || t('absence:create.failed'));
             }
         } catch (e) {
-            const apiMsg = e?.response?.data?.message || e?.message || t('absence:create.failed');
+            const apiMsg = e?.response?.data?.error || e?.message || t('absence:create.failed');
             showError(apiMsg);
         } finally {
             setSubmitting(false);
