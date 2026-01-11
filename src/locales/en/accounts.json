@@ -10,7 +10,9 @@
   "menu": {
     "moneyTransfer": "Money Transfer",
     "addIncome": "Add Income",
-    "viewTransferHistory": "View Transfer History"
+    "viewTransferHistory": "View Transfer History",
+    "viewWorkHistory": "View Work History",
+    "reportAbsence": "Report Absence"
   },
   "aria": {
     "more": "More options"

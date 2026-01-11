@@ -10,7 +10,9 @@
   "menu": {
     "moneyTransfer": "Geldüberweisung",
     "addIncome": "Einnahme hinzufügen",
-    "viewTransferHistory": "Überweisungsverlauf anzeigen"
+    "viewTransferHistory": "Überweisungsverlauf anzeigen",
+    "viewWorkHistory": "Arbeitsverlauf anzeigen",
+    "reportAbsence": "Abwesenheit melden"
   },
   "aria": {
     "more": "Weitere Optionen"

@@ -24,7 +24,9 @@ import {
     SwapHoriz,
     AddCircle,
     WorkOutline,
-    WorkOff
+    WorkOff,
+    EventBusy,
+    WorkHistoryOutlined
 } from '@mui/icons-material';
 import axios from 'axios';
 import {useAuth} from '../contexts/AuthContext';
@@ -34,9 +36,11 @@ import TransfersDialog from './TransfersDialog';
 import WorkStatusDisplay from './WorkStatusDisplay';
 import {useTranslation} from 'react-i18next';
 import {permissionsService} from '../services/permissionsService';
+import {useNavigate} from "react-router-dom";
 
 const AccountList = forwardRef((props, ref) => {
     const {t, i18n} = useTranslation(['accounts']);
+    const navigate = useNavigate();
     const {token, user} = useAuth();
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -204,6 +208,12 @@ const AccountList = forwardRef((props, ref) => {
         setTransfersDialogOpen(false);
         setSelectedAccount(null);
     };
+
+    const handleWorkHistoryClick = () => {
+        handleMenuClose();
+        const { user_id, company } = selectedAccount;
+        navigate(`/company/${company.id}/user/${user_id}/work-history`);
+    }
 
     if (loading) {
         return (
@@ -478,6 +488,17 @@ const AccountList = forwardRef((props, ref) => {
                 <MenuItem onClick={handleTransfersHistoryClick}>
                     <History sx={{mr: 1, fontSize: 20}}/>
                     {t('accounts:menu.viewTransferHistory')}
+                </MenuItem>
+                <MenuItem onClick={handleWorkHistoryClick}>
+                    <WorkHistoryOutlined sx={{mr: 1, fontSize: 20}}/>
+                    {t('accounts:menu.viewWorkHistory')}
+                </MenuItem>
+                <MenuItem sx={{color: 'error.main'}} onClick={() => {
+                    handleMenuClose();
+                    // Mazeret bildirme dialog'u açılacak
+                }}>
+                    <EventBusy sx={{mr: 1, fontSize: 20}}/>
+                    {t('accounts:menu.reportAbsence')}
                 </MenuItem>
             </Menu>
 

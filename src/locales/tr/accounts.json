@@ -10,7 +10,9 @@
   "menu": {
     "moneyTransfer": "Para Transferi",
     "addIncome": "Gelir Ekle",
-    "viewTransferHistory": "Transfer Geçmişini Görüntüle"
+    "viewTransferHistory": "Transfer Geçmişini Görüntüle",
+    "viewWorkHistory": "Çalışma Geçmişini Görüntüle",
+    "reportAbsence": "Mazeret Bildir"
   },
   "aria": {
     "more": "Daha fazla seçenek"
