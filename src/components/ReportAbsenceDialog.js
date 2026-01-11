@@ -62,6 +62,42 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
         }
     }, []);
 
+    // Başlangıç tarihi değiştiğinde
+    const handleStartDateChange = useCallback((newStartDate) => {
+        setStartDate(newStartDate);
+        // Eğer bitiş tarihi daha erken ise veya boşsa, başlangıç tarihine eşitle
+        if (!endDate || newStartDate > endDate) {
+            setEndDate(newStartDate);
+        }
+    }, [endDate]);
+
+    // Başlangıç saati değiştiğinde
+    const handleStartTimeChange = useCallback((newStartTime) => {
+        setStartTime(newStartTime);
+        // Eğer tarihler aynıysa ve bitiş saati daha erken ise, başlangıç saatine eşitle
+        if (startDate === endDate && newStartTime > endTime) {
+            setEndTime(newStartTime);
+        }
+    }, [startDate, endDate, endTime]);
+
+    // Bitiş tarihi değiştiğinde
+    const handleEndDateChange = useCallback((newEndDate) => {
+        setEndDate(newEndDate);
+        // Eğer bitiş tarihi başlangıçtan erken ise, başlangıç tarihini bitiş tarihine eşitle
+        if (startDate && newEndDate < startDate) {
+            setStartDate(newEndDate);
+        }
+    }, [startDate]);
+
+    // Bitiş saati değiştiğinde
+    const handleEndTimeChange = useCallback((newEndTime) => {
+        setEndTime(newEndTime);
+        // Eğer tarihler aynıysa ve bitiş saati başlangıçtan erken ise, başlangıç saatini bitiş saatine eşitle
+        if (startDate === endDate && newEndTime < startTime) {
+            setStartTime(newEndTime);
+        }
+    }, [startDate, endDate, startTime]);
+
     // dosya yönetimi
     const handleFileSelect = useCallback((event) => {
         const files = Array.from(event.target.files || []);
@@ -366,7 +402,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                             label={t('common:date')}
                             fullWidth
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
+                            onChange={(e) => handleStartDateChange(e.target.value)}
                             InputLabelProps={{shrink: true}}
                         />
 
@@ -375,7 +411,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                             label={t('common:time')}
                             fullWidth
                             value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
+                            onChange={(e) => handleStartTimeChange(e.target.value)}
                             disabled={allDay}
                             InputLabelProps={{shrink: true}}
                         />
@@ -398,7 +434,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                             label={t('common:date')}
                             fullWidth
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
+                            onChange={(e) => handleEndDateChange(e.target.value)}
                             InputLabelProps={{shrink: true}}
                         />
 
@@ -407,7 +443,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                             label={t('common:time')}
                             fullWidth
                             value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
+                            onChange={(e) => handleEndTimeChange(e.target.value)}
                             disabled={allDay}
                             InputLabelProps={{shrink: true}}
                         />
