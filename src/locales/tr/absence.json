@@ -16,7 +16,7 @@
     "take_photo": "Fotoğraf Çek"
   },
   "hints": {
-    "file_upload": "Maksimum 10MB boyutunda resim veya PDF dosyası yükleyebilirsiniz.",
+    "file_upload": "Maksimum {{maxSize}}MB boyutunda resim veya PDF dosyası yükleyebilirsiniz.",
     "all_day": "Bu seçenek seçildiğinde izin, günün tamamını kapsar."
   },
   "validations": {

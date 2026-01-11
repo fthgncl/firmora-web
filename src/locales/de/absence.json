@@ -16,7 +16,7 @@
     "take_photo": "Foto Aufnehmen"
   },
   "hints": {
-    "file_upload": "Sie können Bilder oder PDF-Dateien bis zu 10MB hochladen.",
+    "file_upload": "Sie können Bilder oder PDF-Dateien bis zu {{maxSize}}MB hochladen.",
     "all_day": "Selecting this option means the leave applies to the entire day."
   },
   "validations": {

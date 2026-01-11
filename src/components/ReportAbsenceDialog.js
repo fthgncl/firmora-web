@@ -67,7 +67,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
         const files = Array.from(event.target.files || []);
         const validFiles = files.filter(file => {
             const isValidType = file.type.startsWith('image/') || file.type === 'application/pdf';
-            const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
+            const isValidSize = file.size <= 25 * 1024 * 1024; // 25MB limit
             if (!isValidType) showError(t('absence:validations.invalid_file_type'));
             if (!isValidSize) showError(t('absence:validations.file_too_large'));
             return isValidType && isValidSize;
@@ -506,7 +506,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                     )}
 
                     <Typography variant="caption" color="text.secondary" sx={{display: 'block', mt: 0.5}}>
-                        {t('absence:hints.file_upload')}
+                        {t('absence:hints.file_upload', {maxSize: 25})}
                     </Typography>
                 </Box>
             </DialogContent>

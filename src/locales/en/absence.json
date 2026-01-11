@@ -16,7 +16,7 @@
     "take_photo": "Take Photo"
   },
   "hints": {
-    "file_upload": "You can upload images or PDF files up to 10MB.",
+    "file_upload": "You can upload images or PDF files up to {{maxSize}}MB in size.",
     "all_day": "When this option is selected, the leave covers the entire day."
   },
   "validations": {
