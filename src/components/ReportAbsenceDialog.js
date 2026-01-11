@@ -332,6 +332,49 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
                     </Box>
                 </Paper>
 
+                {/* Hızlı Tarih Seçimi */}
+                <Box sx={{mb: 3}}>
+                    <Typography variant="subtitle2" sx={{mb: 1.5, color: 'text.secondary'}}>
+                        {t('absence:quick_select')}
+                    </Typography>
+                    <Stack direction="row" spacing={1.5}>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                                const today = new Date().toISOString().split('T')[0];
+                                handleStartDateChange(today);
+                                handleEndDateChange(today);
+                            }}
+                            sx={{
+                                borderRadius: 2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                            }}
+                        >
+                            {t('absence:today')}
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                                const tomorrow = new Date();
+                                tomorrow.setDate(tomorrow.getDate() + 1);
+                                const tomorrowStr = tomorrow.toISOString().split('T')[0];
+                                handleStartDateChange(tomorrowStr);
+                                handleEndDateChange(tomorrowStr);
+                            }}
+                            sx={{
+                                borderRadius: 2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                            }}
+                        >
+                            {t('absence:tomorrow')}
+                        </Button>
+                    </Stack>
+                </Box>
+
                 {/* Tüm Gün */}
                 <Paper
                     elevation={allDay ? 4 : 1}

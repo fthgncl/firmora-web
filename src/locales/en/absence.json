@@ -4,6 +4,9 @@
     "submit": "Submit",
     "source_account": "Account"
   },
+  "quick_select": "Quick Select",
+  "today": "Today",
+  "tomorrow": "Tomorrow",
   "fields": {
     "all_day": "All Day",
     "start_datetime": "Start Date and Time",

@@ -4,6 +4,9 @@
     "submit": "Senden",
     "source_account": "Konto"
   },
+  "quick_select": "Schnellauswahl",
+  "today": "Heute",
+  "tomorrow": "Morgen",
   "fields": {
     "all_day": "Ganztägig",
     "start_datetime": "Startdatum und -zeit",

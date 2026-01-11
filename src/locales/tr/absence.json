@@ -4,6 +4,9 @@
     "submit": "Gönder",
     "source_account": "Hesap"
   },
+  "quick_select": "Hızlı Seçim",
+  "today": "Bugün",
+  "tomorrow": "Yarın",
   "fields": {
     "all_day": "Tüm Gün",
     "start_datetime": "Başlangıç Tarihi ve Saati",
