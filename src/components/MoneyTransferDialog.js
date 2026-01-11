@@ -290,7 +290,7 @@ export default function MoneyTransferDialog({open, onClose, sourceAccount = null
             const isValidType = file.type.startsWith('image/') || file.type === 'application/pdf';
             const isValidSize = file.size <= 25 * 1024 * 1024; // 25MB limit
             if (!isValidType) showError(t('transfers:validations.invalid_file_type'));
-            if (!isValidSize) showError(t('transfers:validations.file_too_large'));
+            if (!isValidSize) showError(t('transfers:validations.file_too_large', {maxSize: 25}));
             return isValidType && isValidSize;
         });
         setAttachedFiles(prev => [...prev, ...validFiles]);
