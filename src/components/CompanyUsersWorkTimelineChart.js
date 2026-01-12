@@ -31,13 +31,17 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
         navigate(`/company/${companyId}/user/${userId}/work-history`);
     };
 
-    // Tüm oturumlardan min ve max zaman değerlerini bul
-    const allTimes = employees.flatMap(emp =>
-        emp.sessions?.flatMap(s => [
+    // Tüm oturumlardan ve allowedDays'den min ve max zaman değerlerini bul
+    const allTimes = employees.flatMap(emp => [
+        ...(emp.sessions?.flatMap(s => [
             new Date(s.entryTime).getTime(),
             new Date(s.exitTime).getTime()
-        ]) || []
-    );
+        ]) || []),
+        ...(emp.allowedDays?.flatMap(ad => [
+            new Date(ad.start_date).getTime(),
+            new Date(ad.end_date).getTime()
+        ]) || [])
+    ]);
 
     const minTime = Math.min(...allTimes);
     const maxTime = Math.max(...allTimes);
@@ -257,6 +261,46 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                                 </g>
                             );
                         })}
+
+                        {/* Mazeretli günler - Barlar */}
+                        {employee.allowedDays?.map((allowedDay, allowedDayIdx) => {
+                            const startTime = new Date(allowedDay.start_date).getTime();
+                            const endTime = new Date(allowedDay.end_date).getTime();
+                            const startX = leftMargin + ((startTime - minTime) / timeRange) * chartWidth;
+                            const width = ((endTime - startTime) / timeRange) * chartWidth;
+                            const y = topMargin + idx * rowHeight + 10;
+                            const height = rowHeight - 20;
+
+                            return (
+                                <rect
+                                    key={`allowed-${allowedDayIdx}`}
+                                    x={startX}
+                                    y={y}
+                                    width={Math.max(width, 2)}
+                                    height={height}
+                                    fill={theme.palette.error.main}
+                                    opacity="0.6"
+                                    rx="3"
+                                    style={{ cursor: 'pointer' }}
+                                    onMouseMove={(e) => {
+                                        setTooltip({
+                                            visible: true,
+                                            x: e.clientX,
+                                            y: e.clientY,
+                                            data: {
+                                                employee,
+                                                allowedDay,
+                                                startTime: allowedDay.start_date,
+                                                endTime: allowedDay.end_date
+                                            }
+                                        });
+                                    }}
+                                    onMouseLeave={() => {
+                                        setTooltip({ visible: false, x: 0, y: 0, data: null });
+                                    }}
+                                />
+                            );
+                        })}
                     </g>
                 ))}
 
@@ -319,6 +363,7 @@ export default function CompanyUsersWorkTimelineChart({ employees }) {
                     <SessionTooltip
                         employee={tooltip.data.employee}
                         session={tooltip.data.session}
+                        allowedDay={tooltip.data.allowedDay}
                         startTime={tooltip.data.startTime}
                         endTime={tooltip.data.endTime}
                     />

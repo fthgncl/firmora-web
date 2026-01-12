@@ -7,5 +7,6 @@
   "entry": "Entry",
   "exit": "Exit",
   "startDate": "Start Date",
-  "endDate": "End Date"
+  "endDate": "End Date",
+  "allowed": "Allowed"
 }
