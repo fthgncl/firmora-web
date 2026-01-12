@@ -97,11 +97,7 @@ export default function ReportAbsenceDialog({open, onClose, sourceAccount = null
     // Bitiş tarihi değiştiğinde
     const handleEndDateChange = useCallback((newEndDate) => {
         setEndDate(newEndDate);
-        // Eğer bitiş tarihi başlangıçtan erken ise, başlangıç tarihini bitiş tarihine eşitle
-        if (startDate && newEndDate < startDate) {
-            setStartDate(newEndDate);
-        }
-    }, [startDate]);
+    }, []);
 
     // Bitiş saati değiştiğinde
     const handleEndTimeChange = useCallback((newEndTime) => {
