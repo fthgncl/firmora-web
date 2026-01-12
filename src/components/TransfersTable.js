@@ -98,6 +98,7 @@ const scopeOptions = [
 const statusOptions = [
     {value: '', labelKey: 'list.filters.any'},
     {value: 'completed', labelKey: 'list.status.completed'},
+    {value: 'reject', labelKey: 'list.status.rejected'},
     {value: 'pending', labelKey: 'list.status.pending'}
 ];
 
