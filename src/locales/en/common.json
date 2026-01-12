@@ -70,5 +70,6 @@
   "second": "Second",
   "secondShort": "s",
   "unexpectedError": "An unexpected error occurred.",
-  "time": "Time"
+  "time": "Time",
+  "files": "Files"
 }

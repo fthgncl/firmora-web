@@ -71,5 +71,6 @@
   "second": "Saniye",
   "secondShort": "sn",
   "unexpectedError": "Beklenmeyen bir hata oluştu.",
-  "time": "Zaman"
+  "time": "Zaman",
+  "files": "Dosya"
 }

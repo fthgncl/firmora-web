@@ -30,6 +30,7 @@ export default function UserWorkHistoryPage() {
     const { t } = useTranslation(['users']);
 
     const [sessions, setSessions] = useState([]);
+    const [allowedDays, setAllowedDays] = useState([]);
     const [totalMinutes, setTotalMinutes] = useState(0);
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -68,6 +69,7 @@ export default function UserWorkHistoryPage() {
             );
 
             setSessions( splitByDay(response.data.sessions) || []);
+            setAllowedDays(response.data.allowedDays || []);
             setTotalMinutes(response.data.totalMinutes || 0);
             setUserInfo(response.data.user || null);
         } catch (err) {
@@ -229,7 +231,7 @@ export default function UserWorkHistoryPage() {
             )}
 
             {!loading && sessions.length > 0 && (
-                <WorkTimelineChart sessions={sessions} />
+                <WorkTimelineChart sessions={sessions} allowedDays ={allowedDays} />
             )}
 
             {!loading && sessions.length === 0 && !error && (

@@ -8,7 +8,7 @@ import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import WorkIcon from '@mui/icons-material/Work';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-export default function WorkTimelineChart({sessions}) {
+export default function WorkTimelineChart({sessions, allowedDays}) {
     const theme = useTheme();
     const isNarrow = useMediaQuery(theme.breakpoints.down('sm'));
     const {t, i18n} = useTranslation(['workTimelineChart']);
@@ -16,18 +16,34 @@ export default function WorkTimelineChart({sessions}) {
     // Custom Rectangle component with gradient and shadow
     const CustomFillRectangle = (props) => {
         const isOpen = props.payload?.isOpen || false;
-        const barColor = isOpen
-            ? theme.palette.success.main
-            : theme.palette.primary.main;
-        return <Rectangle {...props} fill={barColor} opacity={0.9}/>;
+        const isAllowedDay = props.dataKey?.startsWith('allowedDay');
+
+        let barColor;
+        if (isAllowedDay) {
+            barColor = theme.palette.error.main;
+        } else if (isOpen) {
+            barColor = theme.palette.success.main;
+        } else {
+            barColor = theme.palette.primary.main;
+        }
+
+        return <Rectangle {...props} fill={barColor} opacity={isAllowedDay ? 0.6 : 0.9}/>;
     };
 
     // Active bar style with enhanced hover effect
     const ActiveRectangle = (props) => {
         const isOpen = props.payload?.isOpen || false;
-        const barColor = isOpen
-            ? theme.palette.success.main
-            : theme.palette.primary.main;
+        const isAllowedDay = props.dataKey?.startsWith('allowedDay');
+
+        let barColor;
+        if (isAllowedDay) {
+            barColor = theme.palette.error.main;
+        } else if (isOpen) {
+            barColor = theme.palette.success.main;
+        } else {
+            barColor = theme.palette.primary.main;
+        }
+
         return <Rectangle
             {...props}
             fill={barColor}
@@ -53,6 +69,19 @@ export default function WorkTimelineChart({sessions}) {
             if (!maxDate || dateOnly > maxDate) maxDate = dateOnly;
         });
 
+        // allowedDays tarihlerini de kontrol et
+        if (allowedDays && allowedDays.length > 0) {
+            allowedDays.forEach((allowedDay) => {
+                const startDate = new Date(allowedDay.start_date);
+                const endDate = new Date(allowedDay.end_date);
+                const startDateOnly = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+                if (!minDate || startDateOnly < minDate) minDate = startDateOnly;
+                if (!maxDate || endDateOnly > maxDate) maxDate = endDateOnly;
+            });
+        }
+
         // Tüm tarihleri doldur
         if (minDate && maxDate) {
             const currentDate = new Date(maxDate);
@@ -67,6 +96,7 @@ export default function WorkTimelineChart({sessions}) {
                     grouped[dateKey] = {
                         name: dateKey,
                         sessions: [],
+                        allowedDays: [],
                         rawDate: new Date(currentDate)
                     };
                 }
@@ -100,6 +130,51 @@ export default function WorkTimelineChart({sessions}) {
             });
         });
 
+        // allowedDays'i ekle
+        if (allowedDays && allowedDays.length > 0) {
+            allowedDays.forEach((allowedDay) => {
+                const startDate = new Date(allowedDay.start_date);
+                const endDate = new Date(allowedDay.end_date);
+
+                // allowedDay'in başladığı günden bittiği güne kadar tüm günlere ekle
+                const currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    const dateKey = currentDate.toLocaleDateString(i18n.language, {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+
+                    if (grouped[dateKey]) {
+                        // Gün içinde başlangıç ve bitiş saatlerini hesapla
+                        let dayStartHour = 0;
+                        let dayEndHour = 24;
+
+                        // İlk gün mü?
+                        if (currentDate.toDateString() === startDate.toDateString()) {
+                            dayStartHour = startDate.getHours() + startDate.getMinutes() / 60;
+                        }
+
+                        // Son gün mü?
+                        if (currentDate.toDateString() === endDate.toDateString()) {
+                            dayEndHour = endDate.getHours() + endDate.getMinutes() / 60;
+                        }
+
+                        grouped[dateKey].allowedDays.push({
+                            range: [dayStartHour, dayEndHour],
+                            description: allowedDay.description,
+                            filesCount: allowedDay.filesCount,
+                            startDate: allowedDay.start_date,
+                            endDate: allowedDay.end_date
+                        });
+                    }
+
+                    currentDate.setDate(currentDate.getDate() + 1);
+                    currentDate.setHours(0, 0, 0, 0);
+                }
+            });
+        }
+
         // Convert to array and add dynamic session keys
         return Object.values(grouped)
             .sort((a, b) => b.rawDate - a.rawDate)
@@ -114,6 +189,15 @@ export default function WorkTimelineChart({sessions}) {
                     };
                     dayData.isOpen = session.isOpen;
                 });
+                day.allowedDays.forEach((allowedDay, idx) => {
+                    dayData[`allowedDay${idx}`] = allowedDay.range;
+                    dayData[`allowedDay${idx}_meta`] = {
+                        description: allowedDay.description,
+                        filesCount: allowedDay.filesCount,
+                        startDate: allowedDay.startDate,
+                        endDate: allowedDay.endDate
+                    };
+                });
                 return dayData;
             });
     };
@@ -123,11 +207,19 @@ export default function WorkTimelineChart({sessions}) {
     // Get maximum number of sessions in a day
     const getMaxSessions = () => {
         return Math.max(...chartData.map(day => {
-            return Object.keys(day).filter(key => key.startsWith('session')).length;
+            return Object.keys(day).filter(key => key.startsWith('session') && !key.endsWith('_meta')).length;
         }), 1);
     };
 
+    // Get maximum number of allowed days in a day
+    const getMaxAllowedDays = () => {
+        return Math.max(...chartData.map(day => {
+            return Object.keys(day).filter(key => key.startsWith('allowedDay') && !key.endsWith('_meta')).length;
+        }), 0);
+    };
+
     const maxSessions = getMaxSessions();
+    const maxAllowedDays = getMaxAllowedDays();
 
     // Custom tooltip with MUI theme colors
     const CustomTooltip = ({active, payload}) => {
@@ -163,21 +255,35 @@ export default function WorkTimelineChart({sessions}) {
                             const metaKey = `${entry.dataKey}_meta`;
                             const meta = entry.payload?.[metaKey];
 
+                            const isAllowedDay = entry.dataKey?.startsWith('allowedDay');
+
                             return (
                                 <Box key={index} sx={{mb: 0.5}}>
                                     <Typography variant="caption" display="block"
                                                 sx={{color: entry.color, fontWeight: 600}}>
+                                        {isAllowedDay ? '🚫 ' : ''}
                                         {String(hours).padStart(2, '0')}:{String(mins).padStart(2, '0')} - {String(endHours).padStart(2, '0')}:{String(endMins).padStart(2, '0')}
                                         {' '}({durationHours} {t('common:hour')} {durationMins} {t('common:minute')})
-
                                     </Typography>
-                                    {meta?.entryNote && (
+                                    {isAllowedDay && meta?.description && (
+                                        <Typography variant="caption" display="block"
+                                                    sx={{color: theme.palette.error.main, fontStyle: 'italic'}}>
+                                            📝 {meta.description}
+                                        </Typography>
+                                    )}
+                                    {isAllowedDay && meta?.filesCount > 0 && (
+                                        <Typography variant="caption" display="block"
+                                                    sx={{color: theme.palette.info.main, fontStyle: 'italic'}}>
+                                            📎 {meta.filesCount} {t('common:files')}
+                                        </Typography>
+                                    )}
+                                    {!isAllowedDay && meta?.entryNote && (
                                         <Typography variant="caption" display="block"
                                                     sx={{color: theme.palette.info.main, fontStyle: 'italic'}}>
                                             📝 {t('workTimelineChart:entry')}: {meta.entryNote}
                                         </Typography>
                                     )}
-                                    {meta?.exitNote && (
+                                    {!isAllowedDay && meta?.exitNote && (
                                         <Typography variant="caption" display="block"
                                                     sx={{color: theme.palette.info.main, fontStyle: 'italic'}}>
                                             📝 {t('workTimelineChart:exit')}: {meta.exitNote}
@@ -198,6 +304,7 @@ export default function WorkTimelineChart({sessions}) {
     const totalSessions = sessions.length;
     const activeSessions = sessions.filter(s => s.isOpen).length;
     const completedSessions = totalSessions - activeSessions;
+    const totalAllowedDays = allowedDays ? allowedDays.length : 0;
     const chartHeight = Math.max(650, chartData.length * 65);
 
     return (
@@ -250,13 +357,15 @@ export default function WorkTimelineChart({sessions}) {
                             />
                         )}
 
-                        <Chip
-                            icon={<RadioButtonCheckedIcon/>}
-                            label={`X ${t('workTimelineChart:paidLeave')}`} // TODO: İzinli gün sayısını ekle
-                            color="error"
-                            variant="outlined"
-                            size="small"
-                        />
+                        {totalAllowedDays > 0 && (
+                            <Chip
+                                icon={<RadioButtonCheckedIcon/>}
+                                label={`${totalAllowedDays} ${t('workTimelineChart:paidLeave')}`}
+                                color="error"
+                                variant="outlined"
+                                size="small"
+                            />
+                        )}
                     </Stack>
 
                     <Divider sx={{mt: 2}}/>
@@ -331,6 +440,17 @@ export default function WorkTimelineChart({sessions}) {
                                     <Bar
                                         key={`session${idx}`}
                                         dataKey={`session${idx}`}
+                                        stackId="a"
+                                        radius={[10, 10, 10, 10]}
+                                        maxBarSize={40}
+                                        shape={CustomFillRectangle}
+                                        activeBar={ActiveRectangle}
+                                    />
+                                ))}
+                                {Array.from({length: maxAllowedDays}, (_, idx) => (
+                                    <Bar
+                                        key={`allowedDay${idx}`}
+                                        dataKey={`allowedDay${idx}`}
                                         stackId="a"
                                         radius={[10, 10, 10, 10]}
                                         maxBarSize={40}
