@@ -57,7 +57,7 @@ const COLUMN_DEFS = [
     {key: 'files_count', labelKey: 'list.columns.files_count'},
     {key: 'status', labelKey: 'list.columns.status'},
     {key: 'sender_final_balance', labelKey: 'list.columns.sender_final_balance'},
-    {key: 'receiver_final_balance', labelKey: 'list.columns.receiver_final_balance'},
+    {key: 'receiver_final_balance', labelKey: 'list.columns.receiver_final_balance'}
 ];
 
 const SORT_FIELDS = [
@@ -66,12 +66,12 @@ const SORT_FIELDS = [
     {value: 'amount', labelKey: 'list.columns.amount'},
     {value: 'status', labelKey: 'list.columns.status'},
     {value: 'transfer_type', labelKey: 'list.columns.transfer_type'},
-    {value: 'currency', labelKey: 'list.columns.currency'},
+    {value: 'currency', labelKey: 'list.columns.currency'}
 ];
 
 const SORT_ORDERS = [
     {value: 'ASC', labelKey: 'sort.asc'},
-    {value: 'DESC', labelKey: 'sort.desc'},
+    {value: 'DESC', labelKey: 'sort.desc'}
 ];
 
 // --- Yardımcılar ---
@@ -92,15 +92,13 @@ const scopeOptions = [
     {value: '', labelKey: 'list.filters.any'},
     {value: 'user', labelKey: 'list.filters.scope.user'},
     {value: 'company', labelKey: 'list.filters.scope.company'},
-    {value: 'external', labelKey: 'list.filters.scope.external'},
+    {value: 'external', labelKey: 'list.filters.scope.external'}
 ];
 
 const statusOptions = [
     {value: '', labelKey: 'list.filters.any'},
     {value: 'completed', labelKey: 'list.status.completed'},
-    {value: 'pending', labelKey: 'list.status.pending'},
-    {value: 'failed', labelKey: 'list.status.failed'},
-    {value: 'reversed', labelKey: 'list.status.reversed'},
+    {value: 'pending', labelKey: 'list.status.pending'}
 ];
 
 const transferTypeOptions = [
@@ -115,7 +113,7 @@ const transferTypeOptions = [
     {value: 'user_to_external', labelKey: 'list.types.user_to_external'},
     {value: 'company_to_external', labelKey: 'list.types.company_to_external'},
     {value: 'external_to_user', labelKey: 'list.types.external_to_user'},
-    {value: 'external_to_company', labelKey: 'list.types.external_to_company'},
+    {value: 'external_to_company', labelKey: 'list.types.external_to_company'}
 ];
 
 const currencyGuess = (c) => (c && /^[A-Z]{3}$/.test(c) ? c : 'USD');
