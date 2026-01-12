@@ -3,7 +3,7 @@ import {
     Button,
     Typography,
 } from '@mui/material';
-import { WorkOutline, WorkOff } from '@mui/icons-material';
+import { WorkOutline, WorkOff, EventBusy } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -15,24 +15,66 @@ const WorkStatusDisplay = ({ userId, companyId, isWorking }) => {
         navigate(`/company/${companyId}/user/${userId}/work-history`);
     };
 
+    const getIcon = () => {
+        if (isWorking === 1) return <WorkOutline fontSize="small" />;
+        if (isWorking === 2) return <EventBusy fontSize="small" />;
+        return <WorkOff fontSize="small" />;
+    };
+
+    const getBgColor = () => {
+        if (isWorking === 1) return 'success.main';
+        if (isWorking === 2) return 'error.main';
+        return 'transparent';
+    };
+
+    const getBorderColor = () => {
+        if (isWorking === 1) return 'success.main';
+        if (isWorking === 2) return 'error.main';
+        return 'divider';
+    };
+
+    const getTextColor = () => {
+        if (isWorking === 1) return 'success.contrastText';
+        if (isWorking === 2) return 'error.contrastText';
+        return 'text.primary';
+    };
+
+    const getHoverBgColor = () => {
+        if (isWorking === 1) return 'success.dark';
+        if (isWorking === 2) return 'error.dark';
+        return 'action.hover';
+    };
+
+    const getHoverBorderColor = () => {
+        if (isWorking === 1) return 'success.dark';
+        if (isWorking === 2) return 'error.dark';
+        return 'divider';
+    };
+
+    const getStatusText = () => {
+        if (isWorking === 1) return t('working');
+        if (isWorking === 2) return t('workTimelineChart:allowed');
+        return t('notWorking');
+    };
+
     return (
         <Button
             size="small"
             onClick={handleClick}
-            startIcon={isWorking === 1 ? <WorkOutline fontSize="small" /> : <WorkOff fontSize="small" />}
+            startIcon={getIcon()}
             aria-label={t('working')}
             sx={{
                 border: 1,
-                borderColor: isWorking === 1 ? 'success.main' : 'divider',
+                borderColor: getBorderColor(),
                 borderRadius: 2,
                 textTransform: 'none',
                 px: 1.25,
                 height: 32,
-                bgcolor: isWorking === 1 ? 'success.main' : 'transparent',
-                color: isWorking === 1 ? 'success.contrastText' : 'text.primary',
+                bgcolor: getBgColor(),
+                color: getTextColor(),
                 '&:hover': {
-                    backgroundColor: isWorking === 1 ? 'success.dark' : 'action.hover',
-                    borderColor: isWorking === 1 ? 'success.dark' : 'divider',
+                    backgroundColor: getHoverBgColor(),
+                    borderColor: getHoverBorderColor(),
                 },
                 '& .MuiButton-startIcon': {
                     display: { xs: 'flex', sm: 'flex' },
@@ -48,7 +90,7 @@ const WorkStatusDisplay = ({ userId, companyId, isWorking }) => {
                     padding: 0.5
                 }}
             >
-                {isWorking === 1 ? t('working') : t('notWorking')}
+                {getStatusText()}
             </Typography>
         </Button>
     );
