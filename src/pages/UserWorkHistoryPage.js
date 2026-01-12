@@ -230,11 +230,11 @@ export default function UserWorkHistoryPage() {
                 </Box>
             )}
 
-            {!loading && sessions.length > 0 && (
+            {!loading && (sessions.length > 0 || allowedDays.length > 0) && (
                 <WorkTimelineChart sessions={sessions} allowedDays ={allowedDays} />
             )}
 
-            {!loading && sessions.length === 0 && !error && (
+            {!loading && sessions.length === 0 && allowedDays.length === 0 && !error && (
                 <Alert severity="info" sx={{ borderRadius: 2 }}>
                     {t('users:noWorkHistory')}
                 </Alert>
