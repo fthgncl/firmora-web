@@ -372,9 +372,6 @@ export default function AllowedDetailPage() {
                         <Typography variant="h4" sx={{fontWeight: 700}}>
                             {t('detail.title')}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {userFullName}
-                        </Typography>
                     </Box>
                 </Stack>
 
@@ -398,6 +395,11 @@ export default function AllowedDetailPage() {
                             color: 'white',
                         }}
                     >
+                        {/* User Name */}
+                        <Typography variant="h5" sx={{fontWeight: 700, mb: 3}}>
+                            {userFullName}
+                        </Typography>
+
                         <Stack direction={{xs: 'column', md: 'row'}} alignItems={{xs: 'flex-start', md: 'center'}} spacing={3}>
                             {/* Start Date */}
                             <Box>
