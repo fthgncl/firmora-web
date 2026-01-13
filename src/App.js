@@ -13,6 +13,7 @@ import TurnstileDisplayPage from "./pages/TurnstileDisplayPage";
 import TurnstileScanPage from "./pages/TurnstileScanPage";
 import ResetPassword from "./pages/ResetPassword";
 import UserWorkHistoryPage from "./pages/UserWorkHistoryPage";
+import AllowedDetailPage from "./pages/AllowedDetailPage";
 import React from "react";
 import AppBar from "./components/AppBar";
 
@@ -88,6 +89,12 @@ function App() {
                 <Route path="/transfer/:transferId" element={
                     <AuthRoute requireAuth={true} redirectTo="/sign-in">
                         <TransferDetailPage/>
+                    </AuthRoute>
+                }/>
+
+                <Route path="/allowed-day/:allowedDayId" element={
+                    <AuthRoute requireAuth={true} redirectTo="/sign-in">
+                        <AllowedDetailPage/>
                     </AuthRoute>
                 }/>
 

@@ -50,5 +50,33 @@
     "rowsPerPage": "Zeilen pro Seite",
     "displayedRows": "{{from}}-{{to}} / {{count}}",
     "viewTransfers": "Benutzertransfers anzeigen"
+  },
+  "allowedDays": {
+    "title": "Benutzer mit Entschuldigungen",
+    "total": "Gesamt: {{total}}",
+    "rowsPerPage": "Zeilen pro Seite",
+    "displayedRows": "{{from}}-{{to}} / {{count}}",
+    "refresh": "Aktualisieren",
+    "loading": "Wird geladen…",
+    "noResultsForSearch": "Keine Suchergebnisse gefunden.",
+    "noRecords": "Keine Entschuldigungseinträge gefunden.",
+    "columns": {
+      "userName": "Benutzername",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "description": "Beschreibung",
+      "filesCount": "Anzahl der Dateien"
+    },
+    "sort": {
+      "asc": "Aufsteigend",
+      "desc": "Absteigend"
+    },
+    "view": {
+      "tooltip": "Ansicht",
+      "columnsTitle": "Anzuzeigende Spalten"
+    },
+    "search": {
+      "placeholder": "In Tabelle suchen (Benutzername, Beschreibung)"
+    }
   }
 }

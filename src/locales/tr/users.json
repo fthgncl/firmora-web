@@ -50,5 +50,33 @@
     "rowsPerPage": "Sayfa başına",
     "displayedRows": "{{from}}-{{to}} / {{count}}",
     "viewTransfers": "Kullanıcı transferlerini görüntüle"
+  },
+  "allowedDays": {
+    "title": "Mazeret Bildiren Kullanıcılar",
+    "total": "Toplam: {{total}}",
+    "rowsPerPage": "Sayfa başına",
+    "displayedRows": "{{from}}-{{to}} / {{count}}",
+    "refresh": "Yenile",
+    "loading": "Yükleniyor…",
+    "noResultsForSearch": "Arama sonucu bulunamadı.",
+    "noRecords": "Mazeret bildirimi bulunamadı.",
+    "columns": {
+      "userName": "Kullanıcı Adı",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
+      "description": "Açıklama",
+      "filesCount": "Belge Sayısı"
+    },
+    "sort": {
+      "asc": "Artan",
+      "desc": "Azalan"
+    },
+    "view": {
+      "tooltip": "Görünüm",
+      "columnsTitle": "Görünecek Sütunlar"
+    },
+    "search": {
+      "placeholder": "Tabloda ara (kullanıcı adı, açıklama)"
+    }
   }
 }

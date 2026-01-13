@@ -50,5 +50,33 @@
     "rowsPerPage": "Rows per page",
     "displayedRows": "{{from}}-{{to}} / {{count}}",
     "viewTransfers": "View user transfers"
+  },
+  "allowedDays": {
+    "title": "Users with Allowed Days",
+    "total": "Total: {{total}}",
+    "rowsPerPage": "Rows per page",
+    "displayedRows": "{{from}}-{{to}} / {{count}}",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "noResultsForSearch": "No results found.",
+    "noRecords": "No allowed day records found.",
+    "columns": {
+      "userName": "User Name",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "description": "Description",
+      "filesCount": "Files Count"
+    },
+    "sort": {
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "view": {
+      "tooltip": "View",
+      "columnsTitle": "Visible Columns"
+    },
+    "search": {
+      "placeholder": "Search table (user name, description)"
+    }
   }
 }

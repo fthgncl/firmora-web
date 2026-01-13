@@ -36,6 +36,7 @@ import {useTranslation} from 'react-i18next';
 import TransfersTable from "../components/TransfersTable";
 import {permissionsService} from "../services/permissionsService";
 import CompanyUsersWorkStatus from "../components/CompanyUsersWorkStatus";
+import UserAllowedDaysList from "../components/UserAllowedDaysList";
 
 export default function CompanyPage() {
     const {companyId} = useParams();
@@ -531,6 +532,11 @@ export default function CompanyPage() {
             {/* Kullanıcı Giriş-Çıkış Kayıtları Listesi */}
             <Grid sx={{mt: 4}}>
                 <CompanyUsersWorkStatus companyId={companyId}/>
+            </Grid>
+
+            {/* Mazeret Bildiren Kullanıcılar Listesi */}
+            <Grid sx={{mt: 4}}>
+                <UserAllowedDaysList companyId={companyId}/>
             </Grid>
 
             {/* Dialoglar */}
