@@ -16,21 +16,18 @@ import {
     Dialog,
     DialogContent,
     DialogTitle,
-    Avatar,
     Stack,
-    Fade,
     useTheme,
     useMediaQuery,
 } from '@mui/material';
 import {
     ArrowBack,
-    Person,
-    CalendarToday,
     Description,
     AttachFile,
     Image as ImageIcon,
     PictureAsPdf,
     Close,
+    AccessTime,
 } from '@mui/icons-material';
 
 import {useTranslation} from 'react-i18next';
@@ -39,15 +36,23 @@ import {useAlert} from '../contexts/AlertContext';
 import axios from 'axios';
 import PDFViewer from '../components/PDFViewer';
 
-const formatDateTime = (d, langCode) =>
-    d ? new Date(d).toLocaleString(langCode, {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
+const formatDateWithDay = (d, langCode) => {
+    if (!d) return '-';
+    const date = new Date(d);
+    const dateStr = date.toLocaleDateString(langCode, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+    const dayStr = date.toLocaleDateString(langCode, {
+        weekday: 'long'
+    });
+    const timeStr = date.toLocaleTimeString(langCode, {
         hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    }) : '-';
+        minute: '2-digit'
+    });
+    return { dateStr, dayStr, timeStr };
+};
 
 // Küçük görsel önizleme
 function ImagePreview({fileToken, token}) {
@@ -334,252 +339,181 @@ export default function AllowedDetailPage() {
 
     const userFullName = user ? [user.name, user.surname].filter(Boolean).join(' ') : '-';
 
+    const calculateDays = () => {
+        const start = new Date(allowedDay.start_date);
+        const end = new Date(allowedDay.end_date);
+        const diffTime = Math.abs(end - start);
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    };
+
     return (
         <Box
             sx={{
                 minHeight: '100vh',
-                py: {xs: 3, md: 6},
-                background: (t) =>
-                    `radial-gradient(circle at top left, ${t.palette.primary.light}22, transparent 55%),
-                     radial-gradient(circle at bottom right, ${t.palette.secondary.light}18, transparent 55%)`,
+                bgcolor: 'background.default',
             }}
         >
-            <Container maxWidth="lg">
-                {/* Üst bar: geri + başlık */}
-                <Box sx={{mb: 3}}>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                        <Button
-                            variant="outlined"
-                            startIcon={<ArrowBack/>}
-                            onClick={() => navigate(-1)}
-                            sx={{
-                                borderRadius: 999,
-                                textTransform: 'none',
-                                fontWeight: 500,
-                            }}
-                        >
-                            {t('back', {ns: 'common'})}
-                        </Button>
-
-                        <Box sx={{flex: 1, minWidth: 0}}>
-                            <Typography
-                                variant="h5"
-                                sx={{
-                                    fontWeight: 700,
-                                    letterSpacing: 0.2,
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
-                                }}
-                            >
-                                {t('detail.title')}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                #{allowedDay.id}
-                            </Typography>
-                        </Box>
-                    </Stack>
-                </Box>
-
-                {/* Hero özet kartı (Tarih aralığı) */}
-                <Fade in timeout={500}>
-                    <Card
-                        elevation={0}
+            <Container maxWidth="md" sx={{py: {xs: 2, md: 4}}}>
+                {/* Header with back button */}
+                <Stack direction="row" alignItems="center" spacing={2} sx={{mb: 4}}>
+                    <IconButton
+                        onClick={() => navigate(-1)}
                         sx={{
-                            mb: 4,
-                            borderRadius: 3,
-                            overflow: 'hidden',
-                            background: "linear-gradient(135deg, #2b2b2b, #125696 70%, #bfa76f33)",
-                            color: '#fff',
-                            px: {xs: 3, md: 4},
-                            py: {xs: 3, md: 4},
+                            bgcolor: 'background.paper',
+                            boxShadow: 1,
+                            '&:hover': {
+                                bgcolor: 'action.hover',
+                            },
                         }}
                     >
-                        <Grid container spacing={3} alignItems="center">
-                            <Grid item xs={12}>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        textTransform: 'uppercase',
-                                        letterSpacing: 1.6,
-                                        opacity: 0.8,
-                                        fontWeight: 600,
-                                    }}
-                                >
-                                    {t('detail.dateRange')}
+                        <ArrowBack/>
+                    </IconButton>
+                    <Box>
+                        <Typography variant="h4" sx={{fontWeight: 700}}>
+                            {t('detail.title')}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {userFullName}
+                        </Typography>
+                    </Box>
+                </Stack>
+
+                {/* Main Content Card */}
+                <Card
+                    elevation={0}
+                    sx={{
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                    }}
+                >
+                    {/* Date Range Header */}
+                    <Box
+                        sx={{
+                            background: (theme) =>
+                                `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                            px: 3,
+                            py: 4,
+                            color: 'white',
+                        }}
+                    >
+                        <Stack direction={{xs: 'column', md: 'row'}} alignItems={{xs: 'flex-start', md: 'center'}} spacing={3}>
+                            {/* Start Date */}
+                            <Box>
+                                <Typography variant="h6" sx={{fontWeight: 700, mb: 0.5}}>
+                                    {formatDateWithDay(allowedDay.start_date, i18n.language).dateStr}
                                 </Typography>
-                                <Stack direction="row" spacing={2} alignItems="center" sx={{mt: 1}}>
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            fontWeight: 700,
-                                            lineHeight: 1.1,
-                                        }}
-                                    >
-                                        {formatDateTime(allowedDay.start_date, i18n.language)}
-                                    </Typography>
-                                    <Typography variant="h5" sx={{opacity: 0.7}}>→</Typography>
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            fontWeight: 700,
-                                            lineHeight: 1.1,
-                                        }}
-                                    >
-                                        {formatDateTime(allowedDay.end_date, i18n.language)}
-                                    </Typography>
-                                </Stack>
-                            </Grid>
-                        </Grid>
-                    </Card>
-                </Fade>
+                                <Typography variant="body2" sx={{opacity: 0.9}}>
+                                    {formatDateWithDay(allowedDay.start_date, i18n.language).dayStr}, {formatDateWithDay(allowedDay.start_date, i18n.language).timeStr}
+                                </Typography>
+                            </Box>
 
-                <Grid container spacing={3}>
-                    {/* Sol taraf: kullanıcı bilgisi + açıklama */}
-                    <Grid item xs={12} md={8}>
-                        {/* Kullanıcı bilgisi */}
-                        <Card elevation={0} sx={{mb: 3, borderRadius: 3, p: 3, border: '1px solid', borderColor: 'divider'}}>
-                            <Typography variant="subtitle2" color="text.secondary"
-                                        sx={{mb: 2, textTransform: 'uppercase', letterSpacing: 1}}>
-                                {t('detail.userInfo')}
-                            </Typography>
+                            {/* Arrow */}
+                            <Typography variant="h4" sx={{fontWeight: 300, opacity: 0.7}}>→</Typography>
 
-                            <Paper
-                                variant="outlined"
+                            {/* End Date */}
+                            <Box>
+                                <Typography variant="h6" sx={{fontWeight: 700, mb: 0.5}}>
+                                    {formatDateWithDay(allowedDay.end_date, i18n.language).dateStr}
+                                </Typography>
+                                <Typography variant="body2" sx={{opacity: 0.9}}>
+                                    {formatDateWithDay(allowedDay.end_date, i18n.language).dayStr}, {formatDateWithDay(allowedDay.end_date, i18n.language).timeStr}
+                                </Typography>
+                            </Box>
+
+                            {/* Days Count */}
+                            <Chip
+                                label={`${calculateDays()} ${t('detail.days', {ns: 'allowedDays', defaultValue: 'gün'})}`}
                                 sx={{
-                                    borderRadius: 2,
-                                    p: 2,
-                                    borderColor: theme.palette.primary.main,
-                                    backgroundColor: 'background.paper',
+                                    bgcolor: 'rgba(255,255,255,0.9)',
+                                    color: 'primary.main',
+                                    fontWeight: 700,
+                                    fontSize: '0.9rem',
+                                    height: 36,
                                 }}
-                            >
-                                <Stack direction="row" spacing={2} alignItems="center">
-                                    <Avatar
-                                        sx={{
-                                            bgcolor: theme.palette.primary.main,
-                                            color: 'primary.contrastText',
-                                            width: 52,
-                                            height: 52,
-                                        }}
-                                    >
-                                        <Person/>
-                                    </Avatar>
+                            />
+                        </Stack>
+                    </Box>
+
+                    <CardContent sx={{p: 3}}>
+                        {/* Info Sections */}
+                        <Stack spacing={2.5}>
+                            {/* Request Date */}
+                            <Box>
+                                <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                                    <AccessTime fontSize="small" color="action" sx={{mt: 0.5}}/>
                                     <Box>
-                                        <Typography variant="overline" sx={{color: 'text.secondary', letterSpacing: 1}}>
-                                            {t('detail.user')}
+                                        <Typography variant="caption" color="text.secondary" sx={{display: 'block', mb: 0.5}}>
+                                            {t('detail.createdAt')}
                                         </Typography>
-                                        <Typography variant="subtitle1" sx={{fontWeight: 700}}>
-                                            {userFullName}
+                                        <Typography variant="body1" sx={{fontWeight: 600}}>
+                                            {formatDateWithDay(allowedDay.created_at, i18n.language).dateStr}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {formatDateWithDay(allowedDay.created_at, i18n.language).dayStr}, {formatDateWithDay(allowedDay.created_at, i18n.language).timeStr}
                                         </Typography>
                                     </Box>
                                 </Stack>
-                                <Box sx={{mt: 2}}>
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <CalendarToday fontSize="small" sx={{color: 'text.secondary'}}/>
-                                        <Box>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {t('detail.createdAt')}
+                            </Box>
+
+                            {/* Description */}
+                            {allowedDay.description && (
+                                <Paper
+                                    variant="outlined"
+                                    sx={{
+                                        p: 2.5,
+                                        borderRadius: 2,
+                                        bgcolor: 'grey.50',
+                                        borderColor: 'grey.200',
+                                    }}
+                                >
+                                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                                        <Description fontSize="small" color="action" sx={{mt: 0.5}}/>
+                                        <Box sx={{flex: 1}}>
+                                            <Typography variant="caption" color="text.secondary" sx={{mb: 0.5, display: 'block'}}>
+                                                {t('detail.description')}
                                             </Typography>
-                                            <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                {formatDateTime(allowedDay.created_at, i18n.language)}
+                                            <Typography variant="body1" sx={{whiteSpace: 'pre-wrap'}}>
+                                                {allowedDay.description}
                                             </Typography>
                                         </Box>
                                     </Stack>
-                                </Box>
-                            </Paper>
-                        </Card>
+                                </Paper>
+                            )}
 
-                        {/* Açıklama */}
-                        {allowedDay.description && (
-                            <Card elevation={0}
-                                  sx={{borderRadius: 3, p: 3, border: '1px dashed', borderColor: 'divider'}}>
-                                <Stack direction="row" spacing={2} alignItems="flex-start">
-                                    <Avatar
-                                        sx={{
-                                            width: 40,
-                                            height: 40,
-                                            borderRadius: 2,
-                                            backdropFilter: 'blur(6px)',
-                                            background: (theme) =>
-                                                theme.palette.mode === 'dark'
-                                                    ? 'linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.10))'
-                                                    : 'linear-gradient(135deg, rgba(0,0,0,0.10), rgba(0,0,0,0.05))',
-                                            color: (theme) =>
-                                                theme.palette.mode === 'dark'
-                                                    ? theme.palette.common.white
-                                                    : theme.palette.common.black,
-                                        }}
-                                    >
-                                        <Description
-                                            sx={{
-                                                fontSize: 22,
-                                                color: (theme) =>
-                                                    theme.palette.mode === 'dark'
-                                                        ? theme.palette.common.white
-                                                        : theme.palette.common.black,
-                                            }}
-                                        />
-                                    </Avatar>
-
-                                    <Box sx={{flex: 1}}>
-                                        <Typography variant="subtitle2" sx={{mb: 0.5}}>
-                                            {t('detail.description')}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {allowedDay.description}
-                                        </Typography>
-                                    </Box>
-                                </Stack>
-                            </Card>
-                        )}
-                    </Grid>
-
-                    {/* Sağ taraf: Ekler (galeri) */}
-                    <Grid item xs={12} md={4}>
-                        {files.length > 0 && (
-                            <Card
-                                elevation={0}
-                                sx={{
-                                    borderRadius: 3,
-                                    border: '1px solid',
-                                    borderColor: 'divider',
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                <CardContent>
-                                    <Stack direction="row" justifyContent="space-between" alignItems="center"
-                                           sx={{mb: 2}}>
-                                        <Typography variant="subtitle2">
-                                            <AttachFile sx={{verticalAlign: 'middle', mr: 1}}/>
-                                            {t('detail.attachments')} ({files.length})
-                                        </Typography>
-                                    </Stack>
-
-                                    {/* Galeri tarzı grid */}
-                                    <Grid container spacing={1.5}>
+                            {/* Files */}
+                            {files.length > 0 && (
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{mb: 2, display: 'flex', alignItems: 'center', gap: 1}}>
+                                        <AttachFile fontSize="small"/>
+                                        {t('detail.attachments')} ({files.length})
+                                    </Typography>
+                                    <Grid container spacing={2}>
                                         {files.map((file, index) => {
                                             const isImage = file.mimeType?.startsWith('image/');
                                             const isPdf = file.mimeType?.includes('pdf');
                                             const isPreviewable = isImage || isPdf;
 
                                             return (
-                                                <Grid item xs={4} sm={3} md={4} key={index}>
+                                                <Grid item xs={6} sm={4} md={3} key={index}>
                                                     <Paper
-                                                        elevation={1}
+                                                        elevation={0}
                                                         sx={{
                                                             borderRadius: 2,
                                                             overflow: 'hidden',
                                                             cursor: 'pointer',
+                                                            border: '1px solid',
+                                                            borderColor: 'divider',
+                                                            height: 140,
                                                             display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            p: isImage ? 0 : 1.5,
-                                                            height: 90,
+                                                            flexDirection: 'column',
+                                                            transition: 'all 0.2s',
                                                             '&:hover': {
-                                                                boxShadow: 4,
-                                                                transform: 'translateY(-2px)',
+                                                                boxShadow: 2,
+                                                                borderColor: 'primary.main',
+                                                                transform: 'translateY(-4px)',
                                                             },
-                                                            transition: 'all 0.15s ease-out',
                                                         }}
                                                         onClick={() => {
                                                             if (isPreviewable) {
@@ -589,31 +523,46 @@ export default function AllowedDetailPage() {
                                                             }
                                                         }}
                                                     >
-                                                        {isImage ? (
-                                                            <ImagePreview fileToken={file.downloadToken} token={token}/>
-                                                        ) : (
-                                                            <Box
+                                                        <Box
+                                                            sx={{
+                                                                flex: 1,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                bgcolor: 'grey.100',
+                                                                p: isImage ? 0 : 2,
+                                                            }}
+                                                        >
+                                                            {isImage ? (
+                                                                <ImagePreview fileToken={file.downloadToken} token={token}/>
+                                                            ) : (
+                                                                getFileIcon(file.mimeType)
+                                                            )}
+                                                        </Box>
+                                                        <Box sx={{p: 1, bgcolor: 'background.paper'}}>
+                                                            <Typography
+                                                                variant="caption"
                                                                 sx={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    width: '100%',
-                                                                    height: '100%',
+                                                                    display: 'block',
+                                                                    whiteSpace: 'nowrap',
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    fontWeight: 500,
                                                                 }}
                                                             >
-                                                                {getFileIcon(file.mimeType)}
-                                                            </Box>
-                                                        )}
+                                                                {file.fileName}
+                                                            </Typography>
+                                                        </Box>
                                                     </Paper>
                                                 </Grid>
                                             );
                                         })}
                                     </Grid>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </Grid>
-                </Grid>
+                                </Box>
+                            )}
+                        </Stack>
+                    </CardContent>
+                </Card>
 
                 {/* Dosya önizleme dialog */}
                 <Dialog

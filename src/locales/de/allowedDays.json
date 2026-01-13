@@ -6,7 +6,8 @@
     "user": "Benutzer",
     "createdAt": "Erstellt am",
     "description": "Beschreibung",
-    "attachments": "Anhänge"
+    "attachments": "Anhänge",
+    "days": "Tage"
   },
   "errors": {
     "fetchFailed": "Urlaubstag-Informationen konnten nicht geladen werden",

@@ -6,7 +6,8 @@
     "user": "Kullanıcı",
     "createdAt": "Oluşturulma Tarihi",
     "description": "Açıklama",
-    "attachments": "Ekler"
+    "attachments": "Ekler",
+    "days": "gün"
   },
   "errors": {
     "fetchFailed": "İzin günü bilgileri alınamadı",

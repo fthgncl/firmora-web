@@ -6,7 +6,8 @@
     "user": "User",
     "createdAt": "Created At",
     "description": "Description",
-    "attachments": "Attachments"
+    "attachments": "Attachments",
+    "days": "days"
   },
   "errors": {
     "fetchFailed": "Failed to fetch allowed day information",
