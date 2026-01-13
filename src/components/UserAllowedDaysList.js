@@ -79,10 +79,10 @@ const UserAllowedDaysList = React.forwardRef(({ companyId, initialLimit = 20, sx
     const [searchTerm, setSearchTerm] = useState('');
     const [hasFetched, setHasFetched] = useState(false);
 
-    // Date filters - 2 days ago to 7 days ahead
+    // Date filters - 1 month ago to 7 days ahead
     const [startDate, setStartDate] = useState(() => {
         const date = new Date();
-        date.setDate(date.getDate() - 2); // 2 days ago
+        date.setMonth(date.getMonth() - 1);
         return date.toISOString().split('T')[0];
     });
     const [endDate, setEndDate] = useState(() => {
