@@ -64,9 +64,11 @@
       "userName": "Kullanıcı Adı",
       "startDate": "Başlangıç Tarihi",
       "endDate": "Bitiş Tarihi",
+      "duration": "Süre",
       "description": "Açıklama",
       "filesCount": "Belge Sayısı"
     },
+    "days": "gün",
     "sort": {
       "asc": "Artan",
       "desc": "Azalan"

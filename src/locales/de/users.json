@@ -64,9 +64,11 @@
       "userName": "Benutzername",
       "startDate": "Startdatum",
       "endDate": "Enddatum",
+      "duration": "Dauer",
       "description": "Beschreibung",
       "filesCount": "Anzahl der Dateien"
     },
+    "days": "Tage",
     "sort": {
       "asc": "Aufsteigend",
       "desc": "Absteigend"
