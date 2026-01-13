@@ -1,0 +1,15 @@
+{
+  "detail": {
+    "title": "Urlaubstag Details",
+    "dateRange": "Zeitraum",
+    "userInfo": "Benutzerinformationen",
+    "user": "Benutzer",
+    "createdAt": "Erstellt am",
+    "description": "Beschreibung",
+    "attachments": "Anhänge"
+  },
+  "errors": {
+    "fetchFailed": "Urlaubstag-Informationen konnten nicht geladen werden",
+    "notFound": "Urlaubstag nicht gefunden"
+  }
+}

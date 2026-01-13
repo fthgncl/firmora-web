@@ -1,0 +1,15 @@
+{
+  "detail": {
+    "title": "İzin Günü Detayları",
+    "dateRange": "Tarih Aralığı",
+    "userInfo": "Kullanıcı Bilgisi",
+    "user": "Kullanıcı",
+    "createdAt": "Oluşturulma Tarihi",
+    "description": "Açıklama",
+    "attachments": "Ekler"
+  },
+  "errors": {
+    "fetchFailed": "İzin günü bilgileri alınamadı",
+    "notFound": "İzin günü bulunamadı"
+  }
+}
