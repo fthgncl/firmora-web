@@ -360,7 +360,7 @@ export default function WorkTimelineChart({sessions, allowedDays}) {
                         {totalAllowedDays > 0 && (
                             <Chip
                                 icon={<RadioButtonCheckedIcon/>}
-                                label={`${totalAllowedDays} ${t('workTimelineChart:paidLeave')}`}
+                                label={`${totalAllowedDays} ${t('workHistoryTable:allowed')}`}
                                 color="error"
                                 variant="outlined"
                                 size="small"
