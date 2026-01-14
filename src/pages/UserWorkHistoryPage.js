@@ -16,10 +16,13 @@ import {
     Avatar,
     IconButton,
     Paper,
-    InputAdornment
+    InputAdornment,
+    ToggleButton,
+    ToggleButtonGroup
 } from '@mui/material';
-import { ArrowBack, AccessTime, Phone, CalendarToday } from '@mui/icons-material';
+import { ArrowBack, AccessTime, Phone, CalendarToday, BarChart, TableChart } from '@mui/icons-material';
 import WorkTimelineChart from '../components/WorkTimelineChart';
+import WorkHistoryTable from '../components/WorkHistoryTable';
 import { formatPhoneForTel } from '../utils/phoneUtils';
 import { splitByDay } from '../utils/sessionTime';
 
@@ -35,6 +38,7 @@ export default function UserWorkHistoryPage() {
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [viewMode, setViewMode] = useState('chart'); // 'chart' or 'table'
 
     // Date filters
     const [startDate, setStartDate] = useState(() => {
@@ -231,7 +235,42 @@ export default function UserWorkHistoryPage() {
             )}
 
             {!loading && (sessions.length > 0 || allowedDays.length > 0) && (
-                <WorkTimelineChart sessions={sessions} allowedDays ={allowedDays} />
+                <>
+                    {/* View Mode Toggle */}
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                        <ToggleButtonGroup
+                            value={viewMode}
+                            exclusive
+                            onChange={(event, newMode) => {
+                                if (newMode !== null) {
+                                    setViewMode(newMode);
+                                }
+                            }}
+                            aria-label="view mode"
+                            sx={{
+                                bgcolor: 'background.paper',
+                                borderRadius: 2,
+                                boxShadow: 1
+                            }}
+                        >
+                            <ToggleButton value="chart" aria-label="chart view">
+                                <BarChart sx={{ mr: 1 }} />
+                                {t('users:viewMode.chart')}
+                            </ToggleButton>
+                            <ToggleButton value="table" aria-label="table view">
+                                <TableChart sx={{ mr: 1 }} />
+                                {t('users:viewMode.table')}
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                    </Box>
+
+                    {/* Render based on view mode */}
+                    {viewMode === 'chart' ? (
+                        <WorkTimelineChart sessions={sessions} allowedDays={allowedDays} />
+                    ) : (
+                        <WorkHistoryTable sessions={sessions} allowedDays={allowedDays} />
+                    )}
+                </>
             )}
 
             {!loading && sessions.length === 0 && allowedDays.length === 0 && !error && (

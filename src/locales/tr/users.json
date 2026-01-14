@@ -1,6 +1,10 @@
 {
   "totalWorkTime": "Toplam Çalışma Süresi",
   "noWorkHistory": "Bu tarih aralığında çalışma kaydı bulunamadı.",
+  "viewMode": {
+    "chart": "Grafik Görünümü",
+    "table": "Tablo Görünümü"
+  },
   "search": {
     "placeholder": "Ara (isim, e-posta, telefon, kullanıcı adı)",
     "resultsFound": "{{count}} sonuç bulundu",

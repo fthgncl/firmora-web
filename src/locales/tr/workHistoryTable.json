@@ -1,0 +1,18 @@
+{
+  "workSessions": "Çalışma Seansları",
+  "date": "Tarih",
+  "entryTime": "Giriş Saati",
+  "exitTime": "Çıkış Saati",
+  "duration": "Süre",
+  "entryNote": "Giriş Notu",
+  "exitNote": "Çıkış Notu",
+  "inProgress": "Devam Ediyor",
+  "allowedDays": "İzin Günleri",
+  "startDate": "Başlangıç Tarihi",
+  "endDate": "Bitiş Tarihi",
+  "totalDays": "Toplam Gün",
+  "description": "Açıklama",
+  "files": "Dosyalar",
+  "noData": "Gösterilecek veri bulunamadı.",
+  "allowed": "Mazeret"
+}

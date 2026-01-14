@@ -1,0 +1,18 @@
+{
+  "workSessions": "Work Sessions",
+  "date": "Date",
+  "entryTime": "Entry Time",
+  "exitTime": "Exit Time",
+  "duration": "Duration",
+  "entryNote": "Entry Note",
+  "exitNote": "Exit Note",
+  "inProgress": "In Progress",
+  "allowedDays": "Allowed Days",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "totalDays": "Total Days",
+  "description": "Description",
+  "files": "Files",
+  "noData": "No data to display.",
+  "allowed": "Excuse"
+}

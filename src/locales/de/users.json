@@ -1,6 +1,10 @@
 {
   "totalWorkTime": "Gesamte Arbeitszeit",
   "noWorkHistory": "Für diesen Datumsbereich wurden keine Arbeitsaufzeichnungen gefunden.",
+  "viewMode": {
+    "chart": "Diagrammansicht",
+    "table": "Tabellenansicht"
+  },
   "search": {
     "placeholder": "Suchen (Name, E-Mail, Telefon, Benutzername)",
     "resultsFound": "{{count}} Ergebnis(se) gefunden",

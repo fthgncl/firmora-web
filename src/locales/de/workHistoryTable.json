@@ -1,0 +1,18 @@
+{
+  "workSessions": "Arbeitssitzungen",
+  "date": "Datum",
+  "entryTime": "Eintrittszeit",
+  "exitTime": "Austrittszeit",
+  "duration": "Dauer",
+  "entryNote": "Eintrittsnotiz",
+  "exitNote": "Austrittsnotiz",
+  "inProgress": "In Bearbeitung",
+  "allowedDays": "Erlaubte Tage",
+  "startDate": "Startdatum",
+  "endDate": "Enddatum",
+  "totalDays": "Gesamttage",
+  "description": "Beschreibung",
+  "files": "Dateien",
+  "noData": "Keine Daten zum Anzeigen.",
+  "allowed": "Beschreibung"
+}
