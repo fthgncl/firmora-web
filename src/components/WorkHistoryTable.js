@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Paper,
     Typography,
@@ -11,15 +11,39 @@ import {
     TableRow,
     Chip,
     Stack,
-    useTheme
+    useTheme,
+    IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    TextField,
+    Tabs,
+    Tab,
+    Snackbar,
+    Alert
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import EditIcon from '@mui/icons-material/Edit';
+import { useAuth } from '../contexts/AuthContext';
+import { permissionsService } from '../services/permissionsService';
+import axios from 'axios';
 
-export default function WorkHistoryTable({ sessions, allowedDays }) {
+export default function WorkHistoryTable({ sessions, allowedDays, companyId }) {
     const theme = useTheme();
     const { t, i18n } = useTranslation(['workHistoryTable']);
+    const { token, user } = useAuth();
+
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [editingSession, setEditingSession] = useState(null);
+    const [newEntryDateTime, setNewEntryDateTime] = useState('');
+    const [newExitDateTime, setNewExitDateTime] = useState('');
+    const [canEditWorkHours, setCanEditWorkHours] = useState(false);
+    const [activeTab, setActiveTab] = useState(0);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
     // Format time from ISO string
     const formatTime = (isoString) => {
@@ -48,6 +72,158 @@ export default function WorkHistoryTable({ sessions, allowedDays }) {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
         return `${hours} ${t('common:hour')} ${mins} ${t('common:minute')}`;
+    };
+
+    // Check permissions on mount and when dependencies change
+    useEffect(() => {
+        const checkPermissions = async () => {
+            if (!token || !user || !companyId) {
+                setCanEditWorkHours(false);
+                return;
+            }
+
+            try {
+                const hasPermission = await permissionsService.checkUserRoles(
+                    token,
+                    user,
+                    companyId,
+                    ['can_edit_work_hours'],
+                    true
+                );
+                setCanEditWorkHours(hasPermission);
+            } catch (error) {
+                console.error('Error checking permissions:', error);
+                setCanEditWorkHours(false);
+            }
+        };
+
+        checkPermissions();
+    }, [token, user, companyId]);
+
+    // Helper function to format datetime to local string
+    const formatDateTimeLocal = (isoString) => {
+        if (!isoString) return '';
+        const date = new Date(isoString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
+    // Open edit dialog
+    const handleEditClick = (session) => {
+        if (!canEditWorkHours) {
+            return;
+        }
+
+        setEditingSession(session);
+        setNewEntryDateTime(formatDateTimeLocal(session.entryTime));
+        setNewExitDateTime(formatDateTimeLocal(session.exitTime));
+        setEditDialogOpen(true);
+    };
+
+    // Handle update request
+    const handleUpdateWorkStatus = async () => {
+        if (!editingSession || (!newEntryDateTime && !newExitDateTime)) return;
+
+        try {
+            const promises = [];
+
+            // Check if entry time changed
+            if (newEntryDateTime && newEntryDateTime !== formatDateTimeLocal(editingSession.entryTime)) {
+                promises.push(
+                    axios.post(
+                        `${process.env.REACT_APP_API_URL}/work-status/update-work-status-date`,
+                        {
+                            entryId: editingSession.entryId,
+                            newDate: new Date(newEntryDateTime).toISOString()
+                        },
+                        {
+                            headers: {
+                                'x-access-token': token
+                            }
+                        }
+                    )
+                );
+            }
+
+            // Check if exit time changed
+            if (editingSession.exitTime && newExitDateTime && newExitDateTime !== formatDateTimeLocal(editingSession.exitTime)) {
+                promises.push(
+                    axios.post(
+                        `${process.env.REACT_APP_API_URL}/work-status/update-work-status-date`,
+                        {
+                            entryId: editingSession.exitId,
+                            newDate: new Date(newExitDateTime).toISOString()
+                        },
+                        {
+                            headers: {
+                                'x-access-token': token
+                            }
+                        }
+                    )
+                );
+            }
+
+            if (promises.length === 0) {
+                setSnackbar({
+                    open: true,
+                    message: t('workHistoryTable:noChanges'),
+                    severity: 'info'
+                });
+                return;
+            }
+
+            const responses = await Promise.all(promises);
+            const allSuccess = responses.every(res => res.data.status === 'success');
+
+            if (allSuccess) {
+                setSnackbar({
+                    open: true,
+                    message: t('workHistoryTable:updateSuccess'),
+                    severity: 'success'
+                });
+                setEditDialogOpen(false);
+                setEditingSession(null);
+                setNewEntryDateTime('');
+                setNewExitDateTime('');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('Error updating work status:', error);
+            const errorMessage = error.response?.data?.message || t('workHistoryTable:updateError');
+            setSnackbar({
+                open: true,
+                message: errorMessage,
+                severity: 'error'
+            });
+        }
+    };
+
+    // Handle snackbar close
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbar({ ...snackbar, open: false });
+    };
+
+    // Close dialog
+    const handleCloseDialog = () => {
+        setEditDialogOpen(false);
+        setEditingSession(null);
+        setNewEntryDateTime('');
+        setNewExitDateTime('');
+        setActiveTab(0);
+    };
+
+    // Handle tab change
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
     };
 
     return (
@@ -88,6 +264,9 @@ export default function WorkHistoryTable({ sessions, allowedDays }) {
                                         <TableCell sx={{ fontWeight: 700 }}>{t('workHistoryTable:duration')}</TableCell>
                                         <TableCell sx={{ fontWeight: 700 }}>{t('workHistoryTable:entryNote')}</TableCell>
                                         <TableCell sx={{ fontWeight: 700 }}>{t('workHistoryTable:exitNote')}</TableCell>
+                                        {canEditWorkHours && (
+                                            <TableCell sx={{ fontWeight: 700 }}>{t('workHistoryTable:actions')}</TableCell>
+                                        )}
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -143,6 +322,18 @@ export default function WorkHistoryTable({ sessions, allowedDays }) {
                                                     {session.exitNote || '-'}
                                                 </Typography>
                                             </TableCell>
+                                            {canEditWorkHours && (
+                                                <TableCell>
+                                                    <IconButton
+                                                        size="small"
+                                                        color="primary"
+                                                        onClick={() => handleEditClick(session)}
+                                                        title={t('workHistoryTable:editSession')}
+                                                    >
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                </TableCell>
+                                            )}
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -247,6 +438,76 @@ export default function WorkHistoryTable({ sessions, allowedDays }) {
                         </Typography>
                     </Box>
                 )}
+
+                {/* Edit Dialog */}
+                <Dialog open={editDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+                    <DialogTitle>
+                        {t('workHistoryTable:editWorkSession')}
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 1 }}>
+                            <Tabs value={activeTab} onChange={handleTabChange} aria-label="work time tabs">
+                                <Tab label={t('workHistoryTable:entryTime')} />
+                                {editingSession?.exitTime && (
+                                    <Tab label={t('workHistoryTable:exitTime')} />
+                                )}
+                            </Tabs>
+                        </Box>
+                        <Box sx={{ pt: 3 }}>
+                            {activeTab === 0 && (
+                                <TextField
+                                    margin="dense"
+                                    label={t('workHistoryTable:entryTime')}
+                                    type="datetime-local"
+                                    fullWidth
+                                    value={newEntryDateTime}
+                                    onChange={(e) => setNewEntryDateTime(e.target.value)}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            )}
+                            {activeTab === 1 && editingSession?.exitTime && (
+                                <TextField
+                                    margin="dense"
+                                    label={t('workHistoryTable:exitTime')}
+                                    type="datetime-local"
+                                    fullWidth
+                                    value={newExitDateTime}
+                                    onChange={(e) => setNewExitDateTime(e.target.value)}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            )}
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog}>
+                            {t('workHistoryTable:cancel')}
+                        </Button>
+                        <Button onClick={handleUpdateWorkStatus} variant="contained" color="primary">
+                            {t('workHistoryTable:save')}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Snackbar for notifications */}
+                <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={6000}
+                    onClose={handleSnackbarClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                >
+                    <Alert
+                        onClose={handleSnackbarClose}
+                        severity={snackbar.severity}
+                        sx={{ width: '100%' }}
+                        variant="filled"
+                    >
+                        {snackbar.message}
+                    </Alert>
+                </Snackbar>
             </Paper>
         </Box>
     );

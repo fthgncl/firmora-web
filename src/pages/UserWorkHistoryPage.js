@@ -268,7 +268,7 @@ export default function UserWorkHistoryPage() {
                     {viewMode === 'chart' ? (
                         <WorkTimelineChart sessions={sessions} allowedDays={allowedDays} />
                     ) : (
-                        <WorkHistoryTable sessions={sessions} allowedDays={allowedDays} />
+                        <WorkHistoryTable sessions={sessions} allowedDays={allowedDays} companyId={companyId} />
                     )}
                 </>
             )}

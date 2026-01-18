@@ -14,5 +14,13 @@
   "description": "Description",
   "files": "Files",
   "noData": "No data to display.",
-  "allowed": "Excuse"
+  "allowed": "Excuse",
+  "actions": "Actions",
+  "editSession": "Edit",
+  "editWorkSession": "Edit Work Session",
+  "cancel": "Cancel",
+  "save": "Save",
+  "updateSuccess": "Work time successfully updated!",
+  "updateError": "An error occurred while updating the work time.",
+  "noChanges": "No changes were made."
 }

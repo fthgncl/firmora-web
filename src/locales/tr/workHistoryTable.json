@@ -14,5 +14,13 @@
   "description": "Açıklama",
   "files": "Dosyalar",
   "noData": "Gösterilecek veri bulunamadı.",
-  "allowed": "Mazeret"
+  "allowed": "Mazeret",
+  "actions": "İşlemler",
+  "editSession": "Düzenle",
+  "editWorkSession": "Çalışma Seansını Düzenle",
+  "cancel": "İptal",
+  "save": "Kaydet",
+  "updateSuccess": "Çalışma zamanı başarıyla güncellendi!",
+  "updateError": "Çalışma zamanı güncellenirken bir hata oluştu.",
+  "noChanges": "Herhangi bir değişiklik yapılmadı."
 }

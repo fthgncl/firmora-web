@@ -14,5 +14,13 @@
   "description": "Beschreibung",
   "files": "Dateien",
   "noData": "Keine Daten zum Anzeigen.",
-  "allowed": "Beschreibung"
+  "allowed": "Beschreibung",
+  "actions": "Aktionen",
+  "editSession": "Bearbeiten",
+  "editWorkSession": "Arbeitssitzung bearbeiten",
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "updateSuccess": "Arbeitszeit erfolgreich aktualisiert!",
+  "updateError": "Beim Aktualisieren der Arbeitszeit ist ein Fehler aufgetreten.",
+  "noChanges": "Es wurden keine Änderungen vorgenommen."
 }
