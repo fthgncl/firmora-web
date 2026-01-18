@@ -12,6 +12,7 @@ import {
     Chip,
     Stack,
     useTheme,
+    useMediaQuery,
     IconButton,
     Dialog,
     DialogTitle,
@@ -36,6 +37,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
     const theme = useTheme();
     const { t, i18n } = useTranslation(['workHistoryTable', 'common']);
     const { token, user } = useAuth();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editingSession, setEditingSession] = useState(null);
@@ -440,9 +442,10 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                     onClose={handleCloseDialog}
                     maxWidth="md"
                     fullWidth
+                    fullScreen={fullScreen}
                     PaperProps={{
                         sx: {
-                            borderRadius: 3,
+                            borderRadius: { xs: 0, sm: 3 },
                             boxShadow: theme.shadows[10]
                         }
                     }}
