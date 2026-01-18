@@ -19,10 +19,10 @@ import {
     DialogActions,
     Button,
     TextField,
-    Tabs,
-    Tab,
     Snackbar,
-    Alert
+    Alert,
+    Divider,
+    Grid
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -42,7 +42,6 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
     const [newEntryDateTime, setNewEntryDateTime] = useState('');
     const [newExitDateTime, setNewExitDateTime] = useState('');
     const [canEditWorkHours, setCanEditWorkHours] = useState(false);
-    const [activeTab, setActiveTab] = useState(0);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
     // Format time from ISO string
@@ -220,12 +219,6 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
         setEditingSession(null);
         setNewEntryDateTime('');
         setNewExitDateTime('');
-        setActiveTab(0);
-    };
-
-    // Handle tab change
-    const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
     };
 
     return (
@@ -442,24 +435,75 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                 )}
 
                 {/* Edit Dialog */}
-                <Dialog open={editDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-                    <DialogTitle>
-                        {t('workHistoryTable:editWorkSession')}
+                <Dialog
+                    open={editDialogOpen}
+                    onClose={handleCloseDialog}
+                    maxWidth="md"
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            borderRadius: 3,
+                            boxShadow: theme.shadows[10]
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{
+                        pb: 2,
+                        borderBottom: `1px solid ${theme.palette.divider}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                    }}>
+                        <EditIcon sx={{ color: theme.palette.primary.main }} />
+                        <Typography variant="h6" component="span" fontWeight={600}>
+                            {t('workHistoryTable:editWorkSession')}
+                        </Typography>
                     </DialogTitle>
-                    <DialogContent>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 1 }}>
-                            <Tabs value={activeTab} onChange={handleTabChange} aria-label="work time tabs">
-                                <Tab label={t('workHistoryTable:entryTime')} />
-                                {editingSession?.exitTime && (
-                                    <Tab label={t('workHistoryTable:exitTime')} />
-                                )}
-                            </Tabs>
-                        </Box>
-                        <Box sx={{ pt: 3 }}>
-                            {activeTab === 0 && (
+                    <DialogContent sx={{ pt: 3 }}>
+                        {/* Session Info Summary */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: 2,
+                                mb: 3,
+                                mt: 3,
+                                bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+                                borderRadius: 2,
+                                border: `1px solid ${theme.palette.divider}`
+                            }}
+                        >
+                            <Grid container spacing={2}>
+                                <Grid item xs={6}>
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                        {t('workHistoryTable:date')}
+                                    </Typography>
+                                    <Typography variant="body2" fontWeight={600}>
+                                        {formatDate(editingSession?.entryTime)}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                        {t('workHistoryTable:duration')}
+                                    </Typography>
+                                    <Typography variant="body2" fontWeight={600}>
+                                        {formatDuration(editingSession?.durationMinutes)}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </Paper>
+
+                        {/* Time Fields */}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                            <Box>
+                                <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                                    <Chip
+                                        label={t('workHistoryTable:entryTime')}
+                                        size="small"
+                                        color="success"
+                                        sx={{ fontWeight: 600 }}
+                                    />
+                                </Stack>
                                 <TextField
-                                    margin="dense"
-                                    label={t('workHistoryTable:entryTime')}
                                     type="datetime-local"
                                     fullWidth
                                     value={newEntryDateTime}
@@ -467,28 +511,109 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
-                                />
-                            )}
-                            {activeTab === 1 && editingSession?.exitTime && (
-                                <TextField
-                                    margin="dense"
-                                    label={t('workHistoryTable:exitTime')}
-                                    type="datetime-local"
-                                    fullWidth
-                                    value={newExitDateTime}
-                                    onChange={(e) => setNewExitDateTime(e.target.value)}
-                                    InputLabelProps={{
-                                        shrink: true,
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: 2,
+                                        }
                                     }}
                                 />
+                            </Box>
+
+                            {editingSession?.exitTime && (
+                                <>
+                                    <Divider />
+                                    <Box>
+                                        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                                            <Chip
+                                                label={t('workHistoryTable:exitTime')}
+                                                size="small"
+                                                color="error"
+                                                sx={{ fontWeight: 600 }}
+                                            />
+                                        </Stack>
+                                        <TextField
+                                            type="datetime-local"
+                                            fullWidth
+                                            value={newExitDateTime}
+                                            onChange={(e) => setNewExitDateTime(e.target.value)}
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            sx={{
+                                                '& .MuiOutlinedInput-root': {
+                                                    borderRadius: 2,
+                                                }
+                                            }}
+                                        />
+                                    </Box>
+                                </>
                             )}
                         </Box>
+
+                        {/* Notes Section */}
+                        {(editingSession?.entryNote || editingSession?.exitNote) && (
+                            <Box sx={{ mt: 3 }}>
+                                <Divider sx={{ mb: 2 }} />
+                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                                    {t('workHistoryTable:notes')}
+                                </Typography>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    {editingSession?.entryNote && (
+                                        <Box sx={{
+                                            p: 1.5,
+                                            bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+                                            borderRadius: 1,
+                                            borderLeft: `3px solid ${theme.palette.success.main}`
+                                        }}>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {t('workHistoryTable:entryNote')}:
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                {editingSession.entryNote}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    {editingSession?.exitNote && (
+                                        <Box sx={{
+                                            p: 1.5,
+                                            bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+                                            borderRadius: 1,
+                                            borderLeft: `3px solid ${theme.palette.error.main}`
+                                        }}>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {t('workHistoryTable:exitNote')}:
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                {editingSession.exitNote}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Box>
+                        )}
                     </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleCloseDialog}>
+                    <DialogActions sx={{
+                        px: 3,
+                        py: 2,
+                        borderTop: `1px solid ${theme.palette.divider}`,
+                        gap: 1
+                    }}>
+                        <Button
+                            onClick={handleCloseDialog}
+                            variant="outlined"
+                            sx={{ borderRadius: 2 }}
+                        >
                             {t('workHistoryTable:cancel')}
                         </Button>
-                        <Button onClick={handleUpdateWorkStatus} variant="contained" color="primary">
+                        <Button
+                            onClick={handleUpdateWorkStatus}
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                                borderRadius: 2,
+                                px: 3
+                            }}
+                        >
                             {t('workHistoryTable:save')}
                         </Button>
                     </DialogActions>

@@ -22,5 +22,6 @@
   "save": "Speichern",
   "updateSuccess": "Arbeitszeit erfolgreich aktualisiert!",
   "updateError": "Beim Aktualisieren der Arbeitszeit ist ein Fehler aufgetreten.",
-  "noChanges": "Es wurden keine Änderungen vorgenommen."
+  "noChanges": "Es wurden keine Änderungen vorgenommen.",
+  "notes": "Notizen"
 }

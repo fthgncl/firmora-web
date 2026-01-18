@@ -22,5 +22,6 @@
   "save": "Kaydet",
   "updateSuccess": "Çalışma zamanı başarıyla güncellendi!",
   "updateError": "Çalışma zamanı güncellenirken bir hata oluştu.",
-  "noChanges": "Herhangi bir değişiklik yapılmadı."
+  "noChanges": "Herhangi bir değişiklik yapılmadı.",
+  "notes": "Notlar"
 }

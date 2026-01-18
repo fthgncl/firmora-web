@@ -22,5 +22,6 @@
   "save": "Save",
   "updateSuccess": "Work time successfully updated!",
   "updateError": "An error occurred while updating the work time.",
-  "noChanges": "No changes were made."
+  "noChanges": "No changes were made.",
+  "notes": "Notes"
 }
