@@ -32,9 +32,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { permissionsService } from '../services/permissionsService';
 import axios from 'axios';
 
-export default function WorkHistoryTable({ sessions, allowedDays, companyId }) {
+export default function WorkHistoryTable({ sessions, allowedDays, companyId, onSessionUpdate }) {
     const theme = useTheme();
-    const { t, i18n } = useTranslation(['workHistoryTable']);
+    const { t, i18n } = useTranslation(['workHistoryTable', 'common']);
     const { token, user } = useAuth();
 
     const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -189,9 +189,11 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId }) {
                 setEditingSession(null);
                 setNewEntryDateTime('');
                 setNewExitDateTime('');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
+
+                // Call the parent component's update function if provided
+                if (onSessionUpdate) {
+                    onSessionUpdate();
+                }
             }
         } catch (error) {
             console.error('Error updating work status:', error);
