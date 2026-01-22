@@ -46,6 +46,16 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
     const [canEditWorkHours, setCanEditWorkHours] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
+    // Sort sessions by date (newest to oldest)
+    const sortedSessions = sessions ? [...sessions].sort((a, b) =>
+        new Date(b.entryTime) - new Date(a.entryTime)
+    ) : [];
+
+    // Sort allowed days by date (newest to oldest)
+    const sortedAllowedDays = allowedDays ? [...allowedDays].sort((a, b) =>
+        new Date(b.start_date) - new Date(a.start_date)
+    ) : [];
+
     // Format time from ISO string
     const formatTime = (isoString) => {
         if (!isoString) return '-';
@@ -236,7 +246,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                 }}
             >
                 {/* Work Sessions Table */}
-                {sessions && sessions.length > 0 && (
+                {sortedSessions && sortedSessions.length > 0 && (
                     <Box sx={{ mb: 4 }}>
                         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                             <AccessTimeIcon sx={{ fontSize: 28, color: theme.palette.primary.main }} />
@@ -244,7 +254,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                                 {t('workHistoryTable:workSessions')}
                             </Typography>
                             <Chip
-                                label={`${sessions.length} ${t('workTimelineChart:completedSessions')}`}
+                                label={`${sortedSessions.length} ${t('workTimelineChart:completedSessions')}`}
                                 size="small"
                                 color="primary"
                                 variant="outlined"
@@ -267,7 +277,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {sessions.map((session, index) => (
+                                    {sortedSessions.map((session, index) => (
                                         <TableRow
                                             key={index}
                                             sx={{
@@ -340,7 +350,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                 )}
 
                 {/* Allowed Days Table */}
-                {allowedDays && allowedDays.length > 0 && (
+                {sortedAllowedDays && sortedAllowedDays.length > 0 && (
                     <Box>
                         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
                             <EventAvailableIcon sx={{ fontSize: 28, color: theme.palette.error.main }} />
@@ -348,7 +358,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                                 {t('workHistoryTable:allowedDays')}
                             </Typography>
                             <Chip
-                                label={`${allowedDays.length} ${t('workHistoryTable:allowed')}`}
+                                label={`${sortedAllowedDays.length} ${t('workHistoryTable:allowed')}`}
                                 size="small"
                                 color="error"
                                 variant="outlined"
@@ -367,7 +377,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {allowedDays.map((allowedDay, index) => {
+                                    {sortedAllowedDays.map((allowedDay, index) => {
                                         const startDate = new Date(allowedDay.start_date);
                                         const endDate = new Date(allowedDay.end_date);
                                         const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
@@ -428,7 +438,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                 )}
 
                 {/* Empty State */}
-                {(!sessions || sessions.length === 0) && (!allowedDays || allowedDays.length === 0) && (
+                {(!sortedSessions || sortedSessions.length === 0) && (!sortedAllowedDays || sortedAllowedDays.length === 0) && (
                     <Box sx={{ textAlign: 'center', py: 8 }}>
                         <Typography variant="body1" color="text.secondary">
                             {t('workHistoryTable:noData')}
