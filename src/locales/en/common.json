@@ -71,5 +71,10 @@
   "secondShort": "s",
   "unexpectedError": "An unexpected error occurred.",
   "time": "Time",
-  "files": "Files"
+  "files": "Files",
+  "googleBackupBanner": {
+    "title": "Google Backup Disabled",
+    "description": "Enable Google Drive backup to secure your data automatically.",
+    "buttonText": "Enable Backup"
+  }
 }

@@ -72,5 +72,10 @@
   "secondShort": "sn",
   "unexpectedError": "Beklenmeyen bir hata oluştu.",
   "time": "Zaman",
-  "files": "Dosya"
+  "files": "Dosya",
+  "googleBackupBanner": {
+    "title": "Google Yedekleme Devre Dışı",
+    "description": "Verilerinizi otomatik olarak güvence altına almak için Google Drive yedeklemesini etkinleştirin.",
+    "buttonText": "Yedeklemeyi Etkinleştir"
+  }
 }
