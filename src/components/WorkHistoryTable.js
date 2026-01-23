@@ -26,6 +26,7 @@ import {
     Grid
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EditIcon from '@mui/icons-material/Edit';
@@ -38,6 +39,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
     const { t, i18n } = useTranslation(['workHistoryTable', 'common']);
     const { token, user } = useAuth();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const navigate = useNavigate();
 
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editingSession, setEditingSession] = useState(null);
@@ -471,6 +473,8 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                                                             size="small"
                                                             color="info"
                                                             variant="outlined"
+                                                            onClick={() => navigate(`/allowed-day/${allowedDay.id}`)}
+                                                            sx={{ cursor: 'pointer' }}
                                                         />
                                                     ) : (
                                                         '-'
