@@ -23,5 +23,7 @@
   "updateSuccess": "Work time successfully updated!",
   "updateError": "An error occurred while updating the work time.",
   "noChanges": "No changes were made.",
-  "notes": "Notes"
+  "notes": "Notes",
+  "fetchError": "An error occurred while loading note information.",
+  "noNotes": "No notes found"
 }

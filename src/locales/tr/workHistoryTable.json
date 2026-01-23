@@ -23,5 +23,7 @@
   "updateSuccess": "Çalışma zamanı başarıyla güncellendi!",
   "updateError": "Çalışma zamanı güncellenirken bir hata oluştu.",
   "noChanges": "Herhangi bir değişiklik yapılmadı.",
-  "notes": "Notlar"
+  "notes": "Notlar",
+  "fetchError": "Not bilgileri yüklenirken bir hata oluştu.",
+  "noNotes": "Not bulunamadı"
 }

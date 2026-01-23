@@ -23,5 +23,7 @@
   "updateSuccess": "Arbeitszeit erfolgreich aktualisiert!",
   "updateError": "Beim Aktualisieren der Arbeitszeit ist ein Fehler aufgetreten.",
   "noChanges": "Es wurden keine Änderungen vorgenommen.",
-  "notes": "Notizen"
+  "notes": "Notizen",
+  "fetchError": "Beim Laden der Notizinformationen ist ein Fehler aufgetreten.",
+  "noNotes": "Keine Notizen gefunden"
 }

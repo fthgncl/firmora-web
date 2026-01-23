@@ -45,6 +45,8 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
     const [newExitDateTime, setNewExitDateTime] = useState('');
     const [canEditWorkHours, setCanEditWorkHours] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+    const [entryExitData, setEntryExitData] = useState(null);
+    const [loadingNotes, setLoadingNotes] = useState(false);
 
     // Sort sessions by date (newest to oldest)
     const sortedSessions = sessions ? [...sessions].sort((a, b) =>
@@ -123,6 +125,46 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
         return `${year}-${month}-${day}T${hours}:${minutes}`;
     };
 
+    // Fetch entry and exit data from API
+    const fetchEntryExitData = async (entryId, exitId) => {
+        setLoadingNotes(true);
+        try {
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/work-status/get-user-entry-and-exit`,
+                {
+                    entryId: entryId,
+                    exitId: exitId
+                },
+                {
+                    headers: {
+                        'x-access-token': token
+                    }
+                }
+            );
+
+            if (response.data.status === 'success') {
+                setEntryExitData(response.data.data);
+
+                // Update datetime fields with fresh data from API
+                if (response.data.data.entry?.created_at) {
+                    setNewEntryDateTime(formatDateTimeLocal(response.data.data.entry.created_at));
+                }
+                if (response.data.data.exit?.created_at) {
+                    setNewExitDateTime(formatDateTimeLocal(response.data.data.exit.created_at));
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching entry and exit data:', error);
+            setSnackbar({
+                open: true,
+                message: error.response?.data?.message || t('workHistoryTable:fetchError'),
+                severity: 'error'
+            });
+        } finally {
+            setLoadingNotes(false);
+        }
+    };
+
     // Open edit dialog
     const handleEditClick = (session) => {
         if (!canEditWorkHours) {
@@ -133,6 +175,11 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
         setNewEntryDateTime(formatDateTimeLocal(session.entryTime));
         setNewExitDateTime(formatDateTimeLocal(session.exitTime));
         setEditDialogOpen(true);
+
+        // Fetch fresh entry and exit data
+        if (session.entryId && session.exitId) {
+            fetchEntryExitData(session.entryId, session.exitId);
+        }
     };
 
     // Handle update request
@@ -231,6 +278,7 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
         setEditingSession(null);
         setNewEntryDateTime('');
         setNewExitDateTime('');
+        setEntryExitData(null);
     };
 
     return (
@@ -564,14 +612,20 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                         </Box>
 
                         {/* Notes Section */}
-                        {(editingSession?.entryNote || editingSession?.exitNote) && (
-                            <Box sx={{ mt: 3 }}>
-                                <Divider sx={{ mb: 2 }} />
-                                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
-                                    {t('workHistoryTable:notes')}
-                                </Typography>
+                        <Box sx={{ mt: 3 }}>
+                            <Divider sx={{ mb: 2 }} />
+                            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                                {t('workHistoryTable:notes')}
+                            </Typography>
+                            {loadingNotes ? (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {t('common:loading')}...
+                                    </Typography>
+                                </Box>
+                            ) : (entryExitData?.entry?.note || entryExitData?.exit?.note) ? (
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                    {editingSession?.entryNote && (
+                                    {entryExitData?.entry?.note && (
                                         <Box sx={{
                                             p: 1.5,
                                             bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
@@ -582,11 +636,11 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                                                 {t('workHistoryTable:entryNote')}:
                                             </Typography>
                                             <Typography variant="body2">
-                                                {editingSession.entryNote}
+                                                {entryExitData.entry.note}
                                             </Typography>
                                         </Box>
                                     )}
-                                    {editingSession?.exitNote && (
+                                    {entryExitData?.exit?.note && (
                                         <Box sx={{
                                             p: 1.5,
                                             bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
@@ -597,13 +651,24 @@ export default function WorkHistoryTable({ sessions, allowedDays, companyId, onS
                                                 {t('workHistoryTable:exitNote')}:
                                             </Typography>
                                             <Typography variant="body2">
-                                                {editingSession.exitNote}
+                                                {entryExitData.exit.note}
                                             </Typography>
                                         </Box>
                                     )}
                                 </Box>
-                            </Box>
-                        )}
+                            ) : (
+                                <Box sx={{
+                                    p: 2,
+                                    textAlign: 'center',
+                                    bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+                                    borderRadius: 1
+                                }}>
+                                    <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                                        {t('workHistoryTable:noNotes')}
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
                     </DialogContent>
                     <DialogActions sx={{
                         px: 3,
