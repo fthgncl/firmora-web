@@ -75,6 +75,8 @@
   "googleBackupBanner": {
     "title": "Google Backup Disabled",
     "description": "Enable Google Drive backup to secure your data automatically.",
-    "buttonText": "Enable Backup"
+    "buttonText": "Enable Backup",
+    "lastSuccessfulBackup": "Last Successful Backup",
+    "lastFailedBackup": "Last Failed Backup"
   }
 }

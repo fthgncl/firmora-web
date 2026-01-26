@@ -76,6 +76,8 @@
   "googleBackupBanner": {
     "title": "Google Yedekleme Devre Dışı",
     "description": "Verilerinizi otomatik olarak güvence altına almak için Google Drive yedeklemesini etkinleştirin.",
-    "buttonText": "Yedeklemeyi Etkinleştir"
+    "buttonText": "Yedeklemeyi Etkinleştir",
+    "lastSuccessfulBackup": "Son Başarılı Yedekleme",
+    "lastFailedBackup": "Son Başarısız Yedekleme"
   }
 }

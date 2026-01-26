@@ -75,6 +75,8 @@
   "googleBackupBanner": {
     "title": "Google-Sicherung deaktiviert",
     "description": "Aktivieren Sie die Google Drive-Sicherung, um Ihre Daten automatisch zu sichern.",
-    "buttonText": "Sicherung aktivieren"
+    "buttonText": "Sicherung aktivieren",
+    "lastSuccessfulBackup": "Letzte erfolgreiche Sicherung",
+    "lastFailedBackup": "Letzte fehlgeschlagene Sicherung"
   }
 }
