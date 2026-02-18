@@ -349,32 +349,33 @@ const AccountList = forwardRef((props, ref) => {
                                 </Stack>
                             </Box>
 
-                            {/* Meta satırı - sadece yetki varsa göster */}
+                            {/* Meta satırı */}
+                            <Box
+                                sx={{
+                                    mt: 2,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                {(accountPermissions[account.id]?.canAddIncome || accountPermissions[account.id]?.canTransfer) ? (
+                                    <Chip
+                                        label={account.currency}
+                                        size="small"
+                                        color="primary"
+                                        sx={{fontWeight: 600}}
+                                    />
+                                ) : <Box />}
+
+                                <WorkStatusDisplay
+                                    userId={user.id}
+                                    companyId={account.company?.id}
+                                    isWorking={account.is_working}
+                                />
+                            </Box>
+
                             {(accountPermissions[account.id]?.canAddIncome || accountPermissions[account.id]?.canTransfer) && (
-                                <>
-                                    <Box
-                                        sx={{
-                                            mt: 2,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                        }}
-                                    >
-                                        <Chip
-                                            label={account.currency}
-                                            size="small"
-                                            color="primary"
-                                            sx={{fontWeight: 600}}
-                                        />
-
-                                        <WorkStatusDisplay
-                                            userId={user.id}
-                                            companyId={account.company?.id}
-                                            isWorking={account.is_working}
-                                        />
-                                    </Box>
-
-                                    {/* Bakiye */}
+                                    /* Bakiye */
                                     <Box sx={{mt: 1.5}}>
                                         <Typography
                                             variant="body2"
@@ -390,7 +391,6 @@ const AccountList = forwardRef((props, ref) => {
                                             {formatBalance(account.balance, account.currency)}
                                         </Typography>
                                     </Box>
-                                </>
                             )}
 
                             <Divider sx={{my: 2}}/>
