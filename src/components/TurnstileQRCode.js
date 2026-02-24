@@ -36,7 +36,7 @@ function TurnstileQR({turnstileToken, handleUpdateQr , ...props}) {
         return () => clearInterval(interval);
 
         // eslint-disable-next-line
-    }, [turnstileToken, showAlert]);
+    }, [turnstileToken]);
 
     // QR render et
     useEffect(() => {
