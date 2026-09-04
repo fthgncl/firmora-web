@@ -32,22 +32,42 @@ export const AuthProvider = ({children}) => {
 
     };
 
+    // setTimeout 32 bitlik bir gecikme değeri aldığı için bu süreden uzun beklemeler taşar
+    const MAX_TIMEOUT_DELAY = 2147483647; // ~24.8 gün
+
+    // Token'ın geçerlilik süresi dolduğunda otomatik çıkış yapacak zamanlayıcıyı kurar
+    const scheduleLogout = (expiresAt) => {
+        clearLogoutTimer();
+
+        const remainingTime = expiresAt - Date.now();
+
+        // Uzun süreler tek seferde kurulamadığı için parçalara bölünerek zamanlanır
+        if (remainingTime > MAX_TIMEOUT_DELAY) {
+            logoutTimerRef.current = setTimeout(() => scheduleLogout(expiresAt), MAX_TIMEOUT_DELAY);
+            return;
+        }
+
+        logoutTimerRef.current = setTimeout(logout, Math.max(remainingTime, 0));
+    };
+
     // Token'ı decode edip süre kontrolü yapan yardımcı fonksiyon
     const validateAndDecodeToken = (tokenToValidate) => {
         try {
 
-            clearLogoutTimer();
-
-            // Yeni timeout oluştur ve referansa kaydet
             const decodedToken = jwtDecode(tokenToValidate);
-            logoutTimerRef.current = setTimeout(logout, (decodedToken.exp * 1000) - Date.now());
 
             // Token süresini kontrol et
-            const currentTime = Date.now() / 1000; // Unix timestamp (saniye)
-            if (decodedToken.exp && decodedToken.exp < currentTime) {
+            if (decodedToken.exp && decodedToken.exp * 1000 <= Date.now()) {
                 console.warn(t('auth:errors.tokenExpired'));
                 logout();
                 return null;
+            }
+
+            clearLogoutTimer();
+
+            // Süresi olmayan token'lar için otomatik çıkış zamanlanmaz
+            if (decodedToken.exp) {
+                scheduleLogout(decodedToken.exp * 1000);
             }
 
             return decodedToken;
